@@ -229,17 +229,17 @@ def createDatabase():
     con.commit()
     con.close()
 
-def main():
-    # Initialize database
-    createDatabase()
-    con = aConn()
-    cur = con.cursor()
-    cur.execute("DELETE FROM reports")
-    #cur.execute("DELETE FROM prices")
-    cur.execute("DELETE FROM transactions")
-    con.commit()
-    con.close()
-
-
-if __name__ == "__main__":
-	main()
+# def main():
+#     # Initialize database
+#     createDatabase()
+#     con = aConn()
+#     cur = con.cursor()
+#     cur.execute("DELETE FROM reports")
+#     #cur.execute("DELETE FROM prices")
+#     cur.execute("DELETE FROM transactions")
+#     con.commit()
+#     con.close()
+#
+#
+# if __name__ == "__main__":
+# 	main()
