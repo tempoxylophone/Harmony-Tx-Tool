@@ -1,7 +1,6 @@
 from typing import Tuple
 import transactions
 import taxmap
-import settings
 import datetime
 import argparse
 import logging
@@ -10,6 +9,7 @@ from generate import get_csv
 
 HARMONY_LAUNCH_DATE_STR = "2019-05-01"
 TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
+TX_PAGE_SIZE = 1_000
 
 
 def main() -> Tuple[str, str, str]:
@@ -26,7 +26,6 @@ def main() -> Tuple[str, str, str]:
     costBasis = args.costbasis or 'fifo'
 
     # defaults
-    page_size = settings.TX_PAGE_SIZE
     moreOptions = {
         'purchaseAddresses': []
     }
@@ -40,7 +39,7 @@ def main() -> Tuple[str, str, str]:
 
     # With transaction list, we now generate the events and tax map
     reportData = taxmap.buildTaxMap(
-        transactions.get_harmony_tx_list(args.wallet, page_size),
+        transactions.get_harmony_tx_list(args.wallet, TX_PAGE_SIZE),
         report_wallet_address_eth,
         datetime.datetime.strptime(HARMONY_LAUNCH_DATE_STR, '%Y-%m-%d').date(),
         datetime.datetime.strptime(TODAY_DATE_STR, '%Y-%m-%d').date(),

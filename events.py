@@ -7,11 +7,8 @@ import contracts
 import constants
 import records
 import prices
-import db
-import settings
 import datetime
 import decimal
-import jsonpickle
 import logging
 
 
@@ -191,9 +188,6 @@ def checkTransactions(txs, account, startDate, endDate, network, alreadyComplete
                     results.fiatFeeValue = feeValue
                     events_map['swaps'].append(results)
                     eventsFound = True
-                    # if settings.USE_CACHE:
-                    #     db.saveTransaction(tx, timestamp, 'swaps', jsonpickle.encode(results), account, network, txFee,
-                    #                        feeValue)
                 else:
                     logging.error('Error: Failed to parse a vendor result. {0}'.format(receipt['logs'][0]['address']))
             elif 'Summoning' in action:
@@ -264,16 +258,6 @@ def checkTransactions(txs, account, startDate, endDate, network, alreadyComplete
                             results[1].seller = costList
                             events = [petEggs[results[0]][2], results[1]]
                             events_map['tavern'] += events
-                            if settings.USE_CACHE and db.findTransaction(petEggs[results[0]][0], account) == None:
-                                db.saveTransaction(petEggs[results[0]][0], petEggs[results[0]][1], 'tavern',
-                                                   jsonpickle.encode(events), account, network, txFee, feeValue)
-                            else:
-                                logging.info('tried to save egg record that already existed {0}'.format(tx))
-                            if settings.USE_CACHE and db.findTransaction(tx, account) == None:
-                                db.saveTransaction(tx, timestamp, 'nonep', '', account, network, petEggs[results[0]][4],
-                                                   petEggs[results[0]][5])
-                            else:
-                                logging.info('tried to save none egg when record already existed {0}'.format(tx))
                         else:
                             # on rare occassion the crystal open even might get parsed before the summon crystal
                             logging.info('store crack')

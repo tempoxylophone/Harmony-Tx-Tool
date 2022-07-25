@@ -163,29 +163,6 @@ def get_csv(records, format: str=KOINLY_UNIVERSAL_FORMAT) -> str:
 
     for record in eventRecords['wallet']:
         response += record.to_csv_row()
-        # blockDateStr = parse_utc_ts(record.timestamp)
-        # txFee = ''
-        # txFeeCurrency = ''
-        # if hasattr(record, 'fiatFeeValue'):
-        #     txFee = record.fiatFeeValue
-        #     txFeeCurrency = 'USD'
-        #
-        # if record.action == 'deposit':
-        #     sentAmount = ''
-        #     sentType = ''
-        #     rcvdAmount = record.coinAmount
-        #     rcvdType = contracts.getAddressName(record.coinType)
-        # else:
-        #     sentAmount = record.coinAmount
-        #     sentType = contracts.getAddressName(record.coinType)
-        #     rcvdAmount = ''
-        #     rcvdType = ''
-        #
-        # response += ','.join(
-        #     (blockDateStr, str(sentAmount), sentType, str(rcvdAmount), rcvdType, str(txFee),
-        #                       txFeeCurrency, str(record.fiatValue), record.fiatType, '', 'wallet transfer',
-        #                       record.txHash, '\n')
-        # )
 
     if 'lending' in eventRecords:
         for record in eventRecords['lending']:

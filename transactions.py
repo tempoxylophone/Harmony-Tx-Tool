@@ -2,10 +2,9 @@
 from typing import List
 from pyhmy import account
 import nets
-import settings
 
 
-def get_harmony_tx_hashes(address, page_size=settings.TX_PAGE_SIZE) -> List[str]:
+def get_harmony_tx_list(address: str, page_size: int) -> List[str]:
     offset = 0
     txs = []
     has_more = True
@@ -23,10 +22,6 @@ def get_harmony_tx_hashes(address, page_size=settings.TX_PAGE_SIZE) -> List[str]
 
     # de-dupe tx hashes in order
     return list(dict.fromkeys(txs))
-
-
-def get_harmony_tx_list(address, page_size) -> List[str]:
-    return get_harmony_tx_hashes(address, page_size)
 
 
 def get_num_tx_for_wallet(address: str):

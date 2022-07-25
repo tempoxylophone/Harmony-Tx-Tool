@@ -40,7 +40,7 @@ class HarmonyEVMSmartContract:
         self.has_code = not self._is_missing(self.code)
         self.abi = self.has_code and self.code['abi'] or getABI(self.POSSIBLE_ABIS[0])
         self.abi_attempt_idx = 1
-        self.contract = HarmonyEVMSmartContract.w3.eth.contract(self.address, abi=self.abi)
+        self.contract = HarmonyEVMSmartContract.w3.eth.contract(self.address, abi=self.abi) # noqa
 
     def decode_input(self, tx_input: hex) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
         if self.abi_attempt_idx > len(self.POSSIBLE_ABIS) - 1:

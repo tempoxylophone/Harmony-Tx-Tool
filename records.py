@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime
-from typing import Dict, List
+from typing import List
 from web3 import Web3
 from web3.logs import DISCARD
 
