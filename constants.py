@@ -7,7 +7,6 @@ EGG_TYPES = {
     4: '0x9edb3Da18be4B03857f3d39F83e5C6AAD67bc148'
 }
 
-
 TOKEN_MAP = {
     '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a': 'harmony',
     '0x72Cb10C6bfA5624dD07Ef608027E366bd690048F': 'defi-kingdoms',
@@ -46,3 +45,5 @@ DECIMAL_UNITS = {
     27: 'gether',
     30: 'tether',
 }
+
+KOINLY_UNIVERSAL_FORMAT = 'koinlyuniversal'
