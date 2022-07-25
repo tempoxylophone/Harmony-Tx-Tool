@@ -6,12 +6,13 @@ from datetime import timezone, datetime
 import contracts
 import csvFormats
 from constants import KOINLY_UNIVERSAL_FORMAT
+from koinly_interpreter import KoinlyInterpreter
 
 
 def get_csv(records, format: str=KOINLY_UNIVERSAL_FORMAT) -> str:
     taxRecords = records['taxes']
     eventRecords = records['events']
-    response = csvFormats.getHeaderRow(format)
+    response = KoinlyInterpreter.get_csv_row_header()
 
     for record in eventRecords['tavern']:
         blockDateStr = parse_utc_ts(record.timestamp)

@@ -76,7 +76,9 @@ class HarmonyEVMTransaction:
         decode_successful, function_info = self.tx_payload
         if decode_successful:
             f, _ = function_info
-            return str(f)[1:-1]
+
+            # escape and strip class name in python to string
+            return "\"{0}\"".format(str(f)[1:-1].split(" ")[1])
         else:
             return ""
 
