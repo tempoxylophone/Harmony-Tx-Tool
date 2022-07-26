@@ -21,6 +21,7 @@ class KoinlyInterpreter:
         'From',
         '\n',
     ]
+    KOINLY_USE_ONE_ADDRESS_FORMAT = True
 
 
     @staticmethod

@@ -49,8 +49,18 @@ class HarmonyAddress:
             pyharmony.bech32.convertbits(p, 8, 5)
         )
 
-    def get_address_str(self, address_format: str = 'one') -> str:
+    def get_address_str(self, address_format: str) -> str:
         return self.addresses[address_format]
+
+    def get_eth_address(self) -> str:
+        return self.get_address_str(self.FORMAT_ETH)
+
+    def get_one_address(self) -> str:
+        return self.get_address_str(self.FORMAT_ONE)
+
+    def __str__(self) -> str:
+        # default to eth address format
+        return self.get_eth_address()
 
 
 class HarmonyEVMTransaction:
@@ -58,14 +68,13 @@ class HarmonyEVMTransaction:
 
     def __init__(self, account: str, tx_hash: hex):
         # identifiers
-        self.tx_hash = tx_hash
         self.txHash = tx_hash
-        self.account = account
+        self.account = HarmonyAddress(account)
 
         # get transaction data
         self.result = HarmonyEVMTransaction.w3.eth.get_transaction(tx_hash)
-        self.to_addr = self.result['to']
-        self.from_addr = self.result['from']
+        self.to_addr = HarmonyAddress(self.result['to'])
+        self.from_addr = HarmonyAddress(self.result['from'])
 
         # temporal data
         self.block = self.result['blockNumber']
@@ -132,39 +141,38 @@ class walletActivity(HarmonyEVMTransaction):
 
     @classmethod
     def extract_all_wallet_activity_from_transaction(cls, wallet_address: str, tx_hash: hex) -> List[walletActivity]:
-        base_tx_obj = r = walletActivity(wallet_address, tx_hash)
-        token_tx_objs = walletActivity.get_token_activity_from_wallet_activity(r)
+        base_tx_obj = walletActivity(wallet_address, tx_hash)
+        token_tx_objs = walletActivity.get_token_activity_from_wallet_activity(base_tx_obj)
         return [base_tx_obj, *token_tx_objs]
 
     def __init__(self, wallet_address: str, tx_hash: hex, coin_type: str = ""):
         # get information about this tx
         super().__init__(wallet_address, tx_hash)
 
-        if self.result['from'] in contracts.payment_wallets:
-            depositEvent = 'payment'
-        else:
-            depositEvent = 'deposit'
-
-        if self.result['to'] is not None and 'Donation' in contracts.getAddressName(self.result['to']):
-            withdrawalEvent = 'donation'
-        else:
-            withdrawalEvent = 'withdraw'
-
-        self.depositEvent = depositEvent
-        self.withdrawalEvent = withdrawalEvent
+        self.depositEvent = 'payment' if self.is_payment() else 'deposit'
+        self.withdrawalEvent = 'donation' if self.is_donation() else 'withdraw'
 
         # assume it is ONE unless otherwise specified
         self.coinType = coin_type or contracts.getNativeToken("")
 
-        if self.result['to'] == self.account and self.value > 0:
-            self.action = depositEvent
-            self.address = self.result['from']
+        if self.result['to'] == self.account.get_eth_address() and self.value > 0:
+            self.action = self.depositEvent
+            self.address = HarmonyAddress(self.result['from'])
 
-        if self.result['from'] == self.account and self.value > 0:
-            self.action = withdrawalEvent
-            self.address = self.result['to']
+        if self.result['from'] == self.account.get_eth_address() and self.value > 0:
+            self.action = self.withdrawalEvent
+            self.address = HarmonyAddress(self.result['to'])
 
-    def to_csv_row(self, address_format: str = 'one') -> str:
+    def is_payment(self) -> bool:
+        return self.result['from'] in contracts.payment_wallets
+
+    def is_donation(self) -> bool:
+        return (
+                self.result['to'] is not None and
+                'Donation' in contracts.getAddressName(self.result['to'])
+        )
+
+    def to_csv_row(self, use_one_address: bool) -> str:
         if self.action == 'deposit':
             sentAmount = ''
             sentType = ''
@@ -176,6 +184,7 @@ class walletActivity(HarmonyEVMTransaction):
             rcvdAmount = ''
             rcvdType = ''
 
+        address_format = use_one_address and HarmonyAddress.FORMAT_ONE or HarmonyAddress.FORMAT_ETH
         return ','.join(
             (
                 # time of transaction
@@ -205,8 +214,10 @@ class walletActivity(HarmonyEVMTransaction):
                 self.txHash,
                 self.tx_payload_to_string(),
 
-                self.to_addr,
-                self.from_addr,
+                # transfer information
+                self.to_addr.get_address_str(address_format),
+                self.from_addr.get_address_str(address_format),
+
                 '\n'
             )
         )
@@ -215,8 +226,8 @@ class walletActivity(HarmonyEVMTransaction):
     def get_token_activity_from_wallet_activity(wallet_activity_instance: walletActivity) -> List[walletActivity]:
         return walletActivity._extractTokenResults(
             walletActivity.w3,
-            wallet_activity_instance.tx_hash,
-            wallet_activity_instance.account,
+            wallet_activity_instance.txHash,
+            wallet_activity_instance.account.get_eth_address(),
             wallet_activity_instance.receipt,
             wallet_activity_instance.depositEvent,
             wallet_activity_instance.withdrawalEvent
@@ -242,8 +253,11 @@ class walletActivity(HarmonyEVMTransaction):
             else:
                 continue
 
-            tokenValue = contracts.valueFromWei(log['args']['value'], log['address'])
-            r = walletActivity(account, txn, log['address'])
+            non_native_token_address = log['address']
+            non_native_token_amount = log['args']['value']
+            tokenValue = contracts.valueFromWei(non_native_token_amount, non_native_token_address)
+
+            r = walletActivity(account, txn, non_native_token_address)
             r.action = event
             r.address = otherAddress
             r.value = tokenValue

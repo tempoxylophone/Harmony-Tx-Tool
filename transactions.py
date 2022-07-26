@@ -24,5 +24,5 @@ def get_harmony_tx_list(address: str, page_size: int) -> List[str]:
     return list(dict.fromkeys(txs))
 
 
-def get_num_tx_for_wallet(address: str):
-    return pyharmony.account.get_transaction_count(address, endpoint=nets.hmy_main)
+def get_num_tx_for_wallet(address: str) -> int:
+    return pyharmony.account.get_transaction_count(address, 'latest', endpoint=nets.hmy_main)

@@ -162,7 +162,7 @@ def get_csv(records, format: str=KOINLY_UNIVERSAL_FORMAT) -> str:
                               str(record.fiatValue), record.fiatType, 'reward', 'quest', record.txHash, '\n'))
 
     for record in eventRecords['wallet']:
-        response += record.to_csv_row()
+        response += record.to_csv_row(KoinlyInterpreter.KOINLY_USE_ONE_ADDRESS_FORMAT)
 
     if 'lending' in eventRecords:
         for record in eventRecords['lending']:
