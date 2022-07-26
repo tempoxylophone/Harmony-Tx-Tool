@@ -1,7 +1,7 @@
 from __future__ import annotations
 import datetime
 from decimal import Decimal
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional, Union, Tuple
 from web3 import Web3
 from web3.logs import DISCARD
 from pyharmony import pyharmony
@@ -40,7 +40,7 @@ class HarmonyAddress:
             raise ValueError("Bad address! Got: {0}".format(address))
 
         # add to directory
-        self._ADDRESS_DIRECTORY[self.get_eth_address()] = self
+        HarmonyAddress._ADDRESS_DIRECTORY[self.eth] = self
 
     def get_address_str(self, address_format: str) -> str:
         return self.addresses[address_format]
@@ -78,7 +78,7 @@ class HarmonyAddress:
         eth_address = cls.address_str_is_eth(address_str) and address_str or convert_one_to_hex(address_str)
 
         # eth address is always the key
-        return cls._ADDRESS_DIRECTORY.get(eth_address, HarmonyAddress(eth_address))
+        return HarmonyAddress._ADDRESS_DIRECTORY.get(eth_address) or HarmonyAddress(eth_address)
 
     @classmethod
     def get_harmony_address(cls, address_object: Union[str, HarmonyAddress]) -> HarmonyAddress:
@@ -115,16 +115,40 @@ class HarmonyToken:
         '0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f',
         '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664'
     }
+    _ERC20_ABI = contracts.getABI('ERC20')
 
-    def __init__(self, address: Union[str, HarmonyAddress], name: Optional[str] = None):
+    def __init__(self, address: Union[str, HarmonyAddress], merge_one_wone_names: Optional[bool] = True):
         self.address = HarmonyAddress.get_harmony_address(address)
+        self.symbol = "?"
+        self.decimals = 18
+        self.name = "?"
 
+        symbol, decimals, name = self.get_token_info()
         self.name = name or contracts.getAddressName(self.address.eth)
-        self.ticker = "?"
+        self.symbol = symbol
+        self.decimals = decimals
+
+        if self.symbol == "WONE" and merge_one_wone_names:
+            # consider WONE and ONE equivalent by symbol
+            self.symbol = "ONE"
+
         self._conversion_unit = self._get_conversion_unit()
 
         # add self to directory for later
-        self._TOKEN_DIRECTORY[self.address] = self
+        HarmonyToken._TOKEN_DIRECTORY[self.address] = self
+
+    def get_token_info(self) -> Tuple[str, int, str]:
+        contract = self.address.w3.eth.contract(  # noqa
+            address=self.address.eth, abi=self._ERC20_ABI
+        )
+        try:
+            symbol = contract.functions.symbol().call()
+            decimals = contract.functions.decimals().call()
+            name = contract.functions.name().call()
+            return symbol, decimals, name
+        except Exception as err:
+            print('Failed to get token info for {0} - ERROR: {1}'.format(self, err))
+            return '?', 18, '?'
 
     def __eq__(self, other) -> bool:
         return isinstance(other, HarmonyToken) and self.address == other.address
@@ -149,11 +173,13 @@ class HarmonyToken:
 
     @classmethod
     def get_harmony_token_by_address(cls, address: Union[HarmonyAddress, str]) -> HarmonyToken:
-        return cls._TOKEN_DIRECTORY.get(
-            address,
-            # use the eth address as default ticker as placeholder
-            HarmonyToken(address)
-        )
+        addr_obj = HarmonyAddress.get_harmony_address(address)
+        return HarmonyToken._TOKEN_DIRECTORY.get(
+            addr_obj
+        ) or HarmonyToken(addr_obj)
+
+    def __str__(self) -> str:
+        return "HarmonyToken: {0} ({1}) [{2}]".format(self.symbol, self.name, self.address.eth)
 
 
 class HarmonyEVMTransaction:
@@ -219,7 +245,7 @@ class HarmonyEVMTransaction:
             print('Got invalid transaction {0} {1}'.format(tx_hash, str(err)))
             raise err
 
-    def tx_payload_to_string(self) -> str:
+    def get_tx_function_signature(self) -> str:
         decode_successful, function_info = self.tx_payload
         if decode_successful:
             f, _ = function_info
@@ -279,10 +305,10 @@ class walletActivity(HarmonyEVMTransaction):
             sentAmount = ''
             sentType = ''
             rcvdAmount = self.coinAmount
-            rcvdType = self.coinType.name
+            rcvdType = self.coinType.symbol
         else:
             sentAmount = self.coinAmount
-            sentType = self.coinType.name
+            sentType = self.coinType.symbol
             rcvdAmount = ''
             rcvdType = ''
 
@@ -314,7 +340,7 @@ class walletActivity(HarmonyEVMTransaction):
 
                 # transaction hash
                 self.txHash,
-                self.tx_payload_to_string(),
+                self.get_tx_function_signature(),
 
                 # transfer information
                 self.to_addr.get_address_str(address_format),
@@ -348,10 +374,10 @@ class walletActivity(HarmonyEVMTransaction):
         for log in decoded_logs:
             if log['args']['from'] == account_address.eth:
                 event = withdrawalEvent
-                otherAddress = HarmonyAddress(log['args']['to'])
+                otherAddress = HarmonyAddress.get_harmony_address(log['args']['to'])
             elif log['args']['to'] == account_address.eth:
                 event = depositEvent
-                otherAddress = HarmonyAddress(log['args']['from'])
+                otherAddress = HarmonyAddress.get_harmony_address(log['args']['from'])
             else:
                 continue
 
