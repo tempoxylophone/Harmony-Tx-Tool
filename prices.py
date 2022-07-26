@@ -136,7 +136,7 @@ def getTokenInfo(w3, address):
         decimals = contract.functions.decimals().call()
         name = contract.functions.name().call()
     except Exception as err:
-        logging.error('Failed to get token info for {0}'.format(address))
+        print('Failed to get token info for {0}'.format(address))
         return ['NA', 18, 'NA']
 
     return [symbol, decimals, name]

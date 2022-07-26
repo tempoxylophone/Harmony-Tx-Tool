@@ -1,21 +1,24 @@
 from __future__ import annotations
 import datetime
-from typing import List
+from decimal import Decimal
+from typing import List, Dict, Optional, Union
 from web3 import Web3
 from web3.logs import DISCARD
 from pyharmony import pyharmony
 
 import nets
+from prices import priceLookup
 import contracts
 from contracts import HarmonyEVMSmartContract
 from koinly_interpreter import KoinlyInterpreter
+from utils import convert_hex_to_one, convert_one_to_hex
 
 
 class HarmonyAddress:
     w3 = Web3(Web3.HTTPProvider(nets.hmy_web3))
     FORMAT_ETH = "eth"
     FORMAT_ONE = "one"
-    bech32_hrp = "one"
+    _ADDRESS_DIRECTORY: Dict[str, HarmonyAddress] = {}
 
     def __init__(self, address: str):
         self.addresses = {
@@ -27,27 +30,17 @@ class HarmonyAddress:
             # given a one address
             self.address_format = self.FORMAT_ONE
             self.addresses[self.FORMAT_ONE] = address
-            self.addresses[self.FORMAT_ETH] = pyharmony.util.convert_one_to_hex(address)
+            self.addresses[self.FORMAT_ETH] = convert_one_to_hex(address)
         elif HarmonyAddress.w3.isAddress(address):
             # given an ethereum address
             self.address_format = self.FORMAT_ETH
             self.addresses[self.FORMAT_ETH] = address
-            self.addresses[self.FORMAT_ONE] = self.convert_hex_to_one(address)
+            self.addresses[self.FORMAT_ONE] = convert_hex_to_one(address)
         else:
             raise ValueError("Bad address! Got: {0}".format(address))
 
-    @staticmethod
-    def convert_hex_to_one(hex_eth_address: str) -> str:
-        p = bytearray.fromhex(
-            # remove 0x prefix from ethereum address if necessary
-            hex_eth_address[2:] if hex_eth_address.startswith("0x") else hex_eth_address
-        )
-
-        # encode to bech32 style "one" address
-        return pyharmony.bech32.bech32_encode(
-            HarmonyAddress.bech32_hrp,
-            pyharmony.bech32.convertbits(p, 8, 5)
-        )
+        # add to directory
+        self._ADDRESS_DIRECTORY[self.get_eth_address()] = self
 
     def get_address_str(self, address_format: str) -> str:
         return self.addresses[address_format]
@@ -58,23 +51,123 @@ class HarmonyAddress:
     def get_one_address(self) -> str:
         return self.get_address_str(self.FORMAT_ONE)
 
+    @classmethod
+    def get_address_string_format(cls, address_string: str) -> str:
+        if pyharmony.account.is_valid_address(address_string):
+            return cls.FORMAT_ONE
+        elif HarmonyAddress.w3.isAddress(address_string):
+            return cls.FORMAT_ETH
+        else:
+            raise ValueError("Bad address, neither eth or one! Got: {0}".format(address_string))
+
+    @property
+    def eth(self) -> str:
+        return self.get_eth_address()
+
+    @property
+    def one(self) -> str:
+        return self.get_one_address()
+
+    @classmethod
+    def address_str_is_eth(cls, address_str: str) -> bool:
+        # also checks if address is neither one or eth, throws ValueError in that case
+        return cls.get_address_string_format(address_str) != cls.FORMAT_ETH
+
+    @classmethod
+    def get_harmony_address_by_string(cls, address_str: str) -> HarmonyAddress:
+        eth_address = cls.address_str_is_eth(address_str) and address_str or convert_one_to_hex(address_str)
+
+        # eth address is always the key
+        return cls._ADDRESS_DIRECTORY.get(eth_address, HarmonyAddress(eth_address))
+
+    @classmethod
+    def get_harmony_address(cls, address_object: Union[str, HarmonyAddress]) -> HarmonyAddress:
+        return address_object if isinstance(address_object, HarmonyAddress) else (
+            cls.get_harmony_address_by_string(address_object)
+        )
+
     def __str__(self) -> str:
         # default to eth address format
         return self.get_eth_address()
+
+    def __eq__(self, other):
+        return isinstance(other, HarmonyAddress) and self.get_eth_address() and (
+                self.get_eth_address() == other.get_eth_address() or
+                self.get_one_address() == other.get_one_address()
+        )
+
+    def __hash__(self):
+        return hash(self.eth)
+
+
+class HarmonyToken:
+    _TOKEN_DIRECTORY: Dict[HarmonyAddress, HarmonyToken] = {}
+    _CONV_BTC_ADDRS = {
+        '0x3095c7557bCb296ccc6e363DE01b760bA031F2d9',
+        '0xdc54046c0451f9269FEe1840aeC808D36015697d'
+    }
+    _CONV_DFK_GOLD_ADDRS = {
+        '0x3a4EDcf3312f44EF027acfd8c21382a5259936e7',
+        '0x576C260513204392F0eC0bc865450872025CB1cA'
+    }
+    _CONV_STABLE_COIN_ADDRS = {
+        '0x985458E523dB3d53125813eD68c274899e9DfAb4',
+        '0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f',
+        '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664'
+    }
+
+    def __init__(self, address: Union[str, HarmonyAddress], name: Optional[str] = None):
+        self.address = HarmonyAddress.get_harmony_address(address)
+
+        self.name = name or contracts.getAddressName(self.address.eth)
+        self.ticker = "?"
+        self._conversion_unit = self._get_conversion_unit()
+
+        # add self to directory for later
+        self._TOKEN_DIRECTORY[self.address] = self
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, HarmonyToken) and self.address == other.address
+
+    def _get_conversion_unit(self) -> str:
+        if self.address.eth in self._CONV_BTC_ADDRS:
+            return "btc"
+        elif self.address.eth in self._CONV_DFK_GOLD_ADDRS:
+            return 'kwei'
+        elif self.address.eth in self._CONV_STABLE_COIN_ADDRS:
+            return 'mwei'
+        else:
+            return 'ether'
+
+    def get_value_from_wei(self, amount: int) -> Decimal:
+        # Simple way to determine conversion, maybe change to lookup on chain later
+        # w3.fromWei doesn't seem to have an 8 decimal option for BTC
+        return (
+                self._conversion_unit == "btc" and amount / Decimal(100000000) or
+                Web3.fromWei(amount, self._conversion_unit)
+        )
+
+    @classmethod
+    def get_harmony_token_by_address(cls, address: Union[HarmonyAddress, str]) -> HarmonyToken:
+        return cls._TOKEN_DIRECTORY.get(
+            address,
+            # use the eth address as default ticker as placeholder
+            HarmonyToken(address)
+        )
 
 
 class HarmonyEVMTransaction:
     w3 = Web3(Web3.HTTPProvider(nets.hmy_web3))
 
-    def __init__(self, account: str, tx_hash: hex):
+    def __init__(self, account: Union[HarmonyAddress, str], tx_hash: hex):
         # identifiers
         self.txHash = tx_hash
-        self.account = HarmonyAddress(account)
+        self.account = HarmonyAddress.get_harmony_address(account)
 
         # get transaction data
         self.result = HarmonyEVMTransaction.w3.eth.get_transaction(tx_hash)
-        self.to_addr = HarmonyAddress(self.result['to'])
-        self.from_addr = HarmonyAddress(self.result['from'])
+        self.to_addr = HarmonyAddress.get_harmony_address(self.result['to'])
+        self.from_addr = HarmonyAddress.get_harmony_address(self.result['from'])
 
         # temporal data
         self.block = self.result['blockNumber']
@@ -145,7 +238,12 @@ class walletActivity(HarmonyEVMTransaction):
         token_tx_objs = walletActivity.get_token_activity_from_wallet_activity(base_tx_obj)
         return [base_tx_obj, *token_tx_objs]
 
-    def __init__(self, wallet_address: str, tx_hash: hex, coin_type: str = ""):
+    def __init__(
+            self,
+            wallet_address: Union[HarmonyAddress, str],
+            tx_hash: hex,
+            harmony_token: Optional[HarmonyToken] = None
+    ):
         # get information about this tx
         super().__init__(wallet_address, tx_hash)
 
@@ -153,15 +251,15 @@ class walletActivity(HarmonyEVMTransaction):
         self.withdrawalEvent = 'donation' if self.is_donation() else 'withdraw'
 
         # assume it is ONE unless otherwise specified
-        self.coinType = coin_type or contracts.getNativeToken("")
+        self.coinType = harmony_token or HarmonyToken.get_harmony_token_by_address(contracts.getNativeToken(""))
 
-        if self.result['to'] == self.account.get_eth_address() and self.value > 0:
+        if self.to_addr == self.account and self.value > 0:
             self.action = self.depositEvent
-            self.address = HarmonyAddress(self.result['from'])
+            self.address = HarmonyAddress.get_harmony_address(self.result['from'])
 
-        if self.result['from'] == self.account.get_eth_address() and self.value > 0:
+        if self.from_addr == self.account and self.value > 0:
             self.action = self.withdrawalEvent
-            self.address = HarmonyAddress(self.result['to'])
+            self.address = HarmonyAddress.get_harmony_address(self.result['to'])
 
     def is_payment(self) -> bool:
         return self.result['from'] in contracts.payment_wallets
@@ -172,15 +270,19 @@ class walletActivity(HarmonyEVMTransaction):
                 'Donation' in contracts.getAddressName(self.result['to'])
         )
 
+    def get_fiat_value(self) -> Decimal:
+        # TODO: fix
+        return priceLookup(self.timestamp, self.coinType.address.eth, self.fiatType)
+
     def to_csv_row(self, use_one_address: bool) -> str:
         if self.action == 'deposit':
             sentAmount = ''
             sentType = ''
             rcvdAmount = self.coinAmount
-            rcvdType = contracts.getAddressName(self.coinType)
+            rcvdType = self.coinType.name
         else:
             sentAmount = self.coinAmount
-            sentType = contracts.getAddressName(self.coinType)
+            sentType = self.coinType.name
             rcvdAmount = ''
             rcvdType = ''
 
@@ -203,7 +305,7 @@ class walletActivity(HarmonyEVMTransaction):
                 "ONE",
 
                 # fiat conversion
-                str(self.fiatValue),
+                str(self.get_fiat_value()),
                 self.fiatType,
                 '',
 
@@ -227,14 +329,14 @@ class walletActivity(HarmonyEVMTransaction):
         return walletActivity._extractTokenResults(
             walletActivity.w3,
             wallet_activity_instance.txHash,
-            wallet_activity_instance.account.get_eth_address(),
+            wallet_activity_instance.account,
             wallet_activity_instance.receipt,
             wallet_activity_instance.depositEvent,
             wallet_activity_instance.withdrawalEvent
         )
 
     @staticmethod
-    def _extractTokenResults(w3, txn, account, receipt, depositEvent, withdrawalEvent):
+    def _extractTokenResults(w3, txn, account_address: HarmonyAddress, receipt, depositEvent, withdrawalEvent):
         contract = w3.eth.contract(
             address='0x72Cb10C6bfA5624dD07Ef608027E366bd690048F',
             abi=contracts.getABI('JewelToken')
@@ -244,20 +346,19 @@ class walletActivity(HarmonyEVMTransaction):
 
         transfers = []
         for log in decoded_logs:
-            if log['args']['from'] == account:
+            if log['args']['from'] == account_address.eth:
                 event = withdrawalEvent
-                otherAddress = log['args']['to']
-            elif log['args']['to'] == account:
+                otherAddress = HarmonyAddress(log['args']['to'])
+            elif log['args']['to'] == account_address.eth:
                 event = depositEvent
-                otherAddress = log['args']['from']
+                otherAddress = HarmonyAddress(log['args']['from'])
             else:
                 continue
 
-            non_native_token_address = log['address']
-            non_native_token_amount = log['args']['value']
-            tokenValue = contracts.valueFromWei(non_native_token_amount, non_native_token_address)
+            non_native_token = HarmonyToken.get_harmony_token_by_address(log['address'])
+            tokenValue = non_native_token.get_value_from_wei(log['args']['value'])
 
-            r = walletActivity(account, txn, non_native_token_address)
+            r = walletActivity(account_address, txn, non_native_token)
             r.action = event
             r.address = otherAddress
             r.value = tokenValue

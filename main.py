@@ -6,7 +6,6 @@ import argparse
 import logging
 import logging.handlers
 from generate import get_csv
-from koinly_interpreter import KoinlyInterpreter
 
 HARMONY_LAUNCH_DATE_STR = "2019-05-01"
 TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
