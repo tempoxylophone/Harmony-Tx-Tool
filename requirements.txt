@@ -1,6 +1,3 @@
 web3
 pyhmy
-jinja2
-jsonpickle
-pymysql
 requests

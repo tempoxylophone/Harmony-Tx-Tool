@@ -3,11 +3,54 @@ import datetime
 from typing import List
 from web3 import Web3
 from web3.logs import DISCARD
+from pyharmony import pyharmony
 
 import nets
 import contracts
 from contracts import HarmonyEVMSmartContract
 from koinly_interpreter import KoinlyInterpreter
+
+
+class HarmonyAddress:
+    w3 = Web3(Web3.HTTPProvider(nets.hmy_web3))
+    FORMAT_ETH = "eth"
+    FORMAT_ONE = "one"
+    bech32_hrp = "one"
+
+    def __init__(self, address: str):
+        self.addresses = {
+            self.FORMAT_ETH: "",
+            self.FORMAT_ONE: "",
+        }
+
+        if pyharmony.account.is_valid_address(address):
+            # given a one address
+            self.address_format = self.FORMAT_ONE
+            self.addresses[self.FORMAT_ONE] = address
+            self.addresses[self.FORMAT_ETH] = pyharmony.util.convert_one_to_hex(address)
+        elif HarmonyAddress.w3.isAddress(address):
+            # given an ethereum address
+            self.address_format = self.FORMAT_ETH
+            self.addresses[self.FORMAT_ETH] = address
+            self.addresses[self.FORMAT_ONE] = self.convert_hex_to_one(address)
+        else:
+            raise ValueError("Bad address! Got: {0}".format(address))
+
+    @staticmethod
+    def convert_hex_to_one(hex_eth_address: str) -> str:
+        p = bytearray.fromhex(
+            # remove 0x prefix from ethereum address if necessary
+            hex_eth_address[2:] if hex_eth_address.startswith("0x") else hex_eth_address
+        )
+
+        # encode to bech32 style "one" address
+        return pyharmony.bech32.bech32_encode(
+            HarmonyAddress.bech32_hrp,
+            pyharmony.bech32.convertbits(p, 8, 5)
+        )
+
+    def get_address_str(self, address_format: str = 'one') -> str:
+        return self.addresses[address_format]
 
 
 class HarmonyEVMTransaction:
@@ -21,6 +64,8 @@ class HarmonyEVMTransaction:
 
         # get transaction data
         self.result = HarmonyEVMTransaction.w3.eth.get_transaction(tx_hash)
+        self.to_addr = self.result['to']
+        self.from_addr = self.result['from']
 
         # temporal data
         self.block = self.result['blockNumber']
@@ -119,7 +164,7 @@ class walletActivity(HarmonyEVMTransaction):
             self.action = withdrawalEvent
             self.address = self.result['to']
 
-    def to_csv_row(self) -> str:
+    def to_csv_row(self, address_format: str = 'one') -> str:
         if self.action == 'deposit':
             sentAmount = ''
             sentType = ''
@@ -159,6 +204,9 @@ class walletActivity(HarmonyEVMTransaction):
                 # transaction hash
                 self.txHash,
                 self.tx_payload_to_string(),
+
+                self.to_addr,
+                self.from_addr,
                 '\n'
             )
         )

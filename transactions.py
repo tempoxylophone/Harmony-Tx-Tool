@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from typing import List
-from pyhmy import account
+from pyharmony import pyharmony
 import nets
 
 
@@ -9,7 +9,7 @@ def get_harmony_tx_list(address: str, page_size: int) -> List[str]:
     txs = []
     has_more = True
     while has_more:
-        results = account.get_transaction_history(
+        results = pyharmony.account.get_transaction_history(
             address,
             page=offset,
             page_size=page_size,
@@ -25,4 +25,4 @@ def get_harmony_tx_list(address: str, page_size: int) -> List[str]:
 
 
 def get_num_tx_for_wallet(address: str):
-    return account.get_transaction_count(address, endpoint=nets.hmy_main)
+    return pyharmony.account.get_transaction_count(address, endpoint=nets.hmy_main)

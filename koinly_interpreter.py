@@ -2,6 +2,7 @@ from datetime import timezone, datetime
 
 
 class KoinlyInterpreter:
+    KOINLY_DATE_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
     KOINLY_ROW_HEADER = [
         'Date',
         'Sent Amount',
@@ -16,9 +17,11 @@ class KoinlyInterpreter:
         'Description',
         'TxHash',
         'Method',
+        'To',
+        'From',
         '\n',
     ]
-    KOINLY_DATE_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
+
 
     @staticmethod
     def parse_utc_ts(timestamp: int) -> str:
