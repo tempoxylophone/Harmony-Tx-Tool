@@ -6,6 +6,7 @@ import argparse
 import logging
 import logging.handlers
 from generate import get_csv
+from koinly_interpreter import KoinlyInterpreter
 
 HARMONY_LAUNCH_DATE_STR = "2019-05-01"
 TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
@@ -53,6 +54,10 @@ def main() -> Tuple[str, str, str]:
 
 
 if __name__ == "__main__":
-    addr, finished_at, tx_csv_str = main()
-    with open("./{0}_{1}".format(addr, finished_at) + ".csv", "w") as f:
-        f.write(tx_csv_str)
+    coinzzz = KoinlyInterpreter.get_harmony_tokens_directory()
+    from pprint import pprint
+
+    pprint(coinzzz)
+    # addr, finished_at, tx_csv_str = main()
+    # with open("./{0}_{1}".format(addr, finished_at) + ".csv", "w") as f:
+    #     f.write(tx_csv_str)
