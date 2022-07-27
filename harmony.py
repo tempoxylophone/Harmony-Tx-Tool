@@ -1,17 +1,19 @@
 from __future__ import annotations
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Dict, Optional, Union, Tuple, Iterable
+from typing import List, Dict, Optional, Union, Tuple, Iterable, Any
 from collections import defaultdict
+from functools import lru_cache
 
+import requests
 from web3 import Web3
+from web3.contract import ContractFunction
 from web3.logs import DISCARD
 from web3.types import TxReceipt, EventData, HexStr
 from pyharmony import pyharmony
 
 import contracts
-from contracts import HarmonyEVMSmartContract
-from utils import api_retry
+from utils import api_retry, get_local_ABI
 from dex import UniswapForkGraph
 
 
@@ -21,16 +23,19 @@ class HarmonyAPI:
     _NET_HMY_WEB3 = 'https://api.harmony.one'
 
     _w3 = Web3(Web3.HTTPProvider(_NET_HMY_WEB3))
-    _ERC20_ABI = contracts.getABI('ERC20')
+    _ERC20_ABI = get_local_ABI('ERC20')
 
     _JEWEL_CONTRACT = _w3.eth.contract(  # noqa
         address='0x72Cb10C6bfA5624dD07Ef608027E366bd690048F',
-        abi=contracts.getABI('JewelToken')
+        abi=get_local_ABI('JewelToken')
     )
+
+    if not _w3.isConnected():
+        raise RuntimeError('Error: Blockchain connection failure.')
 
     @classmethod
     @api_retry()
-    def get_transaction(cls, tx_hash: HexStr):
+    def get_transaction(cls, tx_hash: Union[HexStr, str]):
         return cls._w3.eth.get_transaction(tx_hash)
 
     @classmethod
@@ -44,7 +49,7 @@ class HarmonyAPI:
 
     @classmethod
     @api_retry()
-    def get_tx_receipt(cls, tx_hash: HexStr) -> TxReceipt:
+    def get_tx_receipt(cls, tx_hash: Union[HexStr, str]) -> TxReceipt:
         try:
             return cls._w3.eth.get_transaction_receipt(tx_hash)
         except Exception as err:
@@ -485,7 +490,7 @@ class HarmonyEVMTransaction:
         self.block_date = date.fromtimestamp(self.timestamp)
 
         # event data
-        self.action = HarmonyEVMTransaction.lookup_event(self.result['from'], self.result['to'], account)
+        self.action = HarmonyEVMTransaction.lookup_event(self.result['from'], self.result['to'], str(account))
 
         # function argument data
         self.contract_pointer = HarmonyEVMSmartContract.lookup_harmony_smart_contract_by_address(self.result['to'])
@@ -517,9 +522,9 @@ class HarmonyEVMTransaction:
         return token_qty * token_price + fee_price * fee_qty
 
     @staticmethod
-    def lookup_event(fm, to, account) -> str:
-        fmStr = contracts.address_map.get(fm, fm) or ""
-        toStr = contracts.address_map.get(to, to) or ""
+    def lookup_event(fm_addr: str, to_addr: str, account) -> str:
+        fmStr = contracts.address_map.get(fm_addr, fm_addr) or ""
+        toStr = contracts.address_map.get(to_addr, to_addr) or ""
         if '0x' in fmStr and toStr == account:
             fmStr = 'Deposit from {0}'.format(fmStr)
         if '0x' in toStr and fmStr == account:
@@ -544,3 +549,66 @@ class HarmonyEVMTransaction:
             return "\"{0}\"".format(str(f)[1:-1].split(" ")[1])
         else:
             return ""
+
+
+T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
+
+
+class HarmonyEVMSmartContract:
+    w3 = HarmonyAPI._w3  # noqa
+    API_NOT_FOUND_MESSAGES = {"Not found", "contract not found"}
+    ABI_API_ENDPOINT = "https://ctrver.t.hmny.io/fetchContractCode?contractAddress={0}&shard=0"
+    POSSIBLE_ABIS = [
+        "ERC20",
+        "ERC721",
+        "UniswapV2Router02",
+        "USD Coin",
+        "Wrapped ONE"
+    ]
+
+    @classmethod
+    @lru_cache(maxsize=256)
+    def lookup_harmony_smart_contract_by_address(cls, address: str, name: str = "") -> HarmonyEVMSmartContract:
+        return HarmonyEVMSmartContract(address, name)
+
+    def __init__(self, address: str, assigned_name: str):
+        self.address = address
+        self.name = assigned_name
+
+        # contract function requires us to know interface of source
+        self.code = HarmonyEVMSmartContract.get_code(address)
+        self.has_code = not self._is_missing(self.code)
+        self.abi = self.has_code and self.code['abi'] or get_local_ABI(self.POSSIBLE_ABIS[0])
+        self.abi_attempt_idx = 1
+        self.contract = HarmonyEVMSmartContract.w3.eth.contract(  # noqa
+            Web3.toChecksumAddress(self.address),
+            abi=self.abi
+        )
+
+    def decode_input(self, tx_input: hex) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
+        if self.abi_attempt_idx > len(self.POSSIBLE_ABIS) - 1:
+            # can't decode this, even after trying a few generic ABIs
+            return False, None
+
+        try:
+            f = self.contract.decode_function_input(tx_input)
+            return True, f
+        except ValueError:
+            # can't decode this input, keep shuffling different ABIs until get match, then stop
+            self.abi = get_local_ABI(self.POSSIBLE_ABIS[self.abi_attempt_idx])
+            self.abi_attempt_idx += 1
+            return self.decode_input(tx_input)
+
+    @staticmethod
+    @lru_cache(maxsize=256)
+    def get_code(address: str) -> Dict:
+        url = HarmonyEVMSmartContract.get_code_request_url(address)
+        return requests.get(url).json()
+
+    @staticmethod
+    def get_code_request_url(address: str) -> str:
+        return HarmonyEVMSmartContract.ABI_API_ENDPOINT.format(address)
+
+    @staticmethod
+    def _is_missing(code) -> bool:
+        return code.get("message") in HarmonyEVMSmartContract.API_NOT_FOUND_MESSAGES

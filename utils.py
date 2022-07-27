@@ -2,7 +2,7 @@ from typing import List, Callable, Tuple, Union
 from requests.exceptions import HTTPError, ConnectionError
 from tenacity import (
     retry,
-    retry_any as RetryChain,
+    retry_any as RetryChain,  # noqa
     stop_after_attempt,
     retry_if_exception_type as r,
     wait_exponential,
@@ -41,3 +41,22 @@ def _build_exceptions(exceptions, i=0) -> RetryChain:
 
 def api_retry() -> Callable:
     return retry_on_exceptions(COMMON_API_EXCEPTIONS)  # noqa (type inheritance fails here)
+
+
+from typing import Dict, Tuple, Union, Any
+import decimal
+import os
+from functools import lru_cache
+
+import requests
+from web3 import Web3
+from web3.contract import ContractFunction
+
+import nets
+
+
+def get_local_ABI(contractName):
+    location = os.path.abspath(__file__)
+    with open('{0}/abi/{1}.json'.format('/'.join(location.split('/')[0:-1]), contractName), 'r') as f:
+        ABI = f.read()
+    return ABI

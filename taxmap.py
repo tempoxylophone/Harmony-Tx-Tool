@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import events
 import contracts
-import transaction_types as records
+import transactions as records
 import datetime
 from decimal import *
 
 from taxes import TaxItem, CostBasisItem
 
 
-def buildTaxMap(txns, account, startDate, endDate, costBasis, moreOptions):
+def buildTaxMap(txns, account: str, startDate, endDate, costBasis, moreOptions):
     # Scrape all events and build the Tax Report from it
-    eventMap = events.checkTransactions(txns, account, startDate, endDate, 'harmony')
+    eventMap = events.get_events(txns, account)
 
     # Look up wallet payments distributed by interacting with Jewel contract also
     swapData = buildSwapRecords(

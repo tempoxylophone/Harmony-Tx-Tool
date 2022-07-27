@@ -35,3 +35,18 @@ class KoinlyInterpreter:
     @staticmethod
     def get_csv_row_header() -> str:
         return ",".join(KoinlyInterpreter.KOINLY_ROW_HEADER)
+
+    @staticmethod
+    def getRecordLabel(_, event_type: str, event: str) -> str:
+        if event_type == 'gardens':
+            if event == 'staking-reward':
+                return 'reward'
+            else:
+                return 'ignored'
+        elif event_type == 'tavern':
+            if event == 'sale':
+                return 'realized gain'
+            elif event == 'hire':
+                return 'income'
+            else:
+                return 'cost'

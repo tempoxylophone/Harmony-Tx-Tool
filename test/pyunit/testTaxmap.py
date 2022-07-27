@@ -26,7 +26,7 @@ class testTaxmap(unittest.TestCase):
 		self.yearStart = datetime(datetime.now().year, 1, 1).date()
 		self.yearEnd = datetime(datetime.now().year, 12, 31).date()
 
-		rw0 = records.walletActivity('0xITEST0', self.aTimestamp - 100, 'deposit', '0xCEXWALLET', 'one', 18020)
+		rw0 = records.WalletActivity('0xITEST0', self.aTimestamp - 100, 'deposit', '0xCEXWALLET', 'one', 18020)
 		rw0.fiatValue = decimal.Decimal(180)
 		em['wallet'].append(rw0)
 
@@ -45,7 +45,7 @@ class testTaxmap(unittest.TestCase):
 		rt2.fiatReceiveValue = decimal.Decimal(1210.37345634)
 		em['swaps'].append(rt2)
 
-		rw1 = records.walletActivity('0xTEST3', self.aTimestamp + 88000, 'withdraw', '0xPURCHASE', 'jewel', 18)
+		rw1 = records.WalletActivity('0xTEST3', self.aTimestamp + 88000, 'withdraw', '0xPURCHASE', 'jewel', 18)
 		rw1.fiatValue = decimal.Decimal(180)
 		em['wallet'].append(rw1)
 
