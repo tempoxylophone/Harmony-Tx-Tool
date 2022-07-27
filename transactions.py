@@ -115,7 +115,7 @@ class WalletActivity(HarmonyEVMTransaction):
                 # transfer information
                 self.to_addr.get_address_str(address_format),
                 self.from_addr.get_address_str(address_format),
-
+                self.explorer_url,
                 '\n'
             )
         )

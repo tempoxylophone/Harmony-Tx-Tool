@@ -19,6 +19,7 @@ class KoinlyInterpreter:
         'Method',
         'To',
         'From',
+        'Explorer URL',
         '\n',
     ]
     KOINLY_USE_ONE_ADDRESS_FORMAT = True

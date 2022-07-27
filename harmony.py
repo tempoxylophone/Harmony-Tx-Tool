@@ -19,6 +19,9 @@ from dex import UniswapForkGraph
 
 class HarmonyAPI:
     HARMONY_LAUNCH_DATE: date = datetime.strptime("2019-05-01", '%Y-%m-%d').date()
+    _CUSTOM_EXCEPTIONS = [
+        pyharmony.rpc.exceptions.RPCError
+    ]
     _NET_HMY_MAIN = 'https://api.harmony.one'
     _NET_HMY_WEB3 = 'https://api.harmony.one'
 
@@ -31,12 +34,12 @@ class HarmonyAPI:
     )
 
     @classmethod
-    @api_retry()
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_transaction(cls, tx_hash: Union[HexStr, str]):
         return cls._w3.eth.get_transaction(tx_hash)
 
     @classmethod
-    @api_retry()
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_timestamp(cls, block: int):
         try:
             return cls._w3.eth.get_block(block)['timestamp']
@@ -45,7 +48,7 @@ class HarmonyAPI:
             raise err
 
     @classmethod
-    @api_retry()
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_tx_receipt(cls, tx_hash: Union[HexStr, str]) -> TxReceipt:
         try:
             return cls._w3.eth.get_transaction_receipt(tx_hash)
@@ -54,7 +57,7 @@ class HarmonyAPI:
             raise err
 
     @classmethod
-    @api_retry()
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_tx_transfer_logs(cls, tx_receipt: TxReceipt) -> Iterable[EventData]:
         return cls._JEWEL_CONTRACT.events.Transfer().processReceipt(
             tx_receipt,
@@ -62,7 +65,7 @@ class HarmonyAPI:
         )
 
     @classmethod
-    @api_retry()
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_token_info(cls, token_eth_address: str) -> Tuple[str, int, str]:
         contract = cls._w3.eth.contract(  # noqa
             address=Web3.toChecksumAddress(token_eth_address),
@@ -470,6 +473,7 @@ class HarmonyToken:
 
 
 class HarmonyEVMTransaction:
+    EXPLORER_TX_URL = "https://explorer.harmony.one/tx/{0}"
 
     def __init__(self, account: Union[HarmonyAddress, str], tx_hash: hex):
         # identifiers
@@ -508,6 +512,10 @@ class HarmonyEVMTransaction:
         self.fiatValue = 0
         self.fiatFeeValue = 0
         self.fiatType = 'usd'
+
+    @property
+    def explorer_url(self):
+        return self.EXPLORER_TX_URL.format(self.txHash)
 
     def get_fiat_value(self) -> Decimal:
         token_price = DexPriceManager.get_price_of_token_at_block(self.coinType, self.block)
