@@ -7,12 +7,15 @@ import contracts
 import csvFormats
 from constants import KOINLY_UNIVERSAL_FORMAT
 from koinly_interpreter import KoinlyInterpreter
+from harmony import DexPriceManager
 
 
-def get_csv(records, format: str=KOINLY_UNIVERSAL_FORMAT) -> str:
+def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
     taxRecords = records['taxes']
     eventRecords = records['events']
     response = KoinlyInterpreter.get_csv_row_header()
+
+    DexPriceManager.initialize_static_price_manager(eventRecords['wallet'])
 
     for record in eventRecords['tavern']:
         blockDateStr = parse_utc_ts(record.timestamp)

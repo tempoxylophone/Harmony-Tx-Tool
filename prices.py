@@ -130,7 +130,7 @@ def getCurrentPrice(token, throughToken, network):
 
 def getTokenInfo(w3, address):
     ABI = contracts.getABI('ERC20')
-    contract = w3.eth.contract(address=address, abi=ABI)
+    contract = w3.eth.contract(address=Web3.toChecksumAddress(address), abi=ABI)
     try:
         symbol = contract.functions.symbol().call()
         decimals = contract.functions.decimals().call()

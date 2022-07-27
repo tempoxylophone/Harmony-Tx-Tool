@@ -1,20 +1,43 @@
-from pyharmony import pyharmony
+from typing import List, Callable, Tuple, Union
+from requests.exceptions import HTTPError, ConnectionError
+from tenacity import (
+    retry,
+    retry_any as RetryChain,
+    stop_after_attempt,
+    retry_if_exception_type as r,
+    wait_exponential,
+    wait_random,
+)
 
-HARMONY_BECH32_HRP = "one"
+COMMON_API_EXCEPTIONS = (
+    HTTPError,
+    ConnectionError,
+)
 
 
-def convert_one_to_hex(one_string_hash) -> str:
-    return pyharmony.util.convert_one_to_hex(one_string_hash)
-
-
-def convert_hex_to_one(eth_string_hash) -> str:
-    p = bytearray.fromhex(
-        # remove 0x prefix from ethereum hash if necessary
-        eth_string_hash[2:] if eth_string_hash.startswith("0x") else eth_string_hash
+def retry_on_exceptions(
+        exceptions: Union[List[Exception], Tuple[Exception]],
+        max_tries: int = 5,
+        jitter_range_sec: int = 2,
+        max_wait_sec: int = 120
+) -> Callable:
+    return retry(
+        retry=_build_exceptions(exceptions),
+        reraise=True,
+        wait=(
+                wait_exponential(multiplier=1, min=5, max=max_wait_sec) +
+                wait_random(0, jitter_range_sec)
+        ),
+        stop=stop_after_attempt(max_tries)
     )
 
-    # encode to bech32 style hash "one" hash
-    return pyharmony.bech32.bech32_encode(
-        HARMONY_BECH32_HRP,
-        pyharmony.bech32.convertbits(p, 8, 5)
+
+def _build_exceptions(exceptions, i=0) -> RetryChain:
+    # hahah
+    return r(exceptions[i]) | (
+            i + 1 == len(exceptions) - 1 and r(exceptions[i + 1]) or _build_exceptions(exceptions, i + 1)
     )
+
+
+def api_retry() -> Callable:
+    return retry_on_exceptions(COMMON_API_EXCEPTIONS)  # noqa (type inheritance fails here)

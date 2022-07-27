@@ -5,7 +5,7 @@ from web3.logs import STRICT, IGNORE, DISCARD, WARN
 import nets
 import contracts
 import constants
-import records
+import transaction_types as records
 import prices
 import datetime
 import decimal

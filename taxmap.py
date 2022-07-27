@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import events
 import contracts
-import records
+import transaction_types as records
 import datetime
 from decimal import *
 
