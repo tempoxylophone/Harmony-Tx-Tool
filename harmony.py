@@ -30,9 +30,6 @@ class HarmonyAPI:
         abi=get_local_ABI('JewelToken')
     )
 
-    if not _w3.isConnected():
-        raise RuntimeError('Error: Blockchain connection failure.')
-
     @classmethod
     @api_retry()
     def get_transaction(cls, tx_hash: Union[HexStr, str]):

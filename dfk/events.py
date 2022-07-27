@@ -1232,4 +1232,3 @@ def extractLendingResults(w3, txn, account, timestamp, receipt, network, value):
         # ri.fiatValue = prices.priceLookup(timestamp, rcvdToken)
 
     return [r, ri]
-
