@@ -8,16 +8,16 @@ from harmony import DexPriceManager
 from transactions import WalletActivity
 
 
-def get_csv(records: Dict[str, Dict[str, List[WalletActivity]]]) -> str:
-    eventRecords = records['events']
+def get_csv(records: Dict[str, List[WalletActivity]]) -> str:
+    wallet_txs = records['wallet']
 
     # get fiat prices
-    DexPriceManager.initialize_static_price_manager(eventRecords['wallet'])
+    DexPriceManager.initialize_static_price_manager(wallet_txs)
 
     # build CSV
     return (
             KoinlyInterpreter.get_csv_row_header() +
             "".join(tx.to_csv_row(
                 KoinlyInterpreter.KOINLY_USE_ONE_ADDRESS_FORMAT
-            ) for tx in eventRecords['wallet'])
+            ) for tx in wallet_txs)
     )

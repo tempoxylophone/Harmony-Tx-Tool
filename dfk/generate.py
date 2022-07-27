@@ -10,7 +10,6 @@ from harmony import DexPriceManager
 
 
 def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
-    taxRecords = records['taxes']
     eventRecords = records['events']
     response = KoinlyInterpreter.get_csv_row_header()
 

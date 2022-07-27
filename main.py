@@ -1,48 +1,43 @@
 from typing import Tuple
 import os
 from harmony import HarmonyAPI
-import taxmap
 import datetime
 import argparse
 from generate import get_csv
+from events import get_events
 
 TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
 
 
-def main() -> Tuple[str, str, str]:
-    # cmd arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("wallet", help="The evm compatible wallet address to generate for")
-    args = parser.parse_args()
+def get_harmony_tx_from_wallet_as_csv(wallet_address_eth_str: str) -> Tuple[str, str]:
+    # --- START ---
+    print("Fetching {0} transactions from address {1}...".format(
+        HarmonyAPI.get_num_tx_for_wallet(wallet_address_eth_str),
+        wallet_address_eth_str
+    ))
 
-    wallet_eth_address_str: str = args.wallet
-
-    # list of transactions if loaded from file if available, otherwise fetched
-    num_transactions: int = HarmonyAPI.get_num_tx_for_wallet(wallet_eth_address_str)
-
-    print("Fetching {0} transactions from address {1}...".format(num_transactions, args.wallet))
-
-    # With transaction list, we now generate the events and tax map
-    reportData = taxmap.buildTaxMap(
-        HarmonyAPI.get_harmony_tx_list(args.wallet),
-        wallet_eth_address_str,
-        HarmonyAPI.HARMONY_LAUNCH_DATE,
-        datetime.datetime.strptime(TODAY_DATE_STR, '%Y-%m-%d').date(),
-        'fifo',
-        {
-            'purchaseAddresses': []
-        }
+    # --- GET + PARSE DATA FROM BLOCKCHAIN ---
+    tx_events = get_events(
+        HarmonyAPI.get_harmony_tx_list(wallet_address_eth_str),
+        wallet_address_eth_str
     )
 
-    result: str = get_csv(reportData)
+    # --- WRITE TO FILE ---
+    result: str = get_csv(tx_events)
     _finished_at = datetime.datetime.now().strftime("%Y-%m-%d_%H:%m:%s")
-    return wallet_eth_address_str, _finished_at, result
+    _file_name = wallet_address_eth_str + "_" + _finished_at + ".csv"
+    return result, _file_name
 
 
 if __name__ == "__main__":
-    addr, finished_at, tx_csv_str = main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("wallet", help="Ethereum-style address of Harmony ONE wallet")
+    args = parser.parse_args()
+
+    csv_contents, file_name = get_harmony_tx_from_wallet_as_csv(args.wallet)
 
     # write to desktop
     user_dir = os.path.expanduser("~")
-    with open(user_dir + "/Desktop/{0}_{1}".format(addr, finished_at) + ".csv", "w") as f:
-        f.write(tx_csv_str)
+    path = user_dir + "/Desktop/" + file_name
+    with open(path, "w") as f:
+        f.write(csv_contents)

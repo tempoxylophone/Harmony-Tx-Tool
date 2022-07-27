@@ -13,7 +13,7 @@ from web3.types import TxReceipt, EventData, HexStr
 from pyharmony import pyharmony
 
 import contracts
-from utils import api_retry, get_local_ABI
+from utils import api_retry, get_local_abi
 from dex import UniswapForkGraph
 
 
@@ -23,11 +23,11 @@ class HarmonyAPI:
     _NET_HMY_WEB3 = 'https://api.harmony.one'
 
     _w3 = Web3(Web3.HTTPProvider(_NET_HMY_WEB3))
-    _ERC20_ABI = get_local_ABI('ERC20')
+    _ERC20_ABI = get_local_abi('ERC20')
 
     _JEWEL_CONTRACT = _w3.eth.contract(  # noqa
         address='0x72Cb10C6bfA5624dD07Ef608027E366bd690048F',
-        abi=get_local_ABI('JewelToken')
+        abi=get_local_abi('JewelToken')
     )
 
     @classmethod
@@ -575,7 +575,7 @@ class HarmonyEVMSmartContract:
         # contract function requires us to know interface of source
         self.code = HarmonyEVMSmartContract.get_code(address)
         self.has_code = not self._is_missing(self.code)
-        self.abi = self.has_code and self.code['abi'] or get_local_ABI(self.POSSIBLE_ABIS[0])
+        self.abi = self.has_code and self.code['abi'] or get_local_abi(self.POSSIBLE_ABIS[0])
         self.abi_attempt_idx = 1
         self.contract = HarmonyEVMSmartContract.w3.eth.contract(  # noqa
             Web3.toChecksumAddress(self.address),
@@ -592,7 +592,7 @@ class HarmonyEVMSmartContract:
             return True, f
         except ValueError:
             # can't decode this input, keep shuffling different ABIs until get match, then stop
-            self.abi = get_local_ABI(self.POSSIBLE_ABIS[self.abi_attempt_idx])
+            self.abi = get_local_abi(self.POSSIBLE_ABIS[self.abi_attempt_idx])
             self.abi_attempt_idx += 1
             return self.decode_input(tx_input)
 
