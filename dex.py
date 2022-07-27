@@ -4,7 +4,7 @@ from decimal import Decimal
 import requests
 
 
-class UniswapForkGraph:
+class UniswapV2ForkGraph:
     _UNIX_TS_1_DAY_APPROX = 86400
     _UA_HEADERS = {
         'authority': 'graph.viper.exchange',
@@ -219,8 +219,8 @@ class UniswapForkGraph:
     @staticmethod
     def _compute_ts_bounds(ts_min, ts_max):
         return (
-            ts_min - UniswapForkGraph._UNIX_TS_1_DAY_APPROX,
-            ts_max + UniswapForkGraph._UNIX_TS_1_DAY_APPROX
+            ts_min - UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX,
+            ts_max + UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX
         )
 
     def _get_graph_ql_price_query_data(self, token_address: str, block_nums: Iterable[int]) -> Dict[str, Dict]:

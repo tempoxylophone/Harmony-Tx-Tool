@@ -14,7 +14,7 @@ from pyharmony import pyharmony
 
 import contracts
 from utils import api_retry, get_local_abi
-from dex import UniswapForkGraph
+from dex import UniswapV2ForkGraph
 
 
 class HarmonyAPI:
@@ -237,7 +237,7 @@ class DexPriceManager:
         'https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2',  # VIPERSWAP
         'https://defi-kingdoms-community-api-gateway-co06z8vi.uc.gateway.dev/graphql',  # DEFIKINGDOMS
     ]
-    _DEX_GRAPHS = [UniswapForkGraph(x) for x in _DEX_GRAPH_URLS]
+    _DEX_GRAPHS = [UniswapV2ForkGraph(x) for x in _DEX_GRAPH_URLS]
 
     @classmethod
     def get_price_of_token_at_block(cls, token: HarmonyToken, block: int) -> Decimal:
@@ -275,7 +275,7 @@ class DexPriceManager:
         return {}
 
     @classmethod
-    def _try_to_get_token_or_pair_info_from_dexes(cls, dex_graph: UniswapForkGraph, token_address: str) -> Dict:
+    def _try_to_get_token_or_pair_info_from_dexes(cls, dex_graph: UniswapV2ForkGraph, token_address: str) -> Dict:
         return dex_graph.get_token_or_pair_info(
             token_address,
         )
@@ -323,7 +323,7 @@ class DexPriceManager:
 
     @staticmethod
     def _try_to_get_token_prices_from_dexes(
-            dex_graph: UniswapForkGraph,
+            dex_graph: UniswapV2ForkGraph,
             token_address: str,
             blocks: Iterable[int]) -> Dict:
         return dex_graph.get_token_price_by_block_timeseries(
@@ -333,7 +333,7 @@ class DexPriceManager:
 
     @staticmethod
     def _try_to_get_lp_prices_from_dexes(
-            dex_graph: UniswapForkGraph,
+            dex_graph: UniswapV2ForkGraph,
             token_address: str,
             min_ts: int,
             max_ts: int,
