@@ -1,6 +1,6 @@
-from typing import List, Sequence, Type, Union, Callable
+from typing import List, Type, Callable
 import os
-from requests.exceptions import HTTPError, ConnectionError, RequestException
+from requests.exceptions import HTTPError, ConnectionError
 from tenacity import (
     retry,
     retry_any as RetryChain,  # noqa
@@ -10,12 +10,12 @@ from tenacity import (
     wait_random,
 )
 
-COMMON_API_EXCEPTIONS: List[Type] = [
+T_EXCEPTION = Type[BaseException]
+
+COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
     HTTPError,
     ConnectionError,
 ]
-
-T_EXCEPTION = Type[BaseException]
 
 
 def retry_on_exceptions(
@@ -36,14 +36,13 @@ def retry_on_exceptions(
 
 
 def _build_exceptions(exceptions: List[T_EXCEPTION], i: int = 0) -> RetryChain:
-    # hahah
     return r(exceptions[i]) | (
             i + 1 == len(exceptions) - 1 and r(exceptions[i + 1]) or _build_exceptions(exceptions, i + 1)
     )
 
 
 def api_retry(custom_exceptions: List[T_EXCEPTION]) -> Callable:
-    return retry_on_exceptions(COMMON_API_EXCEPTIONS + custom_exceptions)  # noqa (type inheritance fails here)
+    return retry_on_exceptions(COMMON_API_EXCEPTIONS + custom_exceptions)
 
 
 def get_local_abi(abi_json_filename: str) -> str:
