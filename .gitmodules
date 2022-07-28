@@ -1,0 +1,4 @@
+[submodule "txtool/pyhmy"]
+	path = txtool/pyhmy
+	url = https://github.com/tempoxylophone/pyhmy.git
+	branch = code-only
