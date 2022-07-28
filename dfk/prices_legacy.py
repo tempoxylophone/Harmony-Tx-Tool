@@ -6,8 +6,10 @@ import datetime
 import logging
 import decimal
 import contracts
-import nets
 from constants import DECIMAL_UNITS as decimal_units, TOKEN_MAP as token_map
+
+hmy_main = 'https://api.harmony.one'
+hmy_web3 = 'https://api.harmony.one'
 
 today_prices = {}
 
@@ -95,7 +97,7 @@ def getPrice(token, date, fiatType='usd'):
 
 # Return USD price of token based on its pair to throughToken to 1USDC
 def getCurrentPrice(token, throughToken, network):
-    w3 = Web3(Web3.HTTPProvider(nets.hmy_web3))
+    w3 = Web3(Web3.HTTPProvider(hmy_web3))
     ABI = contracts.getABI('UniswapV2Router02')
     contract = w3.eth.contract(address='0x24ad62502d1C652Cc7684081169D04896aC20f30', abi=ABI)
     addrUSDC = '0x985458E523dB3d53125813eD68c274899e9DfAb4'

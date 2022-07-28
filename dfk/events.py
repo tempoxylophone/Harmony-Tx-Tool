@@ -2,14 +2,17 @@
 from typing import Dict
 from web3 import Web3
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
-import nets
 import contracts
 import constants
 import transactions as records
-import prices
+import prices_legacy as prices
 import datetime
 import decimal
 import logging
+
+hmy_main = 'https://api.harmony.one'
+hmy_web3 = 'https://api.harmony.one'
+
 
 DFK_EVENT_WORDS = {
     'Quest',
@@ -58,7 +61,7 @@ def checkTransactions(txs, account, startDate, endDate, network, alreadyComplete
     events_map = EventsMap()
 
     # connect to harmony network
-    w3 = Web3(Web3.HTTPProvider(nets.hmy_web3))
+    w3 = Web3(Web3.HTTPProvider(hmy_web3))
 
     if not w3.isConnected():
         raise RuntimeError('Error: Blockchain connection failure.')

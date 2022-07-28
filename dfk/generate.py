@@ -5,7 +5,7 @@
 from datetime import timezone, datetime
 import contracts
 from constants import KOINLY_UNIVERSAL_FORMAT
-from koinly_interpreter import KoinlyInterpreter
+from koinly import KoinlyInterpreter
 from harmony import DexPriceManager
 
 
