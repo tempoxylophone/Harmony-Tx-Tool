@@ -10,7 +10,7 @@ from web3 import Web3
 from web3.contract import ContractFunction
 from web3.logs import DISCARD
 from web3.types import TxReceipt, EventData, HexStr
-from pyharmony import pyharmony
+import pyhmy as pyharmony
 
 import contracts
 from utils import api_retry, get_local_abi

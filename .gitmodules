@@ -1,0 +1,4 @@
+[submodule "pyhmy"]
+	path = pyhmy
+	url = https://github.com/tempoxylophone/pyhmy.git
+	branch = code-only
