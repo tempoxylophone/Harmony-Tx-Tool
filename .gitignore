@@ -2,3 +2,7 @@
 __pycache__/
 venv
 *.csv
+.coverage
+htmlcov
+.mypy_cache
+.pytest_cache

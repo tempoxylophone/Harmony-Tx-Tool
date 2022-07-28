@@ -1,8 +1,9 @@
 SHELL := /bin/bash
+PYTHONPATH :=./txtool
 
 update-pyhmy:
-	cd .txtool/pyhmy
-	git pull
+	cd txtool/pyhmy
+	git pull https://github.com/tempoxylophone/pyhmy.git code-only
 	cd ../../
 
 install-dev:
@@ -13,7 +14,12 @@ install:
 	pipenv install
 
 test:
-	PYTHONPATH=./txtool pytest
+	pytest
 
 lint:
-	PYTHONPATH=./txtool mypy .
+	mypy .
+
+coverage:
+	coverage run -m pytest .
+	coverage html
+	open htmlcov/index.html

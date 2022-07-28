@@ -1,0 +1,9 @@
+[run]
+branch = True
+
+[report]
+skip_covered = True
+skip_empty = True
+omit =
+    txtool/dfk/*
+    txtool/pyhmy/*
