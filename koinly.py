@@ -2,8 +2,8 @@ from datetime import timezone, datetime
 
 
 class KoinlyInterpreter:
-    KOINLY_DATE_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
-    KOINLY_ROW_HEADER = [
+    _KOINLY_DATE_FORMAT = '%Y-%m-%d %H:%M:%S %Z'
+    _KOINLY_ROW_HEADER = [
         'Date',
         'Sent Amount',
         'Sent Currency',
@@ -22,20 +22,38 @@ class KoinlyInterpreter:
         'Explorer URL',
         '\n',
     ]
-    KOINLY_USE_ONE_ADDRESS_FORMAT = True
+    _KOINLY_TRACKED_CURRENCY_SYMBOLS = {
+        "ONE",
+        "ETH",
+        "BTC",
+        "USDT",
+        "USDC",
+        "DAI",
+        "MATIC",
+        "BNB",
+        "SOL",
+        "DOT",
+        "AVAX",
+        "LINK",
+        "CRV",
+    }
 
     @staticmethod
-    def parse_utc_ts(timestamp: int) -> str:
+    def format_utc_ts_as_str(timestamp: int) -> str:
         return datetime.fromtimestamp(
             timestamp,
             tz=timezone.utc
         ).strftime(
-            KoinlyInterpreter.KOINLY_DATE_FORMAT
+            KoinlyInterpreter._KOINLY_DATE_FORMAT
         )
 
     @staticmethod
     def get_csv_row_header() -> str:
-        return ",".join(KoinlyInterpreter.KOINLY_ROW_HEADER)
+        return ",".join(KoinlyInterpreter._KOINLY_ROW_HEADER)
+
+    @staticmethod
+    def is_tracked(coin_symbol: str) -> bool:
+        return coin_symbol.upper() in KoinlyInterpreter._KOINLY_TRACKED_CURRENCY_SYMBOLS
 
     @staticmethod
     def getRecordLabel(_, event_type: str, event: str) -> str:
@@ -51,3 +69,10 @@ class KoinlyInterpreter:
                 return 'income'
             else:
                 return 'cost'
+
+
+class KoinlyConfig:
+
+    def __init__(self, address_format: str, omit_tracked_fiat_prices: bool):
+        self.address_format = address_format
+        self.omit_tracked_fiat_prices = omit_tracked_fiat_prices

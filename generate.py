@@ -3,8 +3,8 @@
  Copyright 2021 Paul Willworth <ioscode@gmail.com>
 """
 from typing import Dict, List
-from koinly_interpreter import KoinlyInterpreter
-from harmony import DexPriceManager
+from koinly import KoinlyInterpreter, KoinlyConfig
+from harmony import DexPriceManager, HarmonyAddress
 from transactions import WalletActivity
 
 
@@ -14,10 +14,15 @@ def get_csv(records: Dict[str, List[WalletActivity]]) -> str:
     # get fiat prices
     DexPriceManager.initialize_static_price_manager(wallet_txs)
 
+    report_config = KoinlyConfig(
+        address_format=HarmonyAddress.FORMAT_ONE,
+        omit_tracked_fiat_prices=True
+    )
+
     # build CSV
     return (
             KoinlyInterpreter.get_csv_row_header() +
             "".join(tx.to_csv_row(
-                KoinlyInterpreter.KOINLY_USE_ONE_ADDRESS_FORMAT
+                report_config
             ) for tx in wallet_txs)
     )

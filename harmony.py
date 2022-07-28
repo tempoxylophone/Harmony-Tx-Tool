@@ -470,6 +470,11 @@ class HarmonyToken:
                 Web3.fromWei(amount, self._conversion_unit)
         )
 
+    @property
+    def universal_symbol(self) -> str:
+        # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
+        return self.symbol.startswith("1") and self.symbol[1:] or self.symbol
+
     @classmethod
     def get_harmony_token_by_address(cls, address: Union[HarmonyAddress, str]) -> HarmonyToken:
         addr_obj = HarmonyAddress.get_harmony_address(address)

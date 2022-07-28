@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Optional, Union
 from enum import Enum
 import contracts
-from koinly_interpreter import KoinlyInterpreter
+from koinly import KoinlyConfig, KoinlyInterpreter
 from harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
 
 
@@ -88,12 +88,19 @@ class WalletActivity(HarmonyEVMTransaction):
 
         return ''
 
-    def to_csv_row(self, use_one_address: bool) -> str:
-        address_format = use_one_address and HarmonyAddress.FORMAT_ONE or HarmonyAddress.FORMAT_ETH
+    def to_csv_row(self, report_config: KoinlyConfig) -> str:
+        if (
+                report_config.omit_tracked_fiat_prices and
+                KoinlyInterpreter.is_tracked(self.coinType.universal_symbol)
+        ):
+            fiat_value = ''
+        else:
+            fiat_value = str(self.get_fiat_value())
+
         return ','.join(
             (
                 # time of transaction
-                KoinlyInterpreter.parse_utc_ts(self.timestamp),
+                KoinlyInterpreter.format_utc_ts_as_str(self.timestamp),
 
                 # token sent in this tx (outgoing)
                 str(self.sentAmount or ''),
@@ -108,7 +115,7 @@ class WalletActivity(HarmonyEVMTransaction):
                 HarmonyToken.NATIVE_TOKEN_SYMBOL,
 
                 # fiat conversion
-                str(self.get_fiat_value()),
+                fiat_value,
                 self.fiatType,
 
                 # description
@@ -120,8 +127,8 @@ class WalletActivity(HarmonyEVMTransaction):
                 self.get_tx_function_signature(),
 
                 # transfer information
-                self.to_addr.get_address_str(address_format),
-                self.from_addr.get_address_str(address_format),
+                self.to_addr.get_address_str(report_config.address_format),
+                self.from_addr.get_address_str(report_config.address_format),
                 self.explorer_url,
                 '\n'
             )
