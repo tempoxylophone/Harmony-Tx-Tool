@@ -5,10 +5,10 @@
 from typing import Dict, List
 from koinly import KoinlyInterpreter, KoinlyConfig
 from harmony import DexPriceManager, HarmonyAddress
-from transactions import WalletActivity
+from transactions import HarmonyEVMTransaction
 
 
-def get_csv(records: Dict[str, List[WalletActivity]]) -> str:
+def get_csv(records: Dict[str, List[HarmonyEVMTransaction]]) -> str:
     wallet_txs = records['wallet']
 
     # get fiat prices

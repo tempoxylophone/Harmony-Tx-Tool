@@ -78,6 +78,7 @@ class KoinlyInterpreter:
 
 
 class KoinlyConfig:
+    ROW_HEADER = KoinlyInterpreter._KOINLY_ROW_HEADER  # noqa
 
     def __init__(self, address_format: str, omit_tracked_fiat_prices: bool):
         self.address_format = address_format

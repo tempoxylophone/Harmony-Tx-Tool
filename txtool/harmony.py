@@ -10,8 +10,9 @@ from web3 import Web3
 from web3.contract import ContractFunction
 from web3.logs import DISCARD
 from web3.types import TxReceipt, EventData, HexStr
-import pyhmy as pyharmony
+import pyhmy
 import contracts
+from koinly import KoinlyConfig
 from utils import api_retry, get_local_abi
 from dex import UniswapV2ForkGraph
 
@@ -19,7 +20,7 @@ from dex import UniswapV2ForkGraph
 class HarmonyAPI:
     HARMONY_LAUNCH_DATE: date = datetime.strptime("2019-05-01", '%Y-%m-%d').date()
     _CUSTOM_EXCEPTIONS = [
-        pyharmony.rpc.exceptions.RPCError
+        pyhmy.rpc.exceptions.RPCError
     ]
     _NET_HMY_MAIN = 'https://api.harmony.one'
     _NET_HMY_WEB3 = 'https://api.harmony.one'
@@ -90,7 +91,7 @@ class HarmonyAPI:
         txs = []
         has_more = True
         while has_more:
-            results = pyharmony.account.get_transaction_history(
+            results = pyhmy.account.get_transaction_history(
                 eth_address,
                 page=offset,
                 page_size=page_size,
@@ -106,7 +107,7 @@ class HarmonyAPI:
 
     @staticmethod
     def get_num_tx_for_wallet(eth_address: str) -> int:
-        return pyharmony.account.get_transaction_count(
+        return pyhmy.account.get_transaction_count(
             eth_address,
             'latest',
             endpoint=HarmonyAPI._NET_HMY_MAIN
@@ -203,24 +204,15 @@ class HarmonyAddress:
 
     @classmethod
     def convert_one_to_hex(cls, one_string_hash: str) -> str:
-        return pyharmony.util.convert_one_to_hex(one_string_hash)
+        return pyhmy.util.convert_one_to_hex(one_string_hash)
 
     @classmethod
     def convert_hex_to_one(cls, eth_string_hash: str) -> str:
-        p = bytearray.fromhex(
-            # remove 0x prefix from ethereum hash if necessary
-            eth_string_hash[2:] if eth_string_hash.startswith("0x") else eth_string_hash
-        )
-
-        # encode to bech32 style hash "one" hash
-        return pyharmony.bech32.bech32_encode(
-            cls._HARMONY_BECH32_HRP,
-            pyharmony.bech32.convertbits(p, 8, 5)
-        )
+        return pyhmy.util.convert_hex_to_one(eth_string_hash)
 
     @classmethod
     def is_valid_one_address(cls, address: str) -> bool:
-        return pyharmony.account.is_valid_address(address)
+        return pyhmy.account.is_valid_address(address)
 
     @classmethod
     def is_valid_eth_address(cls, address: str) -> bool:
@@ -579,6 +571,10 @@ class HarmonyEVMTransaction:
         else:
             return ""
 
+    def to_csv_row(self, report_config: KoinlyConfig) -> str:
+        # blank row by default
+        return ",".join(" " for _ in report_config.ROW_HEADER)
+
 
 T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
 
@@ -586,6 +582,8 @@ T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
 class HarmonyEVMSmartContract:
     w3 = HarmonyAPI._w3  # noqa
     API_NOT_FOUND_MESSAGES = {"Not found", "contract not found"}
+
+    # TODO: move API/web stuff to HarmonyAPI
     ABI_API_ENDPOINT = "https://ctrver.t.hmny.io/fetchContractCode?contractAddress={0}&shard=0"
     POSSIBLE_ABIS = [
         "ERC20",
