@@ -50,6 +50,9 @@ zipp = "==3.8.1"
 tenacity = "*"
 
 [dev-packages]
+pytest = "*"
+mypy = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.8"
