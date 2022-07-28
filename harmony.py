@@ -80,6 +80,11 @@ class HarmonyAPI:
             print('Failed to get token info for {0} - ERROR: {1}'.format(token_eth_address, err))
             return '?', 18, '?'
 
+    @classmethod
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def get_smart_contract_byte_code(cls, eth_address: str) -> str:
+        return cls._w3.eth.get_code(eth_address)
+
     @staticmethod
     def get_harmony_tx_list(eth_address: str, page_size: int = 1_000) -> List[str]:
         offset = 0
@@ -133,6 +138,15 @@ class HarmonyAddress:
             self.addresses[self.FORMAT_ONE] = self.convert_hex_to_one(address)
         else:
             raise ValueError("Bad address! Got: {0}".format(address))
+
+        self.belongs_to_smart_contract = bool(
+            # null byte if address belongs to a wallet
+            # this will return True if this is the address of ERC20 token
+            HarmonyAPI.get_smart_contract_byte_code(self.eth)
+        )
+
+        # this will be set if the address is called in the constructor of token
+        self.belongs_to_token = False
 
         # add to directory
         HarmonyAddress._ADDRESS_DIRECTORY[self.eth] = self
@@ -380,6 +394,7 @@ class HarmonyToken:
             merge_one_wone_names: Optional[bool] = True
     ):
         self.address = HarmonyAddress.get_harmony_address(address)
+        self.address.belongs_to_token = True
 
         symbol, decimals, name = HarmonyAPI.get_token_info(self.address.eth)
         self.name = name or contracts.getAddressName(self.address.eth)
@@ -491,7 +506,9 @@ class HarmonyEVMTransaction:
         self.block_date = date.fromtimestamp(self.timestamp)
 
         # event data
-        self.action = HarmonyEVMTransaction.lookup_event(self.result['from'], self.result['to'], str(account))
+        self.action = ""
+        self.event = ""
+        self.is_token_transfer = False
 
         # function argument data
         self.contract_pointer = HarmonyEVMSmartContract.lookup_harmony_smart_contract_by_address(self.result['to'])
@@ -508,7 +525,6 @@ class HarmonyEVMTransaction:
         self.receipt = HarmonyEVMTransaction.get_tx_receipt(tx_hash)
         self.tx_fee_in_native_token = Web3.fromWei(self.result['gasPrice'], 'ether') * self.receipt['gasUsed']
 
-        # TODO: fix
         self.fiatValue = 0
         self.fiatFeeValue = 0
         self.fiatType = 'usd'

@@ -1,8 +1,16 @@
 from __future__ import annotations
 from typing import List, Optional, Union
+from enum import Enum
 import contracts
 from koinly_interpreter import KoinlyInterpreter
 from harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
+
+
+class WalletAction(str, Enum):
+    PAYMENT = 'payment'
+    DEPOSIT = 'deposit'
+    DONATION = 'donation'
+    WITHDRAWAL = 'withdraw'
 
 
 class WalletActivity(HarmonyEVMTransaction):
@@ -24,19 +32,6 @@ class WalletActivity(HarmonyEVMTransaction):
 
         # set custom token if it is given
         self.coinType = harmony_token or self.coinType
-
-        # TODO: change all this, it's confusing
-        self.depositEvent = 'payment' if self.is_payment() else 'deposit'
-        self.withdrawalEvent = 'donation' if self.is_donation() else 'withdraw'
-
-        if self.to_addr == self.account and self.value > 0:
-            self.action = self.depositEvent
-            self.address = HarmonyAddress.get_harmony_address(self.result['from'])
-
-        if self.from_addr == self.account and self.value > 0:
-            self.action = self.withdrawalEvent
-            self.address = HarmonyAddress.get_harmony_address(self.result['to'])
-
         self.sentAmount = 0
         self.sentCurrency = None
         self.gotAmount = 0
@@ -45,7 +40,16 @@ class WalletActivity(HarmonyEVMTransaction):
         self.reinterpret_action()
 
     def reinterpret_action(self):
-        if self.action == 'deposit':
+        if not self.is_token_transfer:
+            if self.to_addr == self.account and self.value > 0:
+                self.action = self.is_payment() and WalletAction.PAYMENT or WalletAction.DEPOSIT
+                self.from_addr = HarmonyAddress.get_harmony_address(self.result['from'])
+
+            if self.from_addr == self.account and self.value > 0:
+                self.action = self.is_donation() and WalletAction.DONATION or WalletAction.WITHDRAWAL
+                self.to_addr = HarmonyAddress.get_harmony_address(self.result['to'])
+
+        if self.action == WalletAction.DEPOSIT:
             self.sentAmount = 0
             self.sentCurrency = None
             self.gotAmount = self.coinAmount
@@ -66,11 +70,14 @@ class WalletActivity(HarmonyEVMTransaction):
         )
 
     def get_koinly_description(self) -> str:
-        # TODO: FIX
-        if "Withdrawal to" not in self.action:
-            return self.action
-        else:
-            return ""
+        if self.to_addr.belongs_to_smart_contract and not self.to_addr.belongs_to_token and self.value > 0 and self.sentCurrency:
+            # wallet sent something to smart contract
+            return f"sent {self.sentCurrency} to smart contract"
+
+        if self.from_addr == self.account and self.value > 0 and self.gotCurrency and self.to_addr.belongs_to_smart_contract:
+            return f"got {self.gotCurrency} from smart contract"
+
+        return self.action
 
     def get_koinly_label(self) -> str:
         if (
@@ -126,33 +133,40 @@ class WalletActivity(HarmonyEVMTransaction):
             wallet_activity_instance.txHash,
             wallet_activity_instance.account,
             wallet_activity_instance.receipt,
-            wallet_activity_instance.depositEvent,
-            wallet_activity_instance.withdrawalEvent
         )
 
     @staticmethod
-    def _extract_token_transactions(txn, account_address: HarmonyAddress, receipt, depositEvent, withdrawalEvent):
+    def _extract_token_transactions(txn: str, account_address: HarmonyAddress, receipt):
         transfers = []
         for log in HarmonyAPI.get_tx_transfer_logs(receipt):
-            if log['args']['from'] == account_address.eth:
-                event = withdrawalEvent
-                otherAddress = HarmonyAddress.get_harmony_address(log['args']['to'])
-            elif log['args']['to'] == account_address.eth:
-                event = depositEvent
-                otherAddress = HarmonyAddress.get_harmony_address(log['args']['from'])
-            else:
+            from_addr = log['args']['from']
+            to_addr = log['args']['to']
+
+            if from_addr != account_address.eth and to_addr != account_address.eth:
+                # some intermediate tx
                 continue
 
             token = HarmonyToken.get_harmony_token_by_address(log['address'])
             value = token.get_value_from_wei(log['args']['value'])
 
             r = WalletActivity(account_address, txn, token)
-            r.action = event
-            r.address = otherAddress
             r.value = value
             r.coinAmount = value
+            r.event = log['event']
+            r.is_token_transfer = r.event == "Transfer"
             r.reinterpret_action()
+            r.to_addr = HarmonyAddress.get_harmony_address(to_addr)
+            r.from_addr = HarmonyAddress.get_harmony_address(from_addr)
 
             transfers.append(r)
 
         return transfers
+
+    def __str__(self) -> str:
+        return "tx: {0} --[{1} {2}]--> {3} ({4})".format(
+            self.from_addr.eth,
+            self.value,
+            self.coinType.symbol,
+            self.to_addr.eth,
+            self.txHash
+        )

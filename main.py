@@ -1,8 +1,9 @@
 from typing import Tuple
 import os
-from harmony import HarmonyAPI
 import datetime
 import argparse
+
+from harmony import HarmonyAPI
 from generate import get_csv
 from events import get_events
 
