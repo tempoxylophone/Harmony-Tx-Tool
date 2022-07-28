@@ -1,4 +1,10 @@
 from datetime import timezone, datetime
+from enum import Enum
+
+
+class KoinlyLabel(str, Enum):
+    COST = 'cost'
+    NULL = ''
 
 
 class KoinlyInterpreter:

@@ -168,6 +168,10 @@ class HarmonyAddress:
     def one(self) -> str:
         return self.get_one_address()
 
+    @property
+    def belongs_to_non_token_smart_contract(self) -> bool:
+        return self.belongs_to_smart_contract and not self.belongs_to_token
+
     @classmethod
     def get_address_string_format(cls, address_string: str) -> str:
         if cls.is_valid_one_address(address_string):
