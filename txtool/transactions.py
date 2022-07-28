@@ -1,9 +1,10 @@
 from __future__ import annotations
 from typing import List, Optional, Union, Dict, Any
 from enum import Enum
-import contracts
-from koinly import KoinlyConfig, KoinlyInterpreter, KoinlyLabel
-from harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
+from eth_typing import HexStr
+from txtool import contracts
+from txtool.koinly import KoinlyConfig, KoinlyInterpreter, KoinlyLabel
+from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
 
 
 class WalletAction(str, Enum):
@@ -11,6 +12,7 @@ class WalletAction(str, Enum):
     DEPOSIT = 'deposit'
     DONATION = 'donation'
     WITHDRAWAL = 'withdraw'
+    NULL = ''
 
 
 class WalletActivity(HarmonyEVMTransaction):
@@ -18,7 +20,7 @@ class WalletActivity(HarmonyEVMTransaction):
     def __init__(
             self,
             wallet_address: Union[HarmonyAddress, str],
-            tx_hash: hex,
+            tx_hash: HexStr,
             harmony_token: Optional[HarmonyToken] = None
     ):
         # get information about this tx
@@ -27,9 +29,9 @@ class WalletActivity(HarmonyEVMTransaction):
         # set custom token if it is given
         self.coinType = harmony_token or self.coinType
         self.sentAmount = 0
-        self.sentCurrency: Union[HarmonyToken, None] = None
+        self.sentCurrencySymbol = ''
         self.gotAmount = 0
-        self.gotCurrency: Union[HarmonyToken, None] = None
+        self.gotCurrencySymbol = ''
 
         self._reinterpret_action()
 
@@ -46,21 +48,24 @@ class WalletActivity(HarmonyEVMTransaction):
         if self._is_sender():
             return self._is_donation() and WalletAction.DONATION or WalletAction.WITHDRAWAL
 
+        # unknown
+        return WalletAction.NULL
+
     def _reinterpret_action(self):
         self.action = self._get_action()
 
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
             self.sentAmount = 0
-            self.sentCurrency = None
+            self.sentCurrencySymbol = ''
             self.gotAmount = self.coinAmount
-            self.gotCurrency = self.coinType.symbol
+            self.gotCurrencySymbol = self.coinType.symbol
         else:
             # this wallet sent some currency
             self.sentAmount = self.coinAmount
-            self.sentCurrency = self.coinType.symbol
+            self.sentCurrencySymbol = self.coinType.symbol
             self.gotAmount = 0
-            self.gotCurrency = None
+            self.gotCurrencySymbol = ''
 
     def _is_payment(self) -> bool:
         return self.result['from'] in contracts.payment_wallets
@@ -75,7 +80,7 @@ class WalletActivity(HarmonyEVMTransaction):
     def extract_all_wallet_activity_from_transaction(
             cls,
             wallet_address: str,
-            tx_hash: hex
+            tx_hash: HexStr
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(wallet_address, tx_hash)
         leaf_tx = WalletActivity._get_token_transfers(root_tx)
@@ -90,19 +95,19 @@ class WalletActivity(HarmonyEVMTransaction):
         if (
                 self._is_sender() and
                 self.value > 0 and
-                self.sentCurrency and
+                self.sentCurrencySymbol and
                 self.to_addr.belongs_to_non_token_smart_contract
         ):
             # wallet sent something to smart contract
-            return f"sent {self.sentCurrency} to smart contract"
+            return f"sent {self.sentCurrencySymbol} to smart contract"
 
         if (
                 self._is_receiver() and
                 self.value > 0 and
-                self.gotCurrency and
+                self.gotCurrencySymbol and
                 self.to_addr.belongs_to_non_token_smart_contract
         ):
-            return f"got {self.gotCurrency} from smart contract"
+            return f"got {self.gotCurrencySymbol} from smart contract"
 
         return self.action
 
@@ -114,7 +119,7 @@ class WalletActivity(HarmonyEVMTransaction):
                 self.gotAmount == 0 and
                 self.tx_fee_in_native_token and
                 # fee must be in ONE
-                self.sentCurrency == HarmonyToken.native_token().symbol
+                self.sentCurrencySymbol == HarmonyToken.native_token().symbol
         ):
             return KoinlyLabel.COST
 
@@ -136,11 +141,11 @@ class WalletActivity(HarmonyEVMTransaction):
 
                 # token sent in this tx (outgoing)
                 str(self.sentAmount or ''),
-                self.sentCurrency or '',
+                self.sentCurrencySymbol,
 
                 # token received in this tx (incoming)
                 str(self.gotAmount or ''),
-                self.gotCurrency or '',
+                self.gotCurrencySymbol,
 
                 # gas
                 str(self.tx_fee_in_native_token),

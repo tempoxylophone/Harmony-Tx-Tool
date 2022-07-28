@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from typing import Dict, List
-import transactions as records
+from eth_typing import HexStr
 
-from harmony import HarmonyAPI, HarmonyEVMTransaction
-from dfk.events import DFK_EVENT_WORDS
+from txtool import transactions as records
+from .harmony import HarmonyAPI, HarmonyEVMTransaction
+from .dfk.constants import DFK_EVENT_WORDS
 
 
 def get_new_events_map() -> Dict:
@@ -21,7 +22,7 @@ def get_new_events_map() -> Dict:
     }
 
 
-def get_events(tx_hashes_strings: List[str], wallet_address: str) -> Dict[str, List[HarmonyEVMTransaction]]:
+def get_events(tx_hashes_strings: List[HexStr], wallet_address: str) -> Dict[str, List[HarmonyEVMTransaction]]:
     events_map = get_new_events_map()
 
     for tx_hash_string in tx_hashes_strings:

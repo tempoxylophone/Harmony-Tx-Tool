@@ -3,9 +3,9 @@
  Copyright 2021 Paul Willworth <ioscode@gmail.com>
 """
 from typing import Dict, List
-from koinly import KoinlyInterpreter, KoinlyConfig
-from harmony import DexPriceManager, HarmonyAddress
-from transactions import HarmonyEVMTransaction
+from txtool.koinly import KoinlyInterpreter, KoinlyConfig
+from txtool.harmony import DexPriceManager, HarmonyAddress
+from txtool.transactions import HarmonyEVMTransaction
 
 
 def get_csv(records: Dict[str, List[HarmonyEVMTransaction]]) -> str:

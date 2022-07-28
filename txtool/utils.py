@@ -1,6 +1,6 @@
-from typing import List, Callable, Type
+from typing import List, Sequence, Type, Union, Callable
 import os
-from requests.exceptions import HTTPError, ConnectionError
+from requests.exceptions import HTTPError, ConnectionError, RequestException
 from tenacity import (
     retry,
     retry_any as RetryChain,  # noqa
@@ -10,14 +10,16 @@ from tenacity import (
     wait_random,
 )
 
-COMMON_API_EXCEPTIONS = [
+COMMON_API_EXCEPTIONS: List[Type] = [
     HTTPError,
     ConnectionError,
 ]
 
+T_EXCEPTION = Type[BaseException]
+
 
 def retry_on_exceptions(
-        exceptions: List[Type[Exception]],
+        exceptions: List[T_EXCEPTION],
         max_tries: int = 5,
         jitter_range_sec: int = 2,
         max_wait_sec: int = 120
@@ -33,14 +35,14 @@ def retry_on_exceptions(
     )
 
 
-def _build_exceptions(exceptions: List[Type[Exception]], i: int = 0) -> RetryChain:
+def _build_exceptions(exceptions: List[T_EXCEPTION], i: int = 0) -> RetryChain:
     # hahah
     return r(exceptions[i]) | (
             i + 1 == len(exceptions) - 1 and r(exceptions[i + 1]) or _build_exceptions(exceptions, i + 1)
     )
 
 
-def api_retry(custom_exceptions: List[Type[Exception]]) -> Callable:
+def api_retry(custom_exceptions: List[T_EXCEPTION]) -> Callable:
     return retry_on_exceptions(COMMON_API_EXCEPTIONS + custom_exceptions)  # noqa (type inheritance fails here)
 
 

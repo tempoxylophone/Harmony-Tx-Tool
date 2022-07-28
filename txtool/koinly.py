@@ -76,6 +76,8 @@ class KoinlyInterpreter:
             else:
                 return 'cost'
 
+        return ""
+
 
 class KoinlyConfig:
     ROW_HEADER = KoinlyInterpreter._KOINLY_ROW_HEADER  # noqa

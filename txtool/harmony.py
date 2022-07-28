@@ -1,7 +1,8 @@
 from __future__ import annotations
 from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Dict, Optional, Union, Tuple, Iterable, Any
+from typing import List, Dict, Optional, Union, Tuple, Iterable, Any, TypedDict
+from hexbytes import HexBytes
 from collections import defaultdict
 from functools import lru_cache
 
@@ -10,16 +11,17 @@ from web3 import Web3
 from web3.contract import ContractFunction
 from web3.logs import DISCARD
 from web3.types import TxReceipt, EventData, HexStr
-import pyhmy
-import contracts
-from koinly import KoinlyConfig
-from utils import api_retry, get_local_abi
-from dex import UniswapV2ForkGraph
+
+from txtool import pyhmy
+from txtool import contracts
+from txtool.koinly import KoinlyConfig
+from txtool.utils import api_retry, get_local_abi
+from txtool.dex import UniswapV2ForkGraph
 
 
 class HarmonyAPI:
     HARMONY_LAUNCH_DATE: date = datetime.strptime("2019-05-01", '%Y-%m-%d').date()
-    _CUSTOM_EXCEPTIONS = [
+    _CUSTOM_EXCEPTIONS: List = [
         pyhmy.rpc.exceptions.RPCError
     ]
     _NET_HMY_MAIN = 'https://api.harmony.one'
@@ -29,13 +31,13 @@ class HarmonyAPI:
     _ERC20_ABI = get_local_abi('ERC20')
 
     _JEWEL_CONTRACT = _w3.eth.contract(  # noqa
-        address='0x72Cb10C6bfA5624dD07Ef608027E366bd690048F',
+        address='0x72Cb10C6bfA5624dD07Ef608027E366bd690048F',  # type: ignore
         abi=get_local_abi('JewelToken')
     )
 
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_transaction(cls, tx_hash: Union[HexStr, str]):
+    def get_transaction(cls, tx_hash: HexStr):
         return cls._w3.eth.get_transaction(tx_hash)
 
     @classmethod
@@ -49,7 +51,7 @@ class HarmonyAPI:
 
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_tx_receipt(cls, tx_hash: Union[HexStr, str]) -> TxReceipt:
+    def get_tx_receipt(cls, tx_hash: HexStr) -> TxReceipt:
         try:
             return cls._w3.eth.get_transaction_receipt(tx_hash)
         except Exception as err:
@@ -82,11 +84,11 @@ class HarmonyAPI:
 
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_smart_contract_byte_code(cls, eth_address: str) -> str:
+    def get_smart_contract_byte_code(cls, eth_address: str) -> HexBytes:
         return cls._w3.eth.get_code(eth_address)
 
     @staticmethod
-    def get_harmony_tx_list(eth_address: str, page_size: int = 1_000) -> List[str]:
+    def get_harmony_tx_list(eth_address: str, page_size: int = 1_000) -> List[HexStr]:
         offset = 0
         txs = []
         has_more = True
@@ -234,11 +236,19 @@ class HarmonyAddress:
 
 
 class DexPriceManager:
-    _TX_LOOKUP: Dict[HarmonyToken, Union[List, float, Dict]] = defaultdict(lambda: {
+    class DexPriceInfo(TypedDict):
+        blocks: List[int]
+        timestamps: List[int]
+        timestamp_range: Dict[str, Union[float, int]]
+        fiat_prices_by_block: Dict[int, Decimal]
+
+    _TX_LOOKUP: Dict[HarmonyToken, DexPriceInfo] = defaultdict(lambda: {
         'blocks': [],
         'timestamps': [],
-        'max_timestamp': float("-inf"),
-        'min_timestamp': float("+inf"),
+        'timestamp_range': {
+            'max': float("-inf"),
+            'min': float("+inf"),
+        },
         'fiat_prices_by_block': {},
     })
     _DEX_GRAPH_URLS = [
@@ -268,8 +278,8 @@ class DexPriceManager:
             timestamp = t.timestamp
             p['blocks'].append(t.block)
             p['timestamps'].append(timestamp)
-            p['max_timestamp'] = max(p['max_timestamp'], timestamp)
-            p['min_timestamp'] = min(p['min_timestamp'], timestamp)
+            p['timestamp_range']['max'] = max(p['timestamp_range']['max'], timestamp)
+            p['timestamp_range']['min'] = min(p['timestamp_range']['min'], timestamp)
 
     @classmethod
     def get_token_or_pair_info(cls, token_or_pair_address: str) -> Dict:
@@ -315,8 +325,8 @@ class DexPriceManager:
                     ts = DexPriceManager._try_to_get_lp_prices_from_dexes(
                         dex,
                         harmony_token.address.eth,
-                        token_properties['min_timestamp'],
-                        token_properties['max_timestamp'],
+                        int(token_properties['timestamp_range']['min']),
+                        int(token_properties['timestamp_range']['max']),
                         token_properties['blocks'],
                     )
                 else:
@@ -380,7 +390,7 @@ class HarmonyToken:
     }
 
     @classmethod
-    def native_token(cls):
+    def native_token(cls) -> HarmonyToken:
         return cls.get_harmony_token_by_address(cls.NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     def __init__(
@@ -462,7 +472,7 @@ class HarmonyToken:
         # w3.fromWei doesn't seem to have an 8 decimal option for BTC
         return (
                 self._conversion_unit == "btc" and amount / Decimal(100000000) or
-                Web3.fromWei(amount, self._conversion_unit)
+                Decimal(Web3.fromWei(amount, self._conversion_unit))
         )
 
     @property
@@ -490,7 +500,7 @@ class HarmonyToken:
 class HarmonyEVMTransaction:
     EXPLORER_TX_URL = "https://explorer.harmony.one/tx/{0}"
 
-    def __init__(self, account: Union[HarmonyAddress, str], tx_hash: hex):
+    def __init__(self, account: Union[HarmonyAddress, str], tx_hash: HexStr):
         # identifiers
         self.txHash = tx_hash
         self.account = HarmonyAddress.get_harmony_address(account)
@@ -520,7 +530,7 @@ class HarmonyEVMTransaction:
 
         # assume it is ONE unless otherwise specified, inheritors of this class can change
         # this based data relevant to what they do
-        self.coinType = HarmonyToken.native_token()
+        self.coinType: HarmonyToken = HarmonyToken.native_token()
 
         self.receipt = HarmonyEVMTransaction.get_tx_receipt(tx_hash)
         self.tx_fee_in_native_token = Web3.fromWei(self.result['gasPrice'], 'ether') * self.receipt['gasUsed']
@@ -558,12 +568,12 @@ class HarmonyEVMTransaction:
         return HarmonyAPI.get_timestamp(block)
 
     @classmethod
-    def get_tx_receipt(cls, tx_hash: hex) -> Dict:
+    def get_tx_receipt(cls, tx_hash: HexStr) -> TxReceipt:
         return HarmonyAPI.get_tx_receipt(tx_hash)
 
     def get_tx_function_signature(self) -> str:
         decode_successful, function_info = self.tx_payload
-        if decode_successful:
+        if decode_successful and function_info:
             f, _ = function_info
 
             # escape and strip class name in python to string
@@ -612,7 +622,7 @@ class HarmonyEVMSmartContract:
             abi=self.abi
         )
 
-    def decode_input(self, tx_input: hex) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
+    def decode_input(self, tx_input: HexStr) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
         if self.abi_attempt_idx > len(self.POSSIBLE_ABIS) - 1:
             # can't decode this, even after trying a few generic ABIs
             return False, None
