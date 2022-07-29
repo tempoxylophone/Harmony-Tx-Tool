@@ -1,16 +1,19 @@
-from typing import Tuple
-import os
-import datetime
-import argparse
+from typing import Tuple, Optional
+from datetime import datetime, timezone
 
 from txtool.harmony import HarmonyAPI
 from txtool.generate import get_csv
 from txtool.events import get_events
 
-TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
 
+def get_harmony_tx_from_wallet_as_csv(
+        wallet_address_eth_str: str,
+        dt_arg_lb: Optional[str] = "",
+        dt_arg_ub: Optional[str] = "",
+) -> Tuple[str, str]:
+    dt_lb = dt_arg_lb and _parse_date_arg(dt_arg_lb) or HarmonyAPI.HARMONY_LAUNCH_DATE
+    dt_ub = dt_arg_ub and _parse_date_arg(dt_arg_ub) or datetime.utcnow()
 
-def get_harmony_tx_from_wallet_as_csv(wallet_address_eth_str: str) -> Tuple[str, str]:
     # --- START ---
     print("Fetching {0} transactions from address {1}...".format(
         HarmonyAPI.get_num_tx_for_wallet(wallet_address_eth_str),
@@ -23,22 +26,16 @@ def get_harmony_tx_from_wallet_as_csv(wallet_address_eth_str: str) -> Tuple[str,
         wallet_address_eth_str
     )
 
+    # remove out of range transactions
+    tx_events = [x for x in tx_events if dt_lb.timestamp() <= x.timestamp <= dt_ub.toordinal()]
+
     # --- WRITE TO FILE ---
     result: str = get_csv(tx_events)
-    _finished_at = datetime.datetime.now().strftime("%Y-%m-%d_%H:%m:%s")
+    _finished_at = datetime.now().strftime("%Y-%m-%d_%H:%m:%s")
     _file_name = wallet_address_eth_str + "_" + _finished_at + ".csv"
     return result, _file_name
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("wallet", help="Ethereum-style address of Harmony ONE wallet")
-    args = parser.parse_args()
-
-    csv_contents, file_name = get_harmony_tx_from_wallet_as_csv(args.wallet)
-
-    # write to desktop
-    user_dir = os.path.expanduser("~")
-    path = user_dir + "/Desktop/" + file_name
-    with open(path, "w") as f:
-        f.write(csv_contents)
+def _parse_date_arg(date_str: str) -> datetime:
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    return dt.replace(tzinfo=timezone.utc)

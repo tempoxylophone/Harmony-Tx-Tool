@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, Sequence, List
 from eth_typing import HexStr
 
 from txtool import transactions as records
@@ -21,8 +21,8 @@ def get_new_events_map() -> Dict:
     }
 
 
-def get_events(tx_hashes_strings: List[HexStr], wallet_address: str) -> Dict[str, List[HarmonyEVMTransaction]]:
-    events_map = get_new_events_map()
+def get_events(tx_hashes_strings: List[HexStr], wallet_address: str) -> Sequence[HarmonyEVMTransaction]:
+    events = []
 
     for tx_hash_string in tx_hashes_strings:
         result = HarmonyAPI.get_transaction(tx_hash_string)
@@ -47,6 +47,6 @@ def get_events(tx_hashes_strings: List[HexStr], wallet_address: str) -> Dict[str
                 wallet_address, tx_hash_string
             )
         )
-        events_map['wallet'] += results
+        events += results
 
-    return events_map
+    return events

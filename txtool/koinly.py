@@ -45,11 +45,15 @@ class KoinlyInterpreter:
     }
 
     @staticmethod
-    def format_utc_ts_as_str(timestamp: int) -> str:
+    def timestamp_to_utc_datetime(timestamp: int) -> datetime:
         return datetime.fromtimestamp(
             timestamp,
             tz=timezone.utc
-        ).strftime(
+        )
+
+    @staticmethod
+    def format_utc_ts_as_str(timestamp: int) -> str:
+        return KoinlyInterpreter.timestamp_to_utc_datetime(timestamp).strftime(
             KoinlyInterpreter._KOINLY_DATE_FORMAT
         )
 
