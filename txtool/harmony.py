@@ -13,9 +13,10 @@ from web3.logs import DISCARD
 from web3.types import TxReceipt, EventData, HexStr
 
 from txtool import pyhmy
-from txtool import contracts
 from txtool.utils import api_retry, get_local_abi
 from txtool.dex import UniswapV2ForkGraph
+
+from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP
 
 
 class HarmonyAPI:
@@ -405,7 +406,7 @@ class HarmonyToken:
         self.address.belongs_to_token = True
 
         symbol, decimals, name = HarmonyAPI.get_token_info(self.address.eth)
-        self.name = name or contracts.getAddressName(self.address.eth)
+        self.name = name
         self.symbol = symbol
         self.decimals = decimals
 
@@ -566,8 +567,9 @@ class HarmonyEVMTransaction:
 
     @staticmethod
     def lookup_event(fm_addr: str, to_addr: str, account) -> str:
-        fmStr = contracts.address_map.get(fm_addr, fm_addr) or ""
-        toStr = contracts.address_map.get(to_addr, to_addr) or ""
+        fmStr = HARMONY_TOKEN_ADDRESS_MAP.get(fm_addr, fm_addr) or ""
+        toStr = HARMONY_TOKEN_ADDRESS_MAP.get(to_addr, to_addr) or ""
+
         if '0x' in fmStr and toStr == account:
             fmStr = 'Deposit from {0}'.format(fmStr)
         if '0x' in toStr and fmStr == account:

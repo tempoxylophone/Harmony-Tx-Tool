@@ -1,24 +1,9 @@
-from typing import Dict, Sequence, List
+from typing import Sequence, List
 from eth_typing import HexStr
 
 from txtool import transactions as records
 from .harmony import HarmonyAPI, HarmonyEVMTransaction
 from .dfk.constants import DFK_EVENT_WORDS
-
-
-def get_new_events_map() -> Dict:
-    return {
-        'tavern': [],
-        'swaps': [],
-        'liquidity': [],
-        'wallet': [],
-        'bank': [],
-        'gardens': [],
-        'quests': [],
-        'alchemist': [],
-        'airdrops': [],
-        'lending': [],
-    }
 
 
 def get_events(tx_hashes_strings: List[HexStr], wallet_address: str) -> Sequence[HarmonyEVMTransaction]:

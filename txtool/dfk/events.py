@@ -2,14 +2,19 @@
 from typing import Dict
 from web3 import Web3
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
-import contracts
 import constants
 import transactions as records
-import dfk.priceslegacy as prices
+import txtool.dfk.priceslegacy as prices
 import datetime
 import decimal
 import logging
-from dfk.constants import DFK_EVENT_WORDS
+from txtool.dfk import contracts
+from txtool.dfk.constants import DFK_EVENT_WORDS
+
+
+def getNativeToken(_) -> str:
+    return '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a'
+
 
 hmy_main = 'https://api.harmony.one'
 hmy_web3 = 'https://api.harmony.one'

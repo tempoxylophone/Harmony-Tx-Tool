@@ -2,8 +2,12 @@ from __future__ import annotations
 from typing import List, Optional, Union, Dict, Any
 from enum import Enum
 from eth_typing import HexStr
-from txtool import contracts
 from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
+
+from txtool.dfk.constants import (
+    HARMONY_TOKEN_ADDRESS_MAP,
+    DFK_PAYMENT_WALLET_ADDRESSES
+)
 
 
 class WalletAction(str, Enum):
@@ -64,12 +68,12 @@ class WalletActivity(HarmonyEVMTransaction):
             self.gotCurrencySymbol = ''
 
     def _is_payment(self) -> bool:
-        return self.result['from'] in contracts.payment_wallets
+        return self.result['from'] in DFK_PAYMENT_WALLET_ADDRESSES
 
     def _is_donation(self) -> bool:
         return (
                 bool(self.result['to']) and
-                'Donation' in contracts.getAddressName(self.result['to'])
+                'Donation' in HARMONY_TOKEN_ADDRESS_MAP.get(self.result['to'], "")
         )
 
     @classmethod
