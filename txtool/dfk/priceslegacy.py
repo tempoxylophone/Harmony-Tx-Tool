@@ -8,21 +8,23 @@ import decimal
 import contracts
 from constants import DECIMAL_UNITS as decimal_units, TOKEN_MAP as token_map
 
-hmy_main = 'https://api.harmony.one'
-hmy_web3 = 'https://api.harmony.one'
+hmy_main = "https://api.harmony.one"
+hmy_web3 = "https://api.harmony.one"
 
 today_prices = {}
 
 
-def priceLookup(timestamp, token, fiatType='usd'):
-    lookupDate = datetime.date.fromtimestamp(timestamp).strftime('%d-%m-%Y')
+def priceLookup(timestamp, token, fiatType="usd"):
+    lookupDate = datetime.date.fromtimestamp(timestamp).strftime("%d-%m-%Y")
     # if token is in map, switch to gecko token name instead
     if token in token_map:
         token = token_map[token]
     # Calculate based on gold price if convertible to gold
     if token in contracts.gold_values and contracts.gold_values[token] > 0:
         return decimal.Decimal(
-            getPrice('0x3a4EDcf3312f44EF027acfd8c21382a5259936e7', lookupDate, fiatType) * contracts.gold_values[token])
+            getPrice("0x3a4EDcf3312f44EF027acfd8c21382a5259936e7", lookupDate, fiatType)
+            * contracts.gold_values[token]
+        )
     else:
         return decimal.Decimal(getPrice(token, lookupDate, fiatType))
 
@@ -31,27 +33,31 @@ def fetchPriceData(token, date):
     """
     Use coingecko API
     """
-    realDate = datetime.datetime.strptime(date, '%d-%m-%Y')
+    realDate = datetime.datetime.strptime(date, "%d-%m-%Y")
     prices = None
     # Coin Gecko only has prices from October 20th 2021 forward for JEWEL
-    if (realDate > datetime.datetime.strptime('19-10-2021', '%d-%m-%Y') or token != 'defi-kingdoms') and token[
-        0] != '0':
-        gecko_uri = "https://api.coingecko.com/api/v3/coins/{0}/history?date={1}&localization=false".format(token, date)
+    if (
+        realDate > datetime.datetime.strptime("19-10-2021", "%d-%m-%Y")
+        or token != "defi-kingdoms"
+    ) and token[0] != "0":
+        gecko_uri = "https://api.coingecko.com/api/v3/coins/{0}/history?date={1}&localization=false".format(
+            token, date
+        )
         r = requests.get(gecko_uri)
         if r.status_code == 200:
             result = r.json()
             try:
-                prices = result['market_data']['current_price']
-                marketcap = result['market_data']['market_cap']
-                volume = result['market_data']['total_volume']
+                prices = result["market_data"]["current_price"]
+                marketcap = result["market_data"]["market_cap"]
+                volume = result["market_data"]["total_volume"]
             except Exception as err:
                 result = "Error: failed to get prices no market data {0}".format(r.text)
-                logging.error(result + '\n')
+                logging.error(result + "\n")
             if prices != None:
                 result = prices
         else:
             result = "Error: failed to get prices - {0}".format(r.text)
-            logging.error(result + '\n')
+            logging.error(result + "\n")
     else:
         # Lookup up price in DFK contract for some stuff
         result = fetchItemPrice(token, date)
@@ -66,7 +72,9 @@ def fetchItemPrice(token, date):
         price = today_prices[token]
     else:
         # only look at harmony
-        price = getCurrentPrice(token, '0x72Cb10C6bfA5624dD07Ef608027E366bd690048F', 'harmony')
+        price = getCurrentPrice(
+            token, "0x72Cb10C6bfA5624dD07Ef608027E366bd690048F", "harmony"
+        )
 
         if price >= 0:
             # db.savePriceData(
@@ -87,7 +95,7 @@ def fetchItemPrice(token, date):
     return result
 
 
-def getPrice(token, date, fiatType='usd'):
+def getPrice(token, date, fiatType="usd"):
     prices = fetchPriceData(token, date)
     if fiatType in prices:
         return prices[fiatType]
@@ -98,9 +106,11 @@ def getPrice(token, date, fiatType='usd'):
 # Return USD price of token based on its pair to throughToken to 1USDC
 def getCurrentPrice(token, throughToken, network):
     w3 = Web3(Web3.HTTPProvider(hmy_web3))
-    ABI = contracts.getABI('UniswapV2Router02')
-    contract = w3.eth.contract(address='0x24ad62502d1C652Cc7684081169D04896aC20f30', abi=ABI)
-    addrUSDC = '0x985458E523dB3d53125813eD68c274899e9DfAb4'
+    ABI = contracts.getABI("UniswapV2Router02")
+    contract = w3.eth.contract(
+        address="0x24ad62502d1C652Cc7684081169D04896aC20f30", abi=ABI
+    )
+    addrUSDC = "0x985458E523dB3d53125813eD68c274899e9DfAb4"
     if token in contracts.alternate_pair_through_tokens:
         throughToken = contracts.alternate_pair_through_tokens[token]
 
@@ -109,37 +119,44 @@ def getCurrentPrice(token, throughToken, network):
 
     # Sometimes 8 decimal tokens will try to get looked up, so skip those
     if tokenDecimals in decimal_units and throughTokenDecimals in decimal_units:
-        tokenOne = 1 if tokenDecimals == 0 else Web3.toWei(1, decimal_units[tokenDecimals])
+        tokenOne = (
+            1 if tokenDecimals == 0 else Web3.toWei(1, decimal_units[tokenDecimals])
+        )
         throughTokenOne = Web3.toWei(1, decimal_units[throughTokenDecimals])
     else:
         return -1
 
     price = -1
     try:
-        token0Amount = contract.functions.getAmountsOut(tokenOne, [token, throughToken]).call()
+        token0Amount = contract.functions.getAmountsOut(
+            tokenOne, [token, throughToken]
+        ).call()
         if throughToken == addrUSDC:
             # If through token is USD, we don't need to get through token to USDC
             price = contracts.valueFromWei(token0Amount[1], throughToken)
         else:
-            token1Amount = contract.functions.getAmountsOut(throughTokenOne, [throughToken, addrUSDC]).call()
-            price = contracts.valueFromWei(token0Amount[1], throughToken) * contracts.valueFromWei(token1Amount[1],
-                                                                                                   addrUSDC)
+            token1Amount = contract.functions.getAmountsOut(
+                throughTokenOne, [throughToken, addrUSDC]
+            ).call()
+            price = contracts.valueFromWei(
+                token0Amount[1], throughToken
+            ) * contracts.valueFromWei(token1Amount[1], addrUSDC)
     except Exception as err:
-        logging.error('Price lookup failed for {1}: {0}'.format(err, token))
+        logging.error("Price lookup failed for {1}: {0}".format(err, token))
 
     return price
 
 
 def getTokenInfo(w3, address):
-    ABI = contracts.getABI('ERC20')
+    ABI = contracts.getABI("ERC20")
     contract = w3.eth.contract(address=Web3.toChecksumAddress(address), abi=ABI)
     try:
         symbol = contract.functions.symbol().call()
         decimals = contract.functions.decimals().call()
         name = contract.functions.name().call()
     except Exception as err:
-        print('Failed to get token info for {0}'.format(address))
+        print("Failed to get token info for {0}".format(address))
         print(err)
-        return ['NA', 18, 'NA']
+        return ["NA", 18, "NA"]
 
     return [symbol, decimals, name]

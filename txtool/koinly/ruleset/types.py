@@ -4,13 +4,13 @@ import operator
 
 
 class KoinlyLabel(str, Enum):
-    COST = 'cost'
-    INCOME = 'income'
-    NULL = ''
+    COST = "cost"
+    INCOME = "income"
+    NULL = ""
 
 
 OPERATORS: Dict[str, Callable] = {
-    '==': operator.eq,
+    "==": operator.eq,
     ">": operator.gt,
     "<": operator.lt,
 }
@@ -20,7 +20,7 @@ T_KOINLY_LABEL_RULESET = List[
         # associated description
         str,
         # potential properties that match this label
-        Dict[str, Tuple[str, Union[Type, Callable], Any]]
+        Dict[str, Tuple[str, Union[Type, Callable], Any]],
     ]
 ]
 

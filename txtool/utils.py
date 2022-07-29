@@ -1,7 +1,6 @@
-from typing import List, Type, Callable, Dict
-from json import loads
+from typing import List, Type, Callable
 import os
-from requests.exceptions import HTTPError, ConnectionError
+from requests.exceptions import HTTPError, ConnectionError as HTTPConnectionError
 from tenacity import (
     retry,
     retry_any as RetryChain,  # noqa
@@ -10,36 +9,37 @@ from tenacity import (
     wait_exponential,
     wait_random,
 )
-from eth_abi.abi import decode
 
 T_EXCEPTION = Type[BaseException]
 
 COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
     HTTPError,
-    ConnectionError,
+    HTTPConnectionError,
 ]
 
 
 def retry_on_exceptions(
-        exceptions: List[T_EXCEPTION],
-        max_tries: int = 7,
-        jitter_range_sec: int = 2,
-        max_wait_sec: int = 120
+    exceptions: List[T_EXCEPTION],
+    max_tries: int = 7,
+    jitter_range_sec: int = 2,
+    max_wait_sec: int = 120,
 ) -> Callable:
     return retry(
         retry=_build_exceptions(exceptions),
         reraise=True,
         wait=(
-                wait_exponential(multiplier=1, min=5, max=max_wait_sec) +
-                wait_random(0, jitter_range_sec)
+            wait_exponential(multiplier=1, min=5, max=max_wait_sec)
+            + wait_random(0, jitter_range_sec)
         ),
-        stop=stop_after_attempt(max_tries)
+        stop=stop_after_attempt(max_tries),
     )
 
 
 def _build_exceptions(exceptions: List[T_EXCEPTION], i: int = 0) -> RetryChain:
     return r(exceptions[i]) | (
-            i + 1 == len(exceptions) - 1 and r(exceptions[i + 1]) or _build_exceptions(exceptions, i + 1)
+        i + 1 == len(exceptions) - 1
+        and r(exceptions[i + 1])
+        or _build_exceptions(exceptions, i + 1)
     )
 
 
@@ -49,12 +49,11 @@ def api_retry(custom_exceptions: List[T_EXCEPTION]) -> Callable:
 
 def get_local_abi(abi_json_filename: str) -> str:
     location = os.path.abspath(__file__)
-    path = '{0}/abi/{1}.json'.format(
-        '/'.join(location.split('/')[0:-1]),
-        abi_json_filename
+    path = "{0}/abi/{1}.json".format(
+        "/".join(location.split("/")[0:-1]), abi_json_filename
     )
 
-    with open(path, 'r') as f:
+    with open(path, "r", encoding="UTF-8") as f:
         abi = f.read()
 
     return abi

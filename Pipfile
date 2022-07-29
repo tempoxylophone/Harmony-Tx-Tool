@@ -53,6 +53,8 @@ tenacity = "*"
 pytest = "*"
 mypy = "*"
 coverage = "*"
+black = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.8"

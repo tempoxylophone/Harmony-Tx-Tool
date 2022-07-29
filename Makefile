@@ -18,6 +18,8 @@ test:
 
 lint:
 	mypy .
+	black .
+	pylint txtool
 
 coverage:
 	coverage run -m pytest .

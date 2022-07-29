@@ -2,36 +2,37 @@ from __future__ import annotations
 from typing import List, Optional, Union, Dict, Any
 from enum import Enum
 from eth_typing import HexStr
-from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
-
-from txtool.dfk.constants import (
-    HARMONY_TOKEN_ADDRESS_MAP,
-    DFK_PAYMENT_WALLET_ADDRESSES
+from txtool.harmony import (
+    HarmonyToken,
+    HarmonyAddress,
+    HarmonyEVMTransaction,
+    HarmonyAPI,
 )
+
+from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 
 
 class WalletAction(str, Enum):
-    PAYMENT = 'payment'
-    DEPOSIT = 'deposit'
-    DONATION = 'donation'
-    WITHDRAWAL = 'withdraw'
-    NULL = ''
+    PAYMENT = "payment"
+    DEPOSIT = "deposit"
+    DONATION = "donation"
+    WITHDRAWAL = "withdraw"
+    NULL = ""
 
 
-class WalletActivity(HarmonyEVMTransaction):
-
+class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def __init__(
-            self,
-            wallet_address: Union[HarmonyAddress, str],
-            tx_hash: HexStr,
-            harmony_token: Optional[HarmonyToken] = None
+        self,
+        wallet_address: Union[HarmonyAddress, str],
+        tx_hash: HexStr,
+        harmony_token: Optional[HarmonyToken] = None,
     ):
         # get information about this tx
         super().__init__(wallet_address, tx_hash)
 
         # set custom token if it is given
         self.coinType = harmony_token or self.coinType
-        self._reinterpret_action()
+        self.reinterpret_action()
 
     @property
     def is_receiver(self) -> bool:
@@ -43,21 +44,25 @@ class WalletActivity(HarmonyEVMTransaction):
 
     def _get_action(self) -> WalletAction:
         if self.is_receiver:
-            return self._is_payment() and WalletAction.PAYMENT or WalletAction.DEPOSIT
+            return WalletAction.PAYMENT if self._is_payment() else WalletAction.DEPOSIT
 
         if self.is_sender:
-            return self._is_donation() and WalletAction.DONATION or WalletAction.WITHDRAWAL
+            return (
+                WalletAction.DONATION
+                if self._is_donation()
+                else WalletAction.WITHDRAWAL
+            )
 
         # unknown
         return WalletAction.NULL
 
-    def _reinterpret_action(self):
+    def reinterpret_action(self):
         self.action = self._get_action()
 
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
             self.sentAmount = 0
-            self.sentCurrencySymbol = ''
+            self.sentCurrencySymbol = ""
             self.gotAmount = self.coinAmount
             self.gotCurrencySymbol = self.coinType.symbol
         else:
@@ -65,29 +70,26 @@ class WalletActivity(HarmonyEVMTransaction):
             self.sentAmount = self.coinAmount
             self.sentCurrencySymbol = self.coinType.symbol
             self.gotAmount = 0
-            self.gotCurrencySymbol = ''
+            self.gotCurrencySymbol = ""
 
     def _is_payment(self) -> bool:
-        return self.result['from'] in DFK_PAYMENT_WALLET_ADDRESSES
+        return self.result["from"] in DFK_PAYMENT_WALLET_ADDRESSES
 
     def _is_donation(self) -> bool:
-        return (
-                bool(self.result['to']) and
-                'Donation' in HARMONY_TOKEN_ADDRESS_MAP.get(self.result['to'], "")
+        return bool(self.result["to"]) and "Donation" in HARMONY_TOKEN_ADDRESS_MAP.get(
+            self.result["to"], ""
         )
 
     @classmethod
     def extract_all_wallet_activity_from_transaction(
-            cls,
-            wallet_address: str,
-            tx_hash: Union[HexStr, str]
+        cls, wallet_address: str, tx_hash: Union[HexStr, str]
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(wallet_address, HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx)
         return [
             root_tx,
             # token transfers will appear in sub-transactions
-            *leaf_tx
+            *leaf_tx,
         ]
 
     @staticmethod
@@ -97,36 +99,36 @@ class WalletActivity(HarmonyEVMTransaction):
 
         transfers = []
         for log in HarmonyAPI.get_tx_transfer_logs(receipt):
-            from_addr = log['args']['from']
-            to_addr = log['args']['to']
+            from_addr = log["args"]["from"]
+            to_addr = log["args"]["to"]
 
-            if from_addr != wallet.eth and to_addr != wallet.eth:
+            if wallet.eth not in (from_addr, to_addr):
                 # some intermediate tx
                 continue
 
-            transfers.append(
-                WalletActivity._create_token_tx_from_log(root_tx, log)
-            )
+            transfers.append(WalletActivity._create_token_tx_from_log(root_tx, log))
 
         return transfers
 
     @staticmethod
-    def _create_token_tx_from_log(root_tx: WalletActivity, log: Dict[str, Any]) -> WalletActivity:
-        token = HarmonyToken.get_harmony_token_by_address(log['address'])
-        value = token.get_value_from_wei(log['args']['value'])
+    def _create_token_tx_from_log(
+        root_tx: WalletActivity, log: Dict[str, Any]
+    ) -> WalletActivity:
+        token = HarmonyToken.get_harmony_token_by_address(log["address"])
+        value = token.get_value_from_wei(log["args"]["value"])
 
         r = WalletActivity(root_tx.account, root_tx.txHash, token)
 
         # TODO: why are there both value and coinAmount variables?
         r.value = value
         r.coinAmount = value
-        r.event = log['event']
+        r.event = log["event"]
         r.is_token_transfer = r.event == "Transfer"
 
         # logs can be different from root transaction - must set them here
-        r.to_addr = HarmonyAddress.get_harmony_address(log['args']['to'])
-        r.from_addr = HarmonyAddress.get_harmony_address(log['args']['from'])
-        r._reinterpret_action()
+        r.to_addr = HarmonyAddress.get_harmony_address(log["args"]["to"])
+        r.from_addr = HarmonyAddress.get_harmony_address(log["args"]["from"])
+        r.reinterpret_action()
 
         return r
 
@@ -136,5 +138,5 @@ class WalletActivity(HarmonyEVMTransaction):
             self.value,
             self.coinType.symbol,
             self.to_addr.eth,
-            self.txHash
+            self.txHash,
         )

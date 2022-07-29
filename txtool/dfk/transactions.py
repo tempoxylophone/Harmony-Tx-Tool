@@ -1,7 +1,19 @@
 # Records for Capital Gains
 class TavernTransaction:
-    def __init__(self, txHash, itemType, itemID, event, timestamp, coinType, coinCost=0, fiatType='usd', fiatAmount=0,
-                 seller='', fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        itemType,
+        itemID,
+        event,
+        timestamp,
+        coinType,
+        coinCost=0,
+        fiatType="usd",
+        fiatAmount=0,
+        seller="",
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         # hero or pet or land
         self.itemType = itemType
@@ -19,8 +31,19 @@ class TavernTransaction:
 
 
 class TraderTransaction:
-    def __init__(self, txHash, timestamp, swapType, receiveType, swapAmount=0, receiveAmount=0, fiatType='usd',
-                 fiatSwapValue=0, fiatReceiveValue=0, fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        swapType,
+        receiveType,
+        swapAmount=0,
+        receiveAmount=0,
+        fiatType="usd",
+        fiatSwapValue=0,
+        fiatReceiveValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         # timestamp of block when this transaction was done
         self.timestamp = timestamp
@@ -41,8 +64,22 @@ class TraderTransaction:
 
 
 class LiquidityTransaction:
-    def __init__(self, txHash, timestamp, action, poolAddress, poolAmount, coin1Type, coin1Amount, coin2Type,
-                 coin2Amount, fiatType='usd', coin1FiatValue=0, coin2FiatValue=0, fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        action,
+        poolAddress,
+        poolAmount,
+        coin1Type,
+        coin1Amount,
+        coin2Type,
+        coin2Amount,
+        fiatType="usd",
+        coin1FiatValue=0,
+        coin2FiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         # timestamp of block when transaction was done
         self.timestamp = timestamp
@@ -67,7 +104,17 @@ class LiquidityTransaction:
 
 # Records for Income
 class GardenerTransaction:
-    def __init__(self, txHash, timestamp, event, coinType, coinAmount=0, fiatType='usd', fiatValue=0, fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        event,
+        coinType,
+        coinAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         # deposit, withdraw, staking-reward, staking-reward-locked
@@ -81,8 +128,18 @@ class GardenerTransaction:
 
 
 class BankTransaction:
-    def __init__(self, txHash, timestamp, action, xRate, coinType, coinAmount=0, fiatType='usd', fiatValue=0,
-                 fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        action,
+        xRate,
+        coinType,
+        coinAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         # deposit or withdraw
@@ -99,8 +156,17 @@ class BankTransaction:
 
 
 class AirdropTransaction:
-    def __init__(self, txHash, timestamp, address, tokenReceived, tokenAmount=0, fiatType='usd', fiatValue=0,
-                 fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        address,
+        tokenReceived,
+        tokenAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         self.address = address
@@ -114,7 +180,16 @@ class AirdropTransaction:
 
 
 class QuestTransaction:
-    def __init__(self, txHash, timestamp, rewardType, rewardAmount=0, fiatType='usd', fiatValue=0, fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        rewardType,
+        rewardAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         # what did we get on the quest, address of it
@@ -127,8 +202,18 @@ class QuestTransaction:
 
 
 class AlchemistTransaction:
-    def __init__(self, txHash, timestamp, craftingType, craftingAmount=0, fiatType='usd', fiatValue=0, craftingCosts=0,
-                 costsFiatValue=0, fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        craftingType,
+        craftingAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        craftingCosts=0,
+        costsFiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         # what did we craft with alchemist, address of it
@@ -145,8 +230,18 @@ class AlchemistTransaction:
 
 
 class LendingTransaction:
-    def __init__(self, txHash, timestamp, event, address, coinType, coinAmount=0, fiatType='usd', fiatValue=0,
-                 fiatFeeValue=0):
+    def __init__(
+        self,
+        txHash,
+        timestamp,
+        event,
+        address,
+        coinType,
+        coinAmount=0,
+        fiatType="usd",
+        fiatValue=0,
+        fiatFeeValue=0,
+    ):
         self.txHash = txHash
         self.timestamp = timestamp
         # lend/redeem/borrow/repay/liquidate

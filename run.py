@@ -7,9 +7,15 @@ from txtool.harmony import HarmonyAddress
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("wallets", help="Comma separated Ethereum-style address of Harmony ONE wallets")
-    parser.add_argument("-s", "--start", help="The starting date for the report (inclusive)")
-    parser.add_argument("-e", "--end", help="The ending date for the report (inclusive)")
+    parser.add_argument(
+        "wallets", help="Comma separated Ethereum-style address of Harmony ONE wallets"
+    )
+    parser.add_argument(
+        "-s", "--start", help="The starting date for the report (inclusive)"
+    )
+    parser.add_argument(
+        "-e", "--end", help="The ending date for the report (inclusive)"
+    )
 
     args = parser.parse_args()
 

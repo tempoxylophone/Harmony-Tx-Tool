@@ -6,19 +6,20 @@ from txtool.events import get_events
 
 
 def get_harmony_tx_from_wallet_as_csv(
-        wallet_address_eth_str: str,
-        report: KoinlyReportCreator,
+    wallet_address_eth_str: str,
+    report: KoinlyReportCreator,
 ) -> Tuple[str, str]:
     # --- START ---
-    print("Fetching {0} transactions from address {1}...".format(
-        HarmonyAPI.get_num_tx_for_wallet(wallet_address_eth_str),
-        wallet_address_eth_str
-    ))
+    print(
+        "Fetching {0} transactions from address {1}...".format(
+            HarmonyAPI.get_num_tx_for_wallet(wallet_address_eth_str),
+            wallet_address_eth_str,
+        )
+    )
 
     # --- GET + PARSE DATA FROM BLOCKCHAIN ---
     tx_events = get_events(
-        HarmonyAPI.get_harmony_tx_list(wallet_address_eth_str),
-        wallet_address_eth_str
+        HarmonyAPI.get_harmony_tx_list(wallet_address_eth_str), wallet_address_eth_str
     )
 
     # --- WRITE TO FILE ---
