@@ -14,13 +14,12 @@ from web3.types import TxReceipt, EventData, HexStr
 
 from txtool import pyhmy
 from txtool import contracts
-from txtool.koinly import KoinlyConfig
+from txtool.koinly import KoinlyConfig, KoinlyLabel
 from txtool.utils import api_retry, get_local_abi
 from txtool.dex import UniswapV2ForkGraph
 
 
 class HarmonyAPI:
-    HARMONY_LAUNCH_DATE: datetime = datetime.strptime("2019-05-01", '%Y-%m-%d')
     _CUSTOM_EXCEPTIONS: List = [
         pyhmy.rpc.exceptions.RPCError
     ]
@@ -585,6 +584,14 @@ class HarmonyEVMTransaction:
             return "\"{0}\"".format(str(f)[1:-1].split(" ")[1])
         else:
             return ""
+
+    @property
+    def koinly_label(self) -> str:
+        return KoinlyLabel.NULL
+
+    @property
+    def is_cost(self) -> bool:
+        return self.koinly_label == KoinlyLabel.COST
 
     def to_csv_row(self, report_config: KoinlyConfig) -> str:
         # blank row by default

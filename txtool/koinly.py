@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import timezone, datetime
 from enum import Enum
 
@@ -84,8 +85,24 @@ class KoinlyInterpreter:
 
 
 class KoinlyConfig:
+    HARMONY_LAUNCH_DATE: datetime = datetime.strptime("2019-05-01", '%Y-%m-%d')
     ROW_HEADER = KoinlyInterpreter._KOINLY_ROW_HEADER  # noqa
 
-    def __init__(self, address_format: str, omit_tracked_fiat_prices: bool):
+    def __init__(
+            self,
+            address_format: str,
+            omit_tracked_fiat_prices: bool,
+            omit_cost: bool,
+            date_lb_str: Optional[str] = "",
+            date_ub_str: Optional[str] = "",
+    ):
         self.address_format = address_format
         self.omit_tracked_fiat_prices = omit_tracked_fiat_prices
+        self.omit_cost = omit_cost
+        self.dt_lb = date_lb_str and self._parse_date_arg(date_lb_str) or self.HARMONY_LAUNCH_DATE
+        self.dt_ub = date_ub_str and self._parse_date_arg(date_ub_str) or datetime.utcnow()
+
+    @staticmethod
+    def _parse_date_arg(date_str: str) -> datetime:
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        return dt.replace(tzinfo=timezone.utc)
