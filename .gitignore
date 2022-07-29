@@ -7,3 +7,4 @@ htmlcov
 .mypy_cache
 .pytest_cache
 .env
+tests/real_transactions/
