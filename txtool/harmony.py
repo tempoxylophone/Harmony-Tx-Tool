@@ -111,13 +111,14 @@ class HarmonyAPI:
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def _get_tx_page(eth_address: str, page_num: int, page_size: int) -> List[HexStr]:
         return (
-                pyhmy.account.get_transaction_history(
-                    eth_address,
-                    page=page_num,
-                    page_size=page_size,
-                    include_full_tx=False,
-                    endpoint=HarmonyAPI._NET_HMY_MAIN,
-                ) or []
+            pyhmy.account.get_transaction_history(
+                eth_address,
+                page=page_num,
+                page_size=page_size,
+                include_full_tx=False,
+                endpoint=HarmonyAPI._NET_HMY_MAIN,
+            )
+            or []
         )
 
     @staticmethod
@@ -237,7 +238,7 @@ class HarmonyAddress:
 
     @classmethod
     def get_harmony_address(
-            cls, address_object: Union[str, HarmonyAddress]
+        cls, address_object: Union[str, HarmonyAddress]
     ) -> HarmonyAddress:
         return (
             address_object
@@ -267,12 +268,12 @@ class HarmonyAddress:
 
     def __eq__(self, other):
         return (
-                isinstance(other, HarmonyAddress)
-                and self.get_eth_address()
-                and (
-                        self.get_eth_address() == other.get_eth_address()
-                        or self.get_one_address() == other.get_one_address()
-                )
+            isinstance(other, HarmonyAddress)
+            and self.get_eth_address()
+            and (
+                self.get_eth_address() == other.get_eth_address()
+                or self.get_one_address() == other.get_one_address()
+            )
         )
 
     def __hash__(self):
@@ -319,14 +320,14 @@ class DexPriceManager:
 
     @staticmethod
     def initialize_static_price_manager(
-            transactions: Iterable[HarmonyEVMTransaction],
+        transactions: Iterable[HarmonyEVMTransaction],
     ) -> None:
         DexPriceManager._build_transactions_directory(transactions)
         DexPriceManager._build_transactions_fiat_price_lookup()
 
     @staticmethod
     def _build_transactions_directory(
-            transactions: Iterable[HarmonyEVMTransaction],
+        transactions: Iterable[HarmonyEVMTransaction],
     ) -> None:
         for t in transactions:
             if not isinstance(t, HarmonyEVMTransaction):
@@ -356,7 +357,7 @@ class DexPriceManager:
 
     @classmethod
     def _try_to_get_token_or_pair_info_from_dexes(
-            cls, dex_graph: UniswapV2ForkGraph, token_address: str
+        cls, dex_graph: UniswapV2ForkGraph, token_address: str
     ) -> Dict:
         return dex_graph.get_token_or_pair_info(
             token_address,
@@ -405,7 +406,7 @@ class DexPriceManager:
 
     @staticmethod
     def _try_to_get_token_prices_from_dexes(
-            dex_graph: UniswapV2ForkGraph, token_address: str, blocks: Iterable[int]
+        dex_graph: UniswapV2ForkGraph, token_address: str, blocks: Iterable[int]
     ) -> Dict:
         return dex_graph.get_token_price_by_block_timeseries(
             token_address,
@@ -414,11 +415,11 @@ class DexPriceManager:
 
     @staticmethod
     def _try_to_get_lp_prices_from_dexes(
-            dex_graph: UniswapV2ForkGraph,
-            token_address: str,
-            min_ts: int,
-            max_ts: int,
-            blocks: Iterable[int],
+        dex_graph: UniswapV2ForkGraph,
+        token_address: str,
+        min_ts: int,
+        max_ts: int,
+        blocks: Iterable[int],
     ) -> Dict:
         return dex_graph.get_lp_token_price_by_block_timeseries(
             token_address,
@@ -455,9 +456,9 @@ class HarmonyToken:  # pylint: disable=R0902
         return cls.get_harmony_token_by_address(cls.NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     def __init__(
-            self,
-            address: Union[str, HarmonyAddress],
-            merge_one_wone_names: Optional[bool] = True,
+        self,
+        address: Union[str, HarmonyAddress],
+        merge_one_wone_names: Optional[bool] = True,
     ):
         self.address = HarmonyAddress.get_harmony_address(address)
         self.address.belongs_to_token = True
@@ -514,9 +515,9 @@ class HarmonyToken:  # pylint: disable=R0902
         token_tx_count = token_info["txCount"]
         token_total_liquidity = token_info["totalLiquidity"]
         if (
-                token_trade_vol_usd < 1
-                and token_total_liquidity < 10
-                and token_tx_count < 100
+            token_trade_vol_usd < 1
+            and token_total_liquidity < 10
+            and token_tx_count < 100
         ):
             # somewhat hacky solution but check if the single token has unusually
             # low activity. Someone may have created this by mistake, in which
@@ -551,7 +552,7 @@ class HarmonyToken:  # pylint: disable=R0902
 
     @classmethod
     def get_harmony_token_by_address(
-            cls, address: Union[HarmonyAddress, str]
+        cls, address: Union[HarmonyAddress, str]
     ) -> HarmonyToken:
         addr_obj = HarmonyAddress.get_harmony_address(address)
         return HarmonyToken._TOKEN_DIRECTORY.get(addr_obj) or HarmonyToken(addr_obj)
@@ -618,7 +619,7 @@ class HarmonyEVMTransaction:  # pylint: disable=R0902
 
         self.receipt = HarmonyEVMTransaction.get_tx_receipt(tx_hash)
         self.tx_fee_in_native_token = (
-                Web3.fromWei(self.result["gasPrice"], "ether") * self.receipt["gasUsed"]
+            Web3.fromWei(self.result["gasPrice"], "ether") * self.receipt["gasUsed"]
         )
 
         self.fiatValue = 0
@@ -682,7 +683,7 @@ class HarmonyEVMSmartContract:
     @classmethod
     @lru_cache(maxsize=256)
     def lookup_harmony_smart_contract_by_address(
-            cls, address: str, name: str = ""
+        cls, address: str, name: str = ""
     ) -> HarmonyEVMSmartContract:
         return HarmonyEVMSmartContract(address, name)
 
@@ -700,7 +701,7 @@ class HarmonyEVMSmartContract:
         self.contract = HarmonyAPI.get_contract(self.address, self.abi)
 
     def decode_input(
-            self, tx_input: HexStr
+        self, tx_input: HexStr
     ) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
         if self.abi_attempt_idx > len(self.POSSIBLE_ABIS) - 1:
             # can't decode this, even after trying a few generic ABIs
