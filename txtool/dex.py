@@ -1,4 +1,4 @@
-from typing import Iterable, Dict, List, Union
+from typing import Iterable, Dict, List, Union, Optional
 from decimal import Decimal
 
 import requests
@@ -6,34 +6,39 @@ import requests
 
 class UniswapV2ForkGraph:
     _UNIX_TS_1_DAY_APPROX = 86400
-    _UA_HEADERS = {
-        'authority': 'graph.viper.exchange',
-        'pragma': 'no-cache',
-        'cache-control': 'no-cache',
-        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
-        'accept': '*/*',
-        'dnt': '1',
-        'sec-ch-ua-mobile': '?0',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99'
-                      '.0.4844.81 Safari/537.38',
-        'sec-ch-ua-platform': '"macOS"',
-        'origin': 'https://info.viper.exchange',
-        'sec-fetch-site': 'same-site',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-dest': 'empty',
-        'referer': 'https://info.viper.exchange/',
-        'accept-language': 'en-US,en;q=0.9',
-    }
 
-    def __init__(self, subgraph_url: str):
+    def __init__(self, subgraph_url: str, authority: Optional[str] = "", origin: Optional[str] = ""):
         self.subgraph_url = subgraph_url
+
+        self.authority = authority
+        self.origin = origin
 
     def _graph_ql_request(self, payload: Dict) -> Dict:
         return requests.post(
             self.subgraph_url,
-            headers=self._UA_HEADERS,
+            headers=self._get_graph_ql_headers(),
             json=payload
         ).json()['data']
+
+    def _get_graph_ql_headers(self) -> Dict[str, str]:
+        return {
+            'authority': self.authority,
+            'pragma': 'no-cache',
+            'cache-control': 'no-cache',
+            'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+            'accept': '*/*',
+            'dnt': '1',
+            'sec-ch-ua-mobile': '?0',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.81 Safari/537.38',
+            'sec-ch-ua-platform': '"macOS"',
+            'origin': self.origin,
+            'sec-fetch-site': 'same-site',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-dest': 'empty',
+            'referer': self.origin,
+            'accept-language': 'en-US,en;q=0.9',
+        }
 
     @classmethod
     def _q_get_graph_ql_token_or_pair_info(cls, token_or_pair_address: str):

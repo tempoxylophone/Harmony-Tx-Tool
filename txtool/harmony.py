@@ -257,10 +257,19 @@ class DexPriceManager:
     })
     _DEX_GRAPH_URLS = [
         # order matters, attempts for lookups made first at the front
-        'https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2',  # VIPERSWAP
-        'https://defi-kingdoms-community-api-gateway-co06z8vi.uc.gateway.dev/graphql',  # DEFIKINGDOMS
+        # VIPERSWAP
+        (
+            'https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2',
+            'graph.viper.exchange',
+            'https://info.viper.exchange',
+        ),
+        # DEFIKINGDOMS
+        # see docs: https://devs.defikingdoms.com/api/community-graphql-api/getting-started
+        (
+            'https://defi-kingdoms-community-api-gateway-co06z8vi.uc.gateway.dev/graphql',
+        ),
     ]
-    _DEX_GRAPHS = [UniswapV2ForkGraph(x) for x in _DEX_GRAPH_URLS]
+    _DEX_GRAPHS = [UniswapV2ForkGraph(*x) for x in _DEX_GRAPH_URLS]
 
     @classmethod
     def get_price_of_token_at_block(cls, token: HarmonyToken, block: int) -> Decimal:
@@ -370,7 +379,7 @@ class DexPriceManager:
         )
 
     @staticmethod
-    def _is_valid_price_timeseries(price_timeseries: Dict) -> bool:
+    def _is_valid_price_timeseries(_: Dict) -> bool:
         # TODO: add failure criteria
         return True
 
