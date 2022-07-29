@@ -31,7 +31,7 @@ def get_harmony_tx_from_wallet_as_csv(
 
     # --- WRITE TO FILE ---
     result: str = get_csv(tx_events)
-    _finished_at = datetime.now().strftime("%Y-%m-%d_%H:%m:%s")
+    _finished_at = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     _file_name = wallet_address_eth_str + "_" + _finished_at + ".csv"
     return result, _file_name
 
