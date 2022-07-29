@@ -27,7 +27,7 @@ def get_harmony_tx_from_wallet_as_csv(
     )
 
     # remove out of range transactions
-    tx_events = [x for x in tx_events if dt_lb.timestamp() <= x.timestamp <= dt_ub.toordinal()]
+    tx_events = [x for x in tx_events if dt_lb.timestamp() <= x.timestamp <= dt_ub.timestamp()]
 
     # --- WRITE TO FILE ---
     result: str = get_csv(tx_events)
