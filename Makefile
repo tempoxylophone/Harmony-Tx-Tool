@@ -14,7 +14,7 @@ install:
 	pipenv install
 
 test:
-	pytest
+	pytest -v -s
 
 lint:
 	mypy .

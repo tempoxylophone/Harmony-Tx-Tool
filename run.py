@@ -2,7 +2,7 @@ import os
 import argparse
 
 from txtool.main import get_harmony_tx_from_wallet_as_csv
-from txtool.koinly import KoinlyConfig
+from txtool.koinly import KoinlyReportCreator
 from txtool.harmony import HarmonyAddress
 
 if __name__ == "__main__":
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # go through each wallet and export transactions
     wallet_addresses = [x.strip() for x in args.wallets.split(",")]
 
-    report_config = KoinlyConfig(
+    report = KoinlyReportCreator(
         address_format=HarmonyAddress.FORMAT_ONE,
         omit_tracked_fiat_prices=True,
         omit_cost=True,
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         # run program
         csv_contents, file_name = get_harmony_tx_from_wallet_as_csv(
             wallet_address,
-            report_config,
+            report,
         )
 
         # write result to desktop

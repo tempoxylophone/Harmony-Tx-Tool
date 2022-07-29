@@ -1,4 +1,5 @@
-from typing import List, Type, Callable
+from typing import List, Type, Callable, Dict
+from json import loads
 import os
 from requests.exceptions import HTTPError, ConnectionError
 from tenacity import (
@@ -9,6 +10,7 @@ from tenacity import (
     wait_exponential,
     wait_random,
 )
+from eth_abi.abi import decode
 
 T_EXCEPTION = Type[BaseException]
 

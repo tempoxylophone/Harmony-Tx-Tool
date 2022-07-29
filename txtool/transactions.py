@@ -3,7 +3,6 @@ from typing import List, Optional, Union, Dict, Any
 from enum import Enum
 from eth_typing import HexStr
 from txtool import contracts
-from txtool.koinly import KoinlyConfig, KoinlyInterpreter, KoinlyLabel
 from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyEVMTransaction, HarmonyAPI
 
 
@@ -28,24 +27,21 @@ class WalletActivity(HarmonyEVMTransaction):
 
         # set custom token if it is given
         self.coinType = harmony_token or self.coinType
-        self.sentAmount = 0
-        self.sentCurrencySymbol = ''
-        self.gotAmount = 0
-        self.gotCurrencySymbol = ''
-
         self._reinterpret_action()
 
-    def _is_receiver(self) -> bool:
+    @property
+    def is_receiver(self) -> bool:
         return self.to_addr == self.account
 
-    def _is_sender(self) -> bool:
+    @property
+    def is_sender(self) -> bool:
         return self.from_addr == self.account
 
     def _get_action(self) -> WalletAction:
-        if self._is_receiver():
+        if self.is_receiver:
             return self._is_payment() and WalletAction.PAYMENT or WalletAction.DEPOSIT
 
-        if self._is_sender():
+        if self.is_sender:
             return self._is_donation() and WalletAction.DONATION or WalletAction.WITHDRAWAL
 
         # unknown
@@ -80,96 +76,15 @@ class WalletActivity(HarmonyEVMTransaction):
     def extract_all_wallet_activity_from_transaction(
             cls,
             wallet_address: str,
-            tx_hash: HexStr
+            tx_hash: Union[HexStr, str]
     ) -> List[WalletActivity]:
-        root_tx = WalletActivity(wallet_address, tx_hash)
+        root_tx = WalletActivity(wallet_address, HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx)
         return [
             root_tx,
             # token transfers will appear in sub-transactions
             *leaf_tx
         ]
-
-    @property
-    def koinly_description(self) -> str:
-        if (
-                self._is_sender() and
-                self.value > 0 and
-                self.sentCurrencySymbol and
-                self.to_addr.belongs_to_smart_contract
-        ):
-            # wallet sent something to smart contract
-            return f"sent {self.sentCurrencySymbol} to smart contract"
-
-        if (
-                self._is_receiver() and
-                self.value > 0 and
-                self.gotCurrencySymbol and
-                self.to_addr.belongs_to_smart_contract
-        ):
-            return f"got {self.gotCurrencySymbol} from smart contract"
-
-        return ""
-
-    @property
-    def koinly_label(self) -> str:
-        if (
-                # no currency was moved, only thing that happened was fee
-                self.sentAmount == 0 and
-                self.gotAmount == 0 and
-                self.tx_fee_in_native_token and
-                # fee must be in ONE
-                self.sentCurrencySymbol == HarmonyToken.native_token().symbol
-        ):
-            return KoinlyLabel.COST
-
-        return KoinlyLabel.NULL
-
-    def to_csv_row(self, report_config: KoinlyConfig) -> str:
-        if (
-                report_config.omit_tracked_fiat_prices and
-                KoinlyInterpreter.is_tracked(self.coinType.universal_symbol)
-        ):
-            fiat_value = ''
-        else:
-            fiat_value = str(self.get_fiat_value())
-
-        return ','.join(
-            (
-                # time of transaction
-                KoinlyInterpreter.format_utc_ts_as_str(self.timestamp),
-
-                # token sent in this tx (outgoing)
-                str(self.sentAmount or ''),
-                self.sentCurrencySymbol,
-
-                # token received in this tx (incoming)
-                str(self.gotAmount or ''),
-                self.gotCurrencySymbol,
-
-                # gas
-                str(self.tx_fee_in_native_token),
-                HarmonyToken.NATIVE_TOKEN_SYMBOL,
-
-                # fiat conversion
-                fiat_value,
-                self.fiatType,
-
-                # description
-                self.koinly_label,
-                self.koinly_description,
-
-                # transaction hash
-                self.txHash,
-                self.get_tx_function_signature(),
-
-                # transfer information
-                self.to_addr.get_address_str(report_config.address_format),
-                self.from_addr.get_address_str(report_config.address_format),
-                self.explorer_url,
-                '\n'
-            )
-        )
 
     @staticmethod
     def _get_token_transfers(root_tx: WalletActivity) -> List[WalletActivity]:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import List, Dict, Optional, Union, Tuple, Iterable, Any, TypedDict
 from hexbytes import HexBytes
@@ -14,7 +14,6 @@ from web3.types import TxReceipt, EventData, HexStr
 
 from txtool import pyhmy
 from txtool import contracts
-from txtool.koinly import KoinlyConfig, KoinlyLabel
 from txtool.utils import api_retry, get_local_abi
 from txtool.dex import UniswapV2ForkGraph
 
@@ -509,6 +508,15 @@ class HarmonyEVMTransaction:
         self.txHash = tx_hash
         self.account = HarmonyAddress.get_harmony_address(account)
 
+        # (placeholder values)
+        # token sent in this tx (outgoing)
+        self.sentAmount = 0
+        self.sentCurrencySymbol = ""
+
+        # token received in this tx (incoming)
+        self.gotAmount = 0
+        self.gotCurrencySymbol = ""
+
         # get transaction data
         self.result = HarmonyAPI.get_transaction(tx_hash)
         self.to_addr = HarmonyAddress.get_harmony_address(self.result['to'])
@@ -584,18 +592,6 @@ class HarmonyEVMTransaction:
             return "\"{0}\"".format(str(f)[1:-1].split(" ")[1])
         else:
             return ""
-
-    @property
-    def koinly_label(self) -> str:
-        return KoinlyLabel.NULL
-
-    @property
-    def is_cost(self) -> bool:
-        return self.koinly_label == KoinlyLabel.COST
-
-    def to_csv_row(self, report_config: KoinlyConfig) -> str:
-        # blank row by default
-        return ",".join(" " for _ in report_config.ROW_HEADER)
 
 
 T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
