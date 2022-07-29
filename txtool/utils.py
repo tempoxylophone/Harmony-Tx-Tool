@@ -20,7 +20,7 @@ COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
 
 def retry_on_exceptions(
         exceptions: List[T_EXCEPTION],
-        max_tries: int = 5,
+        max_tries: int = 7,
         jitter_range_sec: int = 2,
         max_wait_sec: int = 120
 ) -> Callable:

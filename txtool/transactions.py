@@ -96,7 +96,7 @@ class WalletActivity(HarmonyEVMTransaction):
                 self._is_sender() and
                 self.value > 0 and
                 self.sentCurrencySymbol and
-                self.to_addr.belongs_to_non_token_smart_contract
+                self.to_addr.belongs_to_smart_contract
         ):
             # wallet sent something to smart contract
             return f"sent {self.sentCurrencySymbol} to smart contract"
@@ -105,11 +105,11 @@ class WalletActivity(HarmonyEVMTransaction):
                 self._is_receiver() and
                 self.value > 0 and
                 self.gotCurrencySymbol and
-                self.to_addr.belongs_to_non_token_smart_contract
+                self.to_addr.belongs_to_smart_contract
         ):
             return f"got {self.gotCurrencySymbol} from smart contract"
 
-        return self.action
+        return ""
 
     @property
     def koinly_label(self) -> str:

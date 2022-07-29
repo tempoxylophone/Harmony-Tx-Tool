@@ -93,19 +93,24 @@ class HarmonyAPI:
         txs = []
         has_more = True
         while has_more:
-            results = pyhmy.account.get_transaction_history(
-                eth_address,
-                page=offset,
-                page_size=page_size,
-                include_full_tx=False,
-                endpoint=HarmonyAPI._NET_HMY_MAIN
-            ) or []
+            results = HarmonyAPI._get_tx_page(eth_address, offset, page_size)
             has_more = bool(results)
             offset += 1
             txs += results
 
         # de-dupe tx hashes in order
         return list(dict.fromkeys(txs))
+
+    @staticmethod
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def _get_tx_page(eth_address: str, page_num: int, page_size: int) -> List[HexStr]:
+        return pyhmy.account.get_transaction_history(
+            eth_address,
+            page=page_num,
+            page_size=page_size,
+            include_full_tx=False,
+            endpoint=HarmonyAPI._NET_HMY_MAIN
+        ) or []
 
     @staticmethod
     def get_num_tx_for_wallet(eth_address: str) -> int:
