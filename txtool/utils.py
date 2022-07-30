@@ -1,4 +1,5 @@
 from typing import List, Type, Callable
+import logging
 import os
 from requests.exceptions import HTTPError, ConnectionError as HTTPConnectionError
 from tenacity import (
@@ -16,6 +17,12 @@ COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
     HTTPError,
     HTTPConnectionError,
 ]
+
+MAIN_LOGGER = logging.getLogger("main")
+
+
+def make_yellow(log_output: str) -> str:
+    return "\x1b[33;20m" + log_output
 
 
 def retry_on_exceptions(

@@ -1,12 +1,12 @@
-from typing import Optional, Sequence
+from typing import Optional, Union, Sequence
 from datetime import timezone, datetime
 
 from txtool.transactions import HarmonyEVMTransaction
-from txtool.harmony import HarmonyToken
+from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyAPI
 from .ruleset import get_label_for_tx_and_description, is_cost
 
 
-class KoinlyReportCreator:
+class KoinlyReportCreator:  # pylint: disable=R0902
     _KOINLY_DATE_FORMAT = "%Y-%m-%d %H:%M:%S %Z"
     _KOINLY_ROW_HEADER = [
         "Date",
@@ -42,17 +42,21 @@ class KoinlyReportCreator:
         "LINK",
         "CRV",
     }
-    HARMONY_LAUNCH_DATE: datetime = datetime.strptime("2019-05-01", "%Y-%m-%d")
+    HARMONY_LAUNCH_DATE: datetime = datetime.utcfromtimestamp(
+        HarmonyAPI.get_timestamp(1)
+    )
 
     def __init__(  # pylint: disable=R0913
         self,
-        address_format: str,
-        omit_tracked_fiat_prices: bool,
-        omit_cost: bool,
+        address_format: Optional[str] = HarmonyAddress.FORMAT_ONE,
+        omit_tracked_fiat_prices: Optional[bool] = True,
+        omit_cost: Optional[bool] = True,
         date_lb_str: Optional[str] = "",
         date_ub_str: Optional[str] = "",
+        # none is unlimited
+        tx_limit: Union[int, None] = None,
     ):
-        self.address_format = address_format
+        self.address_format: str = address_format or HarmonyAddress.FORMAT_ONE
         self.omit_tracked_fiat_prices = omit_tracked_fiat_prices
         self.omit_cost = omit_cost
         self.dt_lb = (
@@ -64,19 +68,25 @@ class KoinlyReportCreator:
             self._parse_date_arg(date_ub_str) if date_ub_str else datetime.utcnow()
         )
 
+        # round to nearest second
+        self.dt_lb_ts = int(self.dt_lb.timestamp())
+        self.dt_ub_ts = int(self.dt_ub.timestamp())
+
+        # mostly for testing, cap the number of tx you can generate in a report
+        self.tx_limit = tx_limit
+
     def get_csv_from_transactions(self, events: Sequence[HarmonyEVMTransaction]) -> str:
         # remove out of range
-        events = [
-            x
-            for x in events
-            if self.dt_lb.timestamp() <= x.timestamp <= self.dt_ub.timestamp()
-        ]
+        events = [x for x in events if self.timestamp_is_in_bounds(x.timestamp)]
 
         # remove costs
         if self.omit_cost:
             events = [x for x in events if not is_cost(x)]
 
         return self.get_csv_row_header() + "".join(self.to_csv_row(tx) for tx in events)
+
+    def timestamp_is_in_bounds(self, ts: int) -> bool:
+        return self.dt_lb_ts <= ts <= self.dt_ub_ts
 
     @staticmethod
     def _parse_date_arg(date_str: str) -> datetime:
@@ -87,16 +97,20 @@ class KoinlyReportCreator:
     def timestamp_to_utc_datetime(timestamp: int) -> datetime:
         return datetime.fromtimestamp(timestamp, tz=timezone.utc)
 
-    def format_utc_ts_as_str(self, timestamp: int) -> str:
-        return self.timestamp_to_utc_datetime(timestamp).strftime(
-            self._KOINLY_DATE_FORMAT
+    @staticmethod
+    def format_utc_ts_as_str(timestamp: int) -> str:
+        return KoinlyReportCreator.timestamp_to_utc_datetime(timestamp).strftime(
+            KoinlyReportCreator._KOINLY_DATE_FORMAT
         )
 
     def get_csv_row_header(self) -> str:
         return ",".join(self._KOINLY_ROW_HEADER)
 
-    def currency_is_tracked(self, coin_symbol: str) -> bool:
-        return coin_symbol.upper() in self._KOINLY_TRACKED_CURRENCY_SYMBOLS
+    @staticmethod
+    def currency_is_tracked(coin_symbol: str) -> bool:
+        return (
+            coin_symbol.upper() in KoinlyReportCreator._KOINLY_TRACKED_CURRENCY_SYMBOLS
+        )
 
     def to_csv_row(self, tx: HarmonyEVMTransaction) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
@@ -104,7 +118,8 @@ class KoinlyReportCreator:
         ):
             fiat_value = ""
         else:
-            fiat_value = str(tx.get_fiat_value())
+            # if 0, make it blank
+            fiat_value = str(tx.get_fiat_value() or "")
 
         label, desc = get_label_for_tx_and_description(tx)
 

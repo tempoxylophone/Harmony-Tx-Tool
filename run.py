@@ -1,9 +1,12 @@
 import os
+import logging
 import argparse
 
 from txtool.main import get_harmony_tx_from_wallet_as_csv
 from txtool.koinly import KoinlyReportCreator
 from txtool.harmony import HarmonyAddress
+
+LOG_LEVELS = {"error": logging.ERROR, "info": logging.INFO, "debug": logging.DEBUG}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -16,8 +19,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "-e", "--end", help="The ending date for the report (inclusive)"
     )
+    parser.add_argument(
+        "-l", "--log", default=logging.ERROR, help="Log level, default = error"
+    )
 
     args = parser.parse_args()
+
+    logging.basicConfig(
+        level=LOG_LEVELS[args.log],
+        format="%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     # go through each wallet and export transactions
     wallet_addresses = [x.strip() for x in args.wallets.split(",")]

@@ -10,6 +10,7 @@ from txtool.harmony import (
 )
 
 from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
+from txtool.utils import MAIN_LOGGER
 
 
 class WalletAction(str, Enum):
@@ -82,10 +83,13 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
     @classmethod
     def extract_all_wallet_activity_from_transaction(
-        cls, wallet_address: str, tx_hash: Union[HexStr, str]
+        cls,
+        wallet_address: str,
+        tx_hash: Union[HexStr, str],
+        exclude_intermediate_tx: Optional[bool] = True,
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(wallet_address, HexStr(tx_hash))
-        leaf_tx = WalletActivity._get_token_transfers(root_tx)
+        leaf_tx = WalletActivity._get_token_transfers(root_tx, exclude_intermediate_tx)
         return [
             root_tx,
             # token transfers will appear in sub-transactions
@@ -93,20 +97,31 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         ]
 
     @staticmethod
-    def _get_token_transfers(root_tx: WalletActivity) -> List[WalletActivity]:
+    def _get_token_transfers(
+        root_tx: WalletActivity, exclude_intermediate_tx: Optional[bool] = True
+    ) -> List[WalletActivity]:
         wallet = root_tx.account
         receipt = root_tx.receipt
+        destination = root_tx.to_addr.eth
 
-        transfers = []
-        for log in HarmonyAPI.get_tx_transfer_logs(receipt):
+        transfers: List[WalletActivity] = []
+        logs = list(HarmonyAPI.get_tx_transfer_logs(receipt))
+
+        for i, log in enumerate(logs, start=1):
             from_addr = log["args"]["from"]
             to_addr = log["args"]["to"]
 
-            if wallet.eth not in (from_addr, to_addr):
+            MAIN_LOGGER.info("\tExtracting sub-tx %s/%s...", i, len(logs))
+
+            if exclude_intermediate_tx and (
+                wallet.eth not in (from_addr, to_addr) and destination != to_addr
+            ):
                 # some intermediate tx
+                MAIN_LOGGER.info("\t\tSkipping intermediate transaction...")
                 continue
 
-            transfers.append(WalletActivity._create_token_tx_from_log(root_tx, log))
+            # in reverse order
+            transfers.insert(0, WalletActivity._create_token_tx_from_log(root_tx, log))
 
         return transfers
 
@@ -132,7 +147,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
         return r
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return "tx: {0} --[{1} {2}]--> {3} ({4})".format(
             self.from_addr.eth,
             self.value,

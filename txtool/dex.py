@@ -1,4 +1,4 @@
-from typing import Iterable, Dict, List, Union, Optional
+from typing import Iterable, Dict, List, Tuple, Union, Optional
 from decimal import Decimal
 
 import requests
@@ -14,14 +14,21 @@ class UniswapV2ForkGraph:
         origin: Optional[str] = "",
     ):
         self.subgraph_url = subgraph_url
-
         self.authority = authority
         self.origin = origin
 
-    def _graph_ql_request(self, payload: Dict) -> Dict:
-        return requests.post(
+    def _graph_ql_request(self, payload: Dict[str, str]) -> Dict:
+        r = requests.post(
             self.subgraph_url, headers=self._get_graph_ql_headers(), json=payload
-        ).json()["data"]
+        ).json()
+
+        try:
+            return r["data"]
+        except KeyError as e:
+            raise RuntimeError(
+                f"Could not get data for subgraph from URL: {self.subgraph_url} "
+                f"with payload: {payload}. Got response: {r}"
+            ) from e
 
     def _get_graph_ql_headers(self) -> Dict[str, str]:
         return {
@@ -245,19 +252,24 @@ class UniswapV2ForkGraph:
     @classmethod
     def _graph_ql_price_result_to_block_price_timeseries(
         cls, block_nums: Iterable[int], price_query_data: Dict
-    ) -> Dict[int, Decimal]:
+    ) -> Tuple[Dict[int, Decimal], bool]:
         ts = {}
+        all_zero = True
         for block_num in block_nums:
             # NB: "ethPrice" is actually price of harmony ONE, not eth
             eth_price = Decimal(price_query_data["b" + str(block_num)]["ethPrice"])
-            token_eth = Decimal(price_query_data["t" + str(block_num)]["derivedETH"])
+            token_eth = Decimal(
+                # could be null if DEX returned nothing for this token
+                (price_query_data["t" + str(block_num)] or {}).get("derivedETH", 0)
+            )
             ts[block_num] = eth_price * token_eth
+            all_zero = all_zero and ts[block_num] == 0
 
-        return ts
+        return ts, all_zero
 
     def get_token_price_by_block_timeseries(
         self, token_address: str, block_nums: Iterable[int]
-    ) -> Dict[int, Decimal]:
+    ) -> Tuple[Dict[int, Decimal], bool]:
         return self._graph_ql_price_result_to_block_price_timeseries(
             block_nums, self._get_graph_ql_price_query_data(token_address, block_nums)
         )
@@ -287,12 +299,12 @@ class UniswapV2ForkGraph:
 
         return ts
 
-    @staticmethod
+    @staticmethod  # noqa: E741
     def _get_best_block_idx(find_block: int, price_blocks: List[Dict]) -> int:
         # binary search for correct block (kind of), blocks are in order of timestamp ASC
-        u, l = 0, len(price_blocks) - 1  # noqa
+        l, u = 0, len(price_blocks) - 1
         best_block_info = (0, float("inf"))
-        while l < u:
+        while l <= u:  # noqa
             c = (u + l) // 2
             curr_block = price_blocks[c]["block"]
 
@@ -302,13 +314,16 @@ class UniswapV2ForkGraph:
                 (c, error) if error < best_block_info[1] else best_block_info
             )
 
-            if curr_block > find_block:
-                l = c - 1  # noqa
-            elif curr_block < find_block:
-                u = c + 1
+            if find_block < curr_block:
+                u = c - 1
+            elif find_block > curr_block:
+                l = c + 1  # noqa
             else:
                 # found exact match (unlikely but possible)
                 return c
 
         # return the index of the best choice given the block number
         return best_block_info[0]
+
+    def __str__(self) -> str:
+        return "DEX Graph at URL: " + self.subgraph_url
