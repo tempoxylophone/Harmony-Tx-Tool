@@ -1,8 +1,11 @@
 from typing import Optional, Union, Sequence
 from datetime import timezone, datetime
 
+from txtool.harmony import HarmonyAddress, HarmonyAPI
+from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
+
 from txtool.transactions import HarmonyEVMTransaction
-from txtool.harmony import HarmonyToken, HarmonyAddress, HarmonyAPI
+
 from .ruleset import get_label_for_tx_and_description, is_cost
 
 
@@ -139,7 +142,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 tx.got_currency_symbol,
                 # gas
                 str(tx.tx_fee_in_native_token),
-                HarmonyToken.NATIVE_TOKEN_SYMBOL,
+                NATIVE_TOKEN_SYMBOL,
                 # fiat conversion
                 fiat_value,
                 str(self.fiat_type),

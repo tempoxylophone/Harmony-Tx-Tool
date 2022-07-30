@@ -1,5 +1,6 @@
 import pytest  # noqa
 from txtool.harmony import HarmonyToken
+from txtool.harmony.constants import NATIVE_TOKEN_ETH_ADDRESS_STR
 
 
 def test_token_object_equality():
@@ -7,7 +8,7 @@ def test_token_object_equality():
 
     # should not invoke the constructor directly, but if two instances are
     # created then, they should be considered equal based on properties
-    native_token_equivalent = HarmonyToken(HarmonyToken.NATIVE_TOKEN_ETH_ADDRESS_STR)
+    native_token_equivalent = HarmonyToken(NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     assert native_token == native_token_equivalent
 

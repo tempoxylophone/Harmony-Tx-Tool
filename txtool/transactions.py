@@ -74,11 +74,11 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             self.got_currency_symbol = ""
 
     def _is_payment(self) -> bool:
-        return self.result["from"] in DFK_PAYMENT_WALLET_ADDRESSES
+        return self.from_addr.eth in DFK_PAYMENT_WALLET_ADDRESSES
 
     def _is_donation(self) -> bool:
-        return bool(self.result["to"]) and "Donation" in HARMONY_TOKEN_ADDRESS_MAP.get(
-            self.result["to"], ""
+        return bool(self.to_addr) and "Donation" in HARMONY_TOKEN_ADDRESS_MAP.get(
+            self.to_addr.eth, ""
         )
 
     @classmethod
@@ -139,8 +139,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         r.is_token_transfer = r.event == "Transfer"
 
         # logs can be different from root transaction - must set them here
-        r.to_addr = HarmonyAddress.get_harmony_address(log["args"]["to"])
-        r.from_addr = HarmonyAddress.get_harmony_address(log["args"]["from"])
+        r.to_addr = HarmonyToken.get_address_and_set_token(log["args"]["to"])
+        r.from_addr = HarmonyToken.get_address_and_set_token(log["args"]["from"])
         r.reinterpret_action()
 
         return r
