@@ -43,15 +43,15 @@ def test_get_coin_info():
     assert len(txs) == 1
 
     tx: HarmonyEVMTransaction = txs[0]
-    assert tx.value == 5
+    assert tx.coin_amount == 5
 
-    token_price = DexPriceManager.get_price_of_token_at_block(tx.coinType, tx.block)
+    token_price = DexPriceManager.get_price_of_token_at_block(tx.coin_type, tx.block)
     assert float(token_price) == 0.02140439349414948193925037049
 
     fiat_val = tx.get_fiat_value(exclude_fee=True)
 
     # test exact
-    assert fiat_val == tx.value * token_price
+    assert fiat_val == tx.coin_amount * token_price
 
     # test approx
     assert float(fiat_val) == 0.10702196747074741
@@ -142,12 +142,12 @@ def test_lp_token_info():
     assert len(txs) == 1
 
     tx: HarmonyEVMTransaction = txs[0]
-    assert float(tx.value) == 0.000057682787963833
+    assert float(tx.coin_amount) == 0.000057682787963833
 
     fiat_val_usd = tx.get_fiat_value(exclude_fee=True)
 
     # check exact
-    assert fiat_val_usd == price_per_lp_token * tx.value
+    assert fiat_val_usd == price_per_lp_token * tx.coin_amount
 
     # check approx
     assert float(fiat_val_usd) == 87.81967073837521837658654842

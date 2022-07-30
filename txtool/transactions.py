@@ -32,7 +32,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         super().__init__(wallet_address, tx_hash)
 
         # set custom token if it is given
-        self.coinType = harmony_token or self.coinType
+        self.coin_type = harmony_token or self.coin_type
         self.reinterpret_action()
 
     @property
@@ -62,16 +62,16 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
-            self.sentAmount = 0
-            self.sentCurrencySymbol = ""
-            self.gotAmount = self.coinAmount
-            self.gotCurrencySymbol = self.coinType.symbol
+            self.sent_amount = 0
+            self.sent_amount = ""
+            self.got_amount = self.coin_amount
+            self.got_currency_symbol = self.coin_type.symbol
         else:
             # this wallet sent some currency
-            self.sentAmount = self.coinAmount
-            self.sentCurrencySymbol = self.coinType.symbol
-            self.gotAmount = 0
-            self.gotCurrencySymbol = ""
+            self.sent_amount = self.coin_amount
+            self.sent_currency_symbol = self.coin_type.symbol
+            self.got_amount = 0
+            self.got_currency_symbol = ""
 
     def _is_payment(self) -> bool:
         return self.result["from"] in DFK_PAYMENT_WALLET_ADDRESSES
@@ -132,11 +132,9 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         token = HarmonyToken.get_harmony_token_by_address(log["address"])
         value = token.get_value_from_wei(log["args"]["value"])
 
-        r = WalletActivity(root_tx.account, root_tx.txHash, token)
+        r = WalletActivity(root_tx.account, root_tx.tx_hash, token)
 
-        # TODO: why are there both value and coinAmount variables?
-        r.value = value
-        r.coinAmount = value
+        r.coin_amount = value
         r.event = log["event"]
         r.is_token_transfer = r.event == "Transfer"
 
@@ -150,8 +148,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def __str__(self) -> str:  # pragma: no cover
         return "tx: {0} --[{1} {2}]--> {3} ({4})".format(
             self.from_addr.eth,
-            self.value,
-            self.coinType.symbol,
+            self.coin_amount,
+            self.coin_type.symbol,
             self.to_addr.eth,
-            self.txHash,
+            self.tx_hash,
         )

@@ -1611,7 +1611,7 @@ def extractBridgeResults(w3, txn, account, timestamp, receipt):
             r = records.WalletActivity(
                 txn, timestamp, "bridge", otherAddress, log["address"], tokenValue
             )
-            r.fiatValue = prices.priceLookup(timestamp, r.coinType) * tokenValue
+            r.fiatValue = prices.priceLookup(timestamp, r.coin_type) * tokenValue
     return r
 
 

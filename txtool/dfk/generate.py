@@ -26,7 +26,7 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
             sentAmount = ""
             sentType = ""
             rcvdAmount = record.coinCost
-            rcvdType = contracts.getAddressName(record.coinType)
+            rcvdType = contracts.getAddressName(record.coin_type)
 
         label = ""
 
@@ -40,10 +40,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatAmount),
-                record.fiatType,
+                record.fiat_type,
                 label,
                 "NFT {0} {1}".format(record.itemID, record.event),
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -65,10 +65,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatSwapValue),
-                record.fiatType,
+                record.fiat_type,
                 "",
                 "swap",
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -92,14 +92,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                     str(txFee),
                     txFeeCurrency,
                     str(record.coin1FiatValue),
-                    record.fiatType,
+                    record.fiat_type,
                     "",
                     "{0} {1} to {2}".format(
                         record.action,
                         record.poolAmount,
                         contracts.getAddressName(record.poolAddress),
                     ),
-                    record.txHash,
+                    record.tx_hash,
                     "\n",
                 )
             )
@@ -113,14 +113,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                     str(txFee),
                     txFeeCurrency,
                     str(record.coin1FiatValue),
-                    record.fiatType,
+                    record.fiat_type,
                     "",
                     "{0} {1} to {2}".format(
                         record.action,
                         record.poolAmount,
                         contracts.getAddressName(record.poolAddress),
                     ),
-                    record.txHash,
+                    record.tx_hash,
                     "\n",
                 )
             )
@@ -135,14 +135,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                     str(txFee),
                     txFeeCurrency,
                     str(record.coin1FiatValue),
-                    record.fiatType,
+                    record.fiat_type,
                     "",
                     "{0} {1} to {2}".format(
                         record.action,
                         record.poolAmount,
                         contracts.getAddressName(record.poolAddress),
                     ),
-                    record.txHash,
+                    record.tx_hash,
                     "\n",
                 )
             )
@@ -156,14 +156,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                     str(txFee),
                     txFeeCurrency,
                     str(record.coin1FiatValue),
-                    record.fiatType,
+                    record.fiat_type,
                     "",
                     "{0} {1} to {2}".format(
                         record.action,
                         record.poolAmount,
                         contracts.getAddressName(record.poolAddress),
                     ),
-                    record.txHash,
+                    record.tx_hash,
                     "\n",
                 )
             )
@@ -176,14 +176,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
             txFeeCurrency = "USD"
         if record.event == "deposit":
             sentAmount = record.coinAmount
-            sentType = contracts.getAddressName(record.coinType)
+            sentType = contracts.getAddressName(record.coin_type)
             rcvdAmount = ""
             rcvdType = ""
         else:
             sentAmount = ""
             sentType = ""
             rcvdAmount = record.coinAmount
-            rcvdType = contracts.getAddressName(record.coinType)
+            rcvdType = contracts.getAddressName(record.coin_type)
         label = ""  # KoinlyInterpreter.getRecordLabel(format, "tavern", record.event)
         response += ",".join(
             (
@@ -195,10 +195,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatValue),
-                record.fiatType,
+                record.fiat_type,
                 label,
                 record.event,
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -214,14 +214,14 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
 
         if record.action == "deposit":
             sentAmount = record.coinAmount
-            sentType = contracts.getAddressName(record.coinType)
+            sentType = contracts.getAddressName(record.coin_type)
             rcvdAmount = record.coinAmount / record.xRate
             rcvdType = "xJewel"
         else:
             sentAmount = record.coinAmount / record.xRate
             sentType = "xJewel"
             rcvdAmount = record.coinAmount
-            rcvdType = contracts.getAddressName(record.coinType)
+            rcvdType = contracts.getAddressName(record.coin_type)
 
         response += ",".join(
             (
@@ -233,10 +233,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatValue),
-                record.fiatType,
+                record.fiat_type,
                 "",
                 "bank {0}".format(record.action),
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -258,10 +258,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatValue),
-                record.fiatType,
+                record.fiat_type,
                 "ignored",
                 "potion crafting",
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -284,10 +284,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatValue),
-                record.fiatType,
+                record.fiat_type,
                 "airdrop",
                 "",
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -310,10 +310,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 str(txFee),
                 txFeeCurrency,
                 str(record.fiatValue),
-                record.fiatType,
+                record.fiat_type,
                 "reward",
                 "quest",
-                record.txHash,
+                record.tx_hash,
                 "\n",
             )
         )
@@ -334,10 +334,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                 sentAmount = ""
                 sentType = ""
                 rcvdAmount = record.coinAmount
-                rcvdType = contracts.getAddressName(record.coinType)
+                rcvdType = contracts.getAddressName(record.coin_type)
             else:
                 sentAmount = record.coinAmount
-                sentType = contracts.getAddressName(record.coinType)
+                sentType = contracts.getAddressName(record.coin_type)
                 rcvdAmount = ""
                 rcvdType = ""
 
@@ -351,10 +351,10 @@ def get_csv(records, format: str = KOINLY_UNIVERSAL_FORMAT) -> str:
                     str(txFee),
                     txFeeCurrency,
                     str(record.fiatValue),
-                    record.fiatType,
+                    record.fiat_type,
                     "",
                     "lending {0}".format(record.event),
-                    record.txHash,
+                    record.tx_hash,
                     "\n",
                 )
             )

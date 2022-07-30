@@ -1,4 +1,4 @@
-import pytest
+import pytest  # noqa
 from txtool.harmony import HarmonyAddress
 
 TEST_ADDRESS_ETH_STR = HarmonyAddress.clean_eth_address_str(

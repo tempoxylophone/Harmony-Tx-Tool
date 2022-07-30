@@ -55,6 +55,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
         date_ub_str: Optional[str] = "",
         # none is unlimited
         tx_limit: Union[int, None] = None,
+        fiat_type: Optional[str] = "usd",
     ):
         self.address_format: str = address_format or HarmonyAddress.FORMAT_ONE
         self.omit_tracked_fiat_prices = omit_tracked_fiat_prices
@@ -74,6 +75,9 @@ class KoinlyReportCreator:  # pylint: disable=R0902
 
         # mostly for testing, cap the number of tx you can generate in a report
         self.tx_limit = tx_limit
+
+        # currency to write to CSV
+        self.fiat_type = fiat_type
 
     def get_csv_from_transactions(self, events: Sequence[HarmonyEVMTransaction]) -> str:
         # remove out of range
@@ -114,7 +118,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
 
     def to_csv_row(self, tx: HarmonyEVMTransaction) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
-            tx.coinType.universal_symbol
+            tx.coin_type.universal_symbol
         ):
             fiat_value = ""
         else:
@@ -128,22 +132,22 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 # time of transaction
                 self.format_utc_ts_as_str(tx.timestamp),
                 # token sent in this tx (outgoing)
-                str(tx.sentAmount or ""),
-                tx.sentCurrencySymbol,
+                str(tx.sent_amount or ""),
+                tx.sent_currency_symbol,
                 # token received in this tx (incoming)
-                str(tx.gotAmount or ""),
-                tx.gotCurrencySymbol,
+                str(tx.got_amount or ""),
+                tx.got_currency_symbol,
                 # gas
                 str(tx.tx_fee_in_native_token),
                 HarmonyToken.NATIVE_TOKEN_SYMBOL,
                 # fiat conversion
                 fiat_value,
-                tx.fiatType,
+                str(self.fiat_type),
                 # human readable stuff
                 label,
                 desc,
                 # transaction hash
-                tx.txHash,
+                tx.tx_hash,
                 tx.get_tx_function_signature(),
                 # transfer information
                 tx.to_addr.get_address_str(self.address_format),

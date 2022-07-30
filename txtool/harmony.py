@@ -401,8 +401,8 @@ class DexPriceManager:
     ) -> None:
         for t in transactions:
             # ensure ONE is included for this block so we can look up gas
-            tokens = [t.coinType] + (
-                not t.coinType.is_native_token and [HarmonyToken.native_token()] or []
+            tokens = [t.coin_type] + (
+                not t.coin_type.is_native_token and [HarmonyToken.native_token()] or []
             )
 
             for token in tokens:
@@ -705,17 +705,17 @@ class HarmonyEVMTransaction:  # pylint: disable=R0902
 
     def __init__(self, account: Union[HarmonyAddress, str], tx_hash: HexStr):
         # identifiers
-        self.txHash = tx_hash
+        self.tx_hash = tx_hash
         self.account = HarmonyAddress.get_harmony_address(account)
 
         # (placeholder values)
         # token sent in this tx (outgoing)
-        self.sentAmount = 0
-        self.sentCurrencySymbol = ""
+        self.sent_amount = 0
+        self.sent_currency_symbol = ""
 
         # token received in this tx (incoming)
-        self.gotAmount = 0
-        self.gotCurrencySymbol = ""
+        self.got_amount = 0
+        self.got_currency_symbol = ""
 
         # get transaction data
         self.result = HarmonyAPI.get_transaction(tx_hash)
@@ -741,31 +741,26 @@ class HarmonyEVMTransaction:  # pylint: disable=R0902
         self.tx_payload = self.contract_pointer.decode_input(self.result["input"])
 
         # currency data
-        self.value = Web3.fromWei(self.result["value"], "ether")
-        self.coinAmount = self.value
+        self.coin_amount = Web3.fromWei(self.result["value"], "ether")
 
         # assume it is ONE unless otherwise specified, inheritors of this class can change
         # this based data relevant to what they do
-        self.coinType: HarmonyToken = HarmonyToken.native_token()
+        self.coin_type: HarmonyToken = HarmonyToken.native_token()
 
         self.receipt = HarmonyEVMTransaction.get_tx_receipt(tx_hash)
-        self.tx_fee_in_native_token = Decimal(
-            Web3.fromWei(self.result["gasPrice"], "ether") * self.receipt["gasUsed"]
-        )
-
-        self.fiatValue = 0
-        self.fiatFeeValue = 0
-        self.fiatType = "usd"
+        self.tx_fee_in_native_token = Web3.fromWei(
+            self.result["gasPrice"], "ether"
+        ) * Decimal(self.receipt["gasUsed"])
 
     @property
     def explorer_url(self):
-        return self.EXPLORER_TX_URL.format(self.txHash)
+        return self.EXPLORER_TX_URL.format(self.tx_hash)
 
     def get_fiat_value(self, exclude_fee: Optional[bool] = False) -> Decimal:
         token_price = DexPriceManager.get_price_of_token_at_block(
-            self.coinType, self.block
+            self.coin_type, self.block
         )
-        token_qty = self.value
+        token_qty = self.coin_amount
 
         fee_price = DexPriceManager.get_price_of_token_at_block(
             HarmonyToken.native_token(), self.block
