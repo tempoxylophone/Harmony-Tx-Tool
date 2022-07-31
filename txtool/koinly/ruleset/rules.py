@@ -13,7 +13,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_currency_symbol": (
                     "==",
                     noop,
-                    HarmonyToken.native_token().symbol,
+                    HarmonyToken.get_native_token().symbol,
                 ),
             },
         )

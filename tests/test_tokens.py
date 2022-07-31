@@ -4,7 +4,7 @@ from txtool.harmony.constants import NATIVE_TOKEN_ETH_ADDRESS_STR
 
 
 def test_token_object_equality():
-    native_token = HarmonyToken.native_token()
+    native_token = HarmonyToken.get_native_token()
 
     # should not invoke the constructor directly, but if two instances are
     # created then, they should be considered equal based on properties
@@ -14,7 +14,7 @@ def test_token_object_equality():
 
 
 def test_merge_wone():
-    native_token = HarmonyToken.native_token()
+    native_token = HarmonyToken.get_native_token()
     wone_address = "0x005caC9eEd29CceC0F9Cca3A0A2052DeFF584667"
 
     assert native_token.address.eth != wone_address

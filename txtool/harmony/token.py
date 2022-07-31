@@ -12,7 +12,7 @@ from .constants import (
 )
 from .api import HarmonyAPI
 from .address import HarmonyAddress
-from .abc import Token
+from .abc import Token, Transaction
 
 
 class DexPriceManager:
@@ -22,7 +22,7 @@ class DexPriceManager:
         timestamp_range: Dict[str, Union[float, int]]
         fiat_prices_by_block: Dict[int, Decimal]
 
-    _TX_LOOKUP: Dict[HarmonyToken, DexPriceInfo] = defaultdict(
+    _TX_LOOKUP: Dict[Token, DexPriceInfo] = defaultdict(
         lambda: {
             "blocks": [],
             "timestamps": [],
@@ -57,20 +57,29 @@ class DexPriceManager:
     @classmethod
     def initialize_static_price_manager(
         cls,
-        transactions: Iterable,
+        transactions: Iterable[Transaction],
     ) -> None:
         DexPriceManager._build_transactions_directory(transactions)
         DexPriceManager._build_transactions_fiat_price_lookup()
 
     @staticmethod
     def _build_transactions_directory(
-        transactions: Iterable,
+        transactions: Iterable[Transaction],
     ) -> None:
         for t in transactions:
+            if not t.coin_type:
+                # token is undefined or not set
+                raise ValueError(
+                    f"Transaction {t} has a null coin type! Can't build prices map."
+                )
+
             # ensure ONE is included for this block so we can look up gas
-            tokens = [t.coin_type] + (
-                not t.coin_type.is_native_token and [HarmonyToken.native_token()] or []
+            native_token: List[Token] = (
+                not (t.coin_type and t.coin_type.is_native_token)
+                and [t.coin_type.get_native_token()]
+                or []
             )
+            tokens = [t.coin_type] + native_token
 
             for token in tokens:
                 timestamp = t.timestamp
@@ -259,7 +268,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         HarmonyToken._TOKEN_DIRECTORY[self.address] = self
 
     @classmethod
-    def native_token(cls) -> HarmonyToken:
+    def get_native_token(cls) -> HarmonyToken:
         return cls.get_harmony_token_by_address(NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     @property
@@ -297,7 +306,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
                 )
 
     @staticmethod
-    def _is_pair(pair_info, token_info) -> bool:
+    def _is_pair(pair_info: Dict, token_info: Dict) -> bool:
         if bool(pair_info) ^ bool(token_info):
             # if there is only 1 result given the address
             return bool(pair_info)

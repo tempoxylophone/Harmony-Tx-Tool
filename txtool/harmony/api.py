@@ -121,16 +121,19 @@ class HarmonyAPI:
     def get_harmony_tx_list(
         eth_address: str, dt_ts_lb: int, dt_ts_ub: int, page_size: int = 1_000
     ) -> List[HexStr]:
+        # this could be more efficient by estimating the page range for transactions
         txs = []
-        num_tx = HarmonyAPI.get_num_tx_for_wallet(eth_address)
-        num_pages = num_tx // page_size
+        num_pages = HarmonyAPI.get_num_tx_for_wallet(eth_address) // page_size + 1
 
-        for p_idx in range(num_pages):
+        has_more = True
+        p_idx = 0
+
+        while has_more and p_idx < num_pages:
             results = HarmonyAPI._get_tx_page(eth_address, p_idx, page_size)
-            new_txs = [
+            in_bounds_txs = [
                 x["hash"] for x in results if dt_ts_lb <= x["timestamp"] <= dt_ts_ub
             ]
-            txs += new_txs
+            txs += in_bounds_txs
 
             MAIN_LOGGER.info(
                 "got page %s/%s of all wallet transactions. Total tx = %s...",
@@ -139,9 +142,9 @@ class HarmonyAPI:
                 len(txs),
             )
 
-            if len(new_txs) < page_size:  # pragma: no cover
-                # we reached oob
-                break
+            # the last tx on current page is in time bounds
+            has_more = bool(results) and results[-1]["hash"] == in_bounds_txs[-1]
+            p_idx += 1
 
         # de-dupe tx hashes in order, sometimes API returns duplicates in pagination
         MAIN_LOGGER.info("Done fetching transactions from API.")

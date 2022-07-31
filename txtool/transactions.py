@@ -149,7 +149,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         return "tx: {0} --[{1} {2}]--> {3} ({4})".format(
             self.from_addr.eth,
             self.coin_amount,
-            self.coin_type.symbol,
+            self.coin_type and self.coin_type.symbol or "(NULL COIN TYPE)",
             self.to_addr.eth,
             self.tx_hash,
         )

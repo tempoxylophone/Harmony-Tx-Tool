@@ -5,14 +5,13 @@ import argparse
 from txtool.main import get_harmony_tx_from_wallet_as_csv
 from txtool.koinly import KoinlyReportCreator
 from txtool.harmony import HarmonyAddress
+from txtool.utils import MAIN_LOGGER
 
 LOG_LEVELS = {"error": logging.ERROR, "info": logging.INFO, "debug": logging.DEBUG}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "wallets", help="Comma separated Ethereum-style address of Harmony ONE wallets"
-    )
+    parser.add_argument("wallet", help="Ethereum-style address of Harmony ONE wallet")
     parser.add_argument(
         "-s", "--start", help="The starting date for the report (inclusive)"
     )
@@ -32,7 +31,7 @@ if __name__ == "__main__":
     )
 
     # go through each wallet and export transactions
-    wallet_addresses = [x.strip() for x in args.wallets.split(",")]
+    wallet_address = args.wallet
 
     report = KoinlyReportCreator(
         address_format=HarmonyAddress.FORMAT_ONE,
@@ -42,15 +41,16 @@ if __name__ == "__main__":
         date_ub_str=args.end,
     )
 
-    for wallet_address in wallet_addresses:
-        # run program
-        csv_contents, file_name = get_harmony_tx_from_wallet_as_csv(
-            wallet_address,
-            report,
-        )
+    # run program
+    csv_contents, file_name = get_harmony_tx_from_wallet_as_csv(
+        wallet_address,
+        report,
+    )
 
-        # write result to desktop
-        user_dir = os.path.expanduser("~")
-        path = user_dir + "/Desktop/" + file_name
-        with open(path, "w") as f:
-            f.write(csv_contents)
+    # write result to desktop
+    user_dir = os.path.expanduser("~")
+    path = user_dir + "/Desktop/" + file_name
+    with open(path, "w") as f:
+        f.write(csv_contents)
+
+    MAIN_LOGGER.info("Done. Goodbye!")

@@ -1,3 +1,5 @@
+import pytest  # noqa
+from txtool.harmony import DexPriceManager
 from txtool.transactions import WalletActivity
 
 
@@ -105,3 +107,20 @@ def test_token_tx_ignore_intermediate_transfers():
     # from unknown contract so can't decode its signature
     assert (False, None) == root.tx_payload
     assert "" == root.get_tx_function_signature()
+
+
+def test_build_prices_for_null_coin_type():
+    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
+    address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"
+
+    with pytest.raises(ValueError) as e:
+        txs = WalletActivity.extract_all_wallet_activity_from_transaction(
+            address, tx_hash, exclude_intermediate_tx=False
+        )
+        for tx in txs:
+            # remove coin type
+            tx.coin_type = None
+
+        DexPriceManager.initialize_static_price_manager(txs)
+
+    assert "null coin type" in str(e)

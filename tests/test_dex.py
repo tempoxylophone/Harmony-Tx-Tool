@@ -8,7 +8,7 @@ import pytest  # noqa
 from txtool.dex import UniswapV2ForkGraph
 from txtool.harmony import HarmonyToken, HarmonyEVMTransaction, DexPriceManager
 
-from .util import get_non_cost_transactions_from_txt_hash
+from .utils import get_non_cost_transactions_from_txt_hash
 
 VIPER_SWAP = UniswapV2ForkGraph(
     "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",

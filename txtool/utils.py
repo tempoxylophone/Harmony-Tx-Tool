@@ -55,6 +55,9 @@ def api_retry(custom_exceptions: List[T_EXCEPTION]) -> Callable:
 
 
 def get_local_abi(abi_json_filename: str) -> str:
+    """
+    Copyright 2021 Paul Willworth <ioscode@gmail.com>
+    """
     location = os.path.abspath(__file__)
     path = "{0}/abi/{1}.json".format(
         "/".join(location.split("/")[0:-1]), abi_json_filename
