@@ -71,6 +71,7 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
             f, _ = function_info
 
             # escape and strip class name in python to string
-            return "{0}".format(str(f)[1:-1].split(" ")[1])
+            # need double quotes to prevent commas from next cell
+            return '"{0}"'.format(str(f)[1:-1].split(" ")[1])
 
         return ""
