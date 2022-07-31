@@ -126,7 +126,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
             fiat_value = ""
         else:
             # if 0, make it blank
-            fiat_value = str(tx.get_fiat_value() or "")
+            fiat_value = str(tx.get_fiat_value(self.omit_cost) or "")
 
         label, desc = get_label_for_tx_and_description(tx)
 
@@ -141,7 +141,8 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 str(tx.got_amount or ""),
                 tx.got_currency_symbol,
                 # gas
-                str(tx.tx_fee_in_native_token),
+                # koinly splits up the tx fee into a separate transaction
+                '0' if self.omit_cost else str(tx.tx_fee_in_native_token),
                 NATIVE_TOKEN_SYMBOL,
                 # fiat conversion
                 fiat_value,
