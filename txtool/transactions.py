@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, Union, Dict, Any
+from typing import List, Optional, Union, Dict, Any, Tuple
 from enum import Enum
 from eth_typing import HexStr
 from txtool.harmony import (
@@ -123,7 +123,75 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             # in reverse order
             transfers.insert(0, WalletActivity._create_token_tx_from_log(root_tx, log))
 
+        if WalletActivity._appears_to_be_uniswap_swap_tx(root_tx):
+            MAIN_LOGGER.info("\tTX: %s looks like a Uniswap Swap...", root_tx.tx_hash)
+            _, to_token_address = WalletActivity._get_uniswap_path(root_tx)
+
+            # wallet originally called uniswap contract
+            uniswap_contract_address = root_tx.to_addr
+
+            # create tx that is the contract sending you what you requested
+            return_tx = WalletActivity(
+                uniswap_contract_address,
+                # technically this is not the same hash, but we want it to show up
+                root_tx.tx_hash,
+                to_token_address.token,  # type: ignore
+            )
+            return_tx.to_addr = wallet
+            return_tx.from_addr = root_tx.to_addr
+
+            # get the coin value from the transfer that is to the contract, sending
+            # the second currency that the contract should send back
+            amount_tx = next(
+                (
+                    x
+                    for x in transfers
+                    if x.to_addr == uniswap_contract_address
+                    and x.coin_type == to_token_address.token
+                )
+            )
+
+            return_tx.coin_amount = amount_tx.coin_amount
+
+            transfers.append(return_tx)
+
         return transfers
+
+    @staticmethod
+    def _appears_to_be_uniswap_swap_tx(root_tx: HarmonyEVMTransaction) -> bool:
+        if "swapExactTokensForETH" not in root_tx.get_tx_function_signature():
+            return False
+
+        decode_success, func_data = root_tx.tx_payload
+
+        if not decode_success or not func_data:
+            return False
+
+        _, func_inputs = func_data
+        did_call = func_inputs["to"] == root_tx.account.eth
+        path_all_tokens = all(
+            x.belongs_to_token for x in WalletActivity._get_uniswap_path(root_tx)
+        )
+
+        return did_call and path_all_tokens
+
+    @staticmethod
+    def _get_uniswap_path(
+        root_tx: HarmonyEVMTransaction,
+    ) -> Tuple[HarmonyAddress, HarmonyAddress]:
+        decode_success, func_data = root_tx.tx_payload
+
+        if not decode_success or not func_data:
+            raise ValueError(
+                "Transaction that appeared to be Uniswap swap could not be decoded"
+            )
+
+        _, func_inputs = func_data
+        address_from, address_to = func_inputs["path"]
+        return (
+            HarmonyAddress.get_harmony_address(address_from),
+            HarmonyAddress.get_harmony_address(address_to),
+        )
 
     @staticmethod
     def _create_token_tx_from_log(

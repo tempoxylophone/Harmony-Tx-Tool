@@ -142,7 +142,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 tx.got_currency_symbol,
                 # gas
                 # koinly splits up the tx fee into a separate transaction
-                '0' if self.omit_cost else str(tx.tx_fee_in_native_token),
+                "0" if self.omit_cost else str(tx.tx_fee_in_native_token),
                 NATIVE_TOKEN_SYMBOL,
                 # fiat conversion
                 fiat_value,
