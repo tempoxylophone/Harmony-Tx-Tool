@@ -55,6 +55,7 @@ mypy = "*"
 coverage = "*"
 black = "*"
 pylint = "*"
+vcrpy = "*"
 
 [requires]
 python_version = "3.8"

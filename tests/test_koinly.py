@@ -1,6 +1,9 @@
 from datetime import timezone
 from txtool.koinly import KoinlyReportCreator
 from txtool.transactions import WalletActivity
+from .utils import get_vcr
+
+vcr = get_vcr(__file__)
 
 
 def test_koinly_tracked_currency():
@@ -29,6 +32,7 @@ def test_create_koinly_report_creator():
     assert report.dt_ub.tzinfo == timezone.utc
 
 
+@vcr.use_cassette()
 def test_omit_costs():
     # random TX from explorers with smart contract interaction
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"

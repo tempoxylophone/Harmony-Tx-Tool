@@ -1,0 +1,62 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getTransactionReceipt\", \"params\": [\"0x0123000000000000000000000000000000000000000000000000000000000000\"], \"id\": 18}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "149"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Length": [
+                        "64"
+                    ],
+                    "Set-Cookie": [],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Date": [
+                        "Tue, 02 Aug 2022 16:25:25 GMT"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b22\u00b4\u00d0Q*J-.\u00cd)Q\u00b2\u00ca+\u00cd\u00c9\u00a9\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ffz\u00c0.\r(\u0000\u0000\u0000"
+                }
+            }
+        }
+    ]
+}

@@ -8,7 +8,9 @@ import pytest  # noqa
 from txtool.dex import UniswapV2ForkGraph
 from txtool.harmony import HarmonyToken, HarmonyEVMTransaction, DexPriceManager
 
-from .utils import get_non_cost_transactions_from_txt_hash
+from .utils import get_non_cost_transactions_from_txt_hash, get_vcr
+
+vcr = get_vcr(__file__)
 
 VIPER_SWAP = UniswapV2ForkGraph(
     "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",
@@ -17,7 +19,8 @@ VIPER_SWAP = UniswapV2ForkGraph(
 )
 
 
-def test_get_coin_info():
+@vcr.use_cassette()
+def test_get_coin_info_graph_only():
     token_address = "0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79"
     token_info = VIPER_SWAP.get_token_or_pair_info(token_address)
 
@@ -27,6 +30,10 @@ def test_get_coin_info():
     assert token_info["token"]["symbol"] == "VIPER"
     assert token_info["token"]["txCount"] > 3_850_000
 
+
+@vcr.use_cassette()
+def test_get_coin_info():
+    token_address = "0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79"
     token_object = HarmonyToken(token_address)
 
     assert not token_object.is_lp_token
@@ -60,6 +67,7 @@ def test_get_coin_info():
     assert "https://explorer.harmony.one/tx/" + tx_hash == tx.explorer_url
 
 
+@vcr.use_cassette()
 def test_lp_token_info():
     token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
     token_info = VIPER_SWAP.get_token_or_pair_info(token_address)
@@ -69,12 +77,12 @@ def test_lp_token_info():
     assert token_info["pair"]["token0"]["symbol"] == "1USDC"
     assert token_info["pair"]["token1"]["symbol"] == "WONE"
     assert (
-        token_info["pair"]["token0"]["id"]
-        == "0x985458e523db3d53125813ed68c274899e9dfab4"
+            token_info["pair"]["token0"]["id"]
+            == "0x985458e523db3d53125813ed68c274899e9dfab4"
     )
     assert (
-        token_info["pair"]["token1"]["id"]
-        == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
+            token_info["pair"]["token1"]["id"]
+            == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
     )
 
     token_object = HarmonyToken(token_address)
@@ -157,6 +165,7 @@ def test_lp_token_info():
     assert "https://explorer.harmony.one/tx/" + tx_hash == tx.explorer_url
 
 
+@vcr.use_cassette()
 def test_get_approx_block_match_for_lp_token():
     lp_token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
 

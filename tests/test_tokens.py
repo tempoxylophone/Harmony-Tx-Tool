@@ -2,7 +2,12 @@ import pytest  # noqa
 from txtool.harmony import HarmonyToken
 from txtool.harmony.constants import NATIVE_TOKEN_ETH_ADDRESS_STR
 
+from .utils import get_vcr
 
+vcr = get_vcr(__file__)
+
+
+@vcr.use_cassette()
 def test_token_object_equality():
     native_token = HarmonyToken.get_native_token()
 
@@ -13,6 +18,7 @@ def test_token_object_equality():
     assert native_token == native_token_equivalent
 
 
+@vcr.use_cassette()
 def test_merge_wone():
     native_token = HarmonyToken.get_native_token()
     wone_address = "0x005caC9eEd29CceC0F9Cca3A0A2052DeFF584667"
@@ -32,6 +38,7 @@ def test_merge_wone():
     assert wrapped_native_token.symbol != native_token.symbol
 
 
+@vcr.use_cassette()
 def test_create_token_from_non_erc20_address():
     # this is a smart contract address
     # random address from explorer
@@ -50,6 +57,7 @@ def test_create_token_from_non_erc20_address():
     assert "This address does not appear to belong to an ERC/HRC20 token" in str(e)
 
 
+@vcr.use_cassette()
 def test_create_token_from_erc20_address():
     rune_token = HarmonyToken.get_harmony_token_by_address(
         "0x66F5BfD910cd83d3766c4B39d13730C911b2D286"
@@ -61,6 +69,7 @@ def test_create_token_from_erc20_address():
     assert rune_token.symbol == "DFKSHVAS"
 
 
+@vcr.use_cassette()
 def test_ambiguous_token_or_lp_position():
     dual_address = "0x0ea67cfe61d2847e1b14a374a884a35529267818"
     token = HarmonyToken.get_harmony_token_by_address(dual_address)

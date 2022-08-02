@@ -1,7 +1,10 @@
 from __future__ import annotations
 from typing import List, Optional, Union, Dict, Any, Tuple
 from enum import Enum
+from decimal import Decimal
+
 from eth_typing import HexStr
+
 from txtool.harmony import (
     HarmonyToken,
     HarmonyAddress,
@@ -62,15 +65,15 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
-            self.sent_amount = 0
-            self.sent_amount = ""
+            self.sent_amount = Decimal(0)
+            self.sent_currency_symbol = ""
             self.got_amount = self.coin_amount
             self.got_currency_symbol = self.coin_type.symbol
         else:
             # this wallet sent some currency
             self.sent_amount = self.coin_amount
             self.sent_currency_symbol = self.coin_type.symbol
-            self.got_amount = 0
+            self.got_amount = Decimal(0)
             self.got_currency_symbol = ""
 
     def _is_payment(self) -> bool:
@@ -100,12 +103,15 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def _get_token_transfers(
         root_tx: WalletActivity, exclude_intermediate_tx: Optional[bool] = True
     ) -> List[WalletActivity]:
+        # TODO: refactor this
         wallet = root_tx.account
         receipt = root_tx.receipt
         destination = root_tx.to_addr.eth
 
         transfers: List[WalletActivity] = []
         logs = list(HarmonyAPI.get_tx_transfer_logs(receipt))
+
+        is_uniswap_swap = WalletActivity._appears_to_be_uniswap_swap_tx(root_tx)
 
         for i, log in enumerate(logs, start=1):
             from_addr = log["args"]["from"]
@@ -114,7 +120,9 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             MAIN_LOGGER.info("\tExtracting sub-tx %s/%s...", i, len(logs))
 
             if exclude_intermediate_tx and (
-                wallet.eth not in (from_addr, to_addr) and destination != to_addr
+                wallet.eth not in (from_addr, to_addr) and
+                destination not in (from_addr, to_addr) and
+                not is_uniswap_swap
             ):
                 # some intermediate tx
                 MAIN_LOGGER.info("\t\tSkipping intermediate transaction...")
@@ -152,8 +160,13 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             )
 
             return_tx.coin_amount = amount_tx.coin_amount
+            return_tx.got_amount = return_tx.coin_amount
+            return_tx.got_currency_symbol = return_tx.coin_type.symbol
 
             transfers.append(return_tx)
+
+            if exclude_intermediate_tx:
+                transfers = [x for x in transfers if wallet.eth in (x.to_addr.eth, x.from_addr.eth)]
 
         return transfers
 

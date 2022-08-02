@@ -1,7 +1,11 @@
 from typing import List, Type, Callable
 import logging
 import os
-from requests.exceptions import HTTPError, ConnectionError as HTTPConnectionError
+from requests.exceptions import (
+    HTTPError,
+    ConnectionError as HTTPConnectionError,
+    JSONDecodeError,
+)
 from tenacity import (
     retry,
     retry_any as RetryChain,  # noqa
@@ -16,6 +20,7 @@ T_EXCEPTION = Type[BaseException]
 COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
     HTTPError,
     HTTPConnectionError,
+    JSONDecodeError,
 ]
 
 MAIN_LOGGER = logging.getLogger("main")

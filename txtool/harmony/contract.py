@@ -11,7 +11,8 @@ T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
 
 
 class HarmonyEVMSmartContract:
-    POSSIBLE_ABIS = ["ERC20", "ERC721", "UniswapV2Router02", "USD Coin", "Wrapped ONE"]
+    # test each ABI until you reach the end or find a match for decoding
+    POSSIBLE_ABIS = ["ERC20", "ERC721", "UniswapV2Router02", "UniswapV2Factory", "USD Coin", "Wrapped ONE"]
 
     @classmethod
     @lru_cache(maxsize=256)
@@ -25,11 +26,8 @@ class HarmonyEVMSmartContract:
         self.name = assigned_name
 
         # contract function requires us to know interface of source
-        self.code = HarmonyAPI.get_code(address)
-        self.has_code = not self._is_missing(self.code)
-        self.abi = (
-            self.code["abi"] if self.has_code else get_local_abi(self.POSSIBLE_ABIS[0])
-        )
+        self.has_code = HarmonyAPI.address_belongs_to_smart_contract(self.address)
+        self.abi = get_local_abi(self.POSSIBLE_ABIS[0])
         self.abi_attempt_idx = 1
         self.contract = HarmonyAPI.get_contract(self.address, self.abi)
 
@@ -46,9 +44,6 @@ class HarmonyEVMSmartContract:
         except ValueError:
             # can't decode this input, keep shuffling different ABIs until get match, then stop
             self.abi = get_local_abi(self.POSSIBLE_ABIS[self.abi_attempt_idx])
+            self.contract = HarmonyAPI.get_contract(self.address, self.abi)
             self.abi_attempt_idx += 1
             return self.decode_input(tx_input)
-
-    @staticmethod
-    def _is_missing(code: Dict) -> bool:
-        return code.get("message") in HarmonyAPI.API_NOT_FOUND_MESSAGES

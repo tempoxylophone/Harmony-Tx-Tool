@@ -1,8 +1,12 @@
 import pytest  # noqa
 from txtool.harmony import DexPriceManager
 from txtool.transactions import WalletActivity
+from .utils import get_vcr
+
+vcr = get_vcr(__file__)
 
 
+@vcr.use_cassette()
 def test_token_tx_with_intermediate_transfers():
     # random TX from explorer
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
@@ -80,6 +84,7 @@ def test_token_tx_with_intermediate_transfers():
     assert leaf.to_addr == root.to_addr
 
 
+@vcr.use_cassette()
 def test_token_tx_ignore_intermediate_transfers():
     # random TX from explorers
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
@@ -109,6 +114,7 @@ def test_token_tx_ignore_intermediate_transfers():
     assert "" == root.get_tx_function_signature()
 
 
+@vcr.use_cassette()
 def test_build_prices_for_null_coin_type():
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
     address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"

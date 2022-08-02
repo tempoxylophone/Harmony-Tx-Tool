@@ -4,6 +4,7 @@ from decimal import Decimal
 from functools import lru_cache
 
 import requests
+from requests.exceptions import JSONDecodeError
 
 from hexbytes import HexBytes
 from web3.contract import Contract
@@ -23,8 +24,8 @@ class HarmonyAPI:
         pyhmy.rpc.exceptions.RPCError,
         pyhmy.rpc.exceptions.RequestsError,
     ]
-    _NET_HMY_MAIN = "https://api.harmony.one"
-    _NET_HMY_WEB3 = "https://api.harmony.one"
+    _NET_HMY_MAIN = "https://a.api.s0.t.hmny.io/"
+    _NET_HMY_WEB3 = "https://a.api.s0.t.hmny.io/"
 
     _w3 = Web3(Web3.HTTPProvider(_NET_HMY_WEB3))
     _ERC20_ABI = get_local_abi("ERC20")
@@ -111,6 +112,23 @@ class HarmonyAPI:
         # this will return True if this is the address of ERC20 token
         return bool(HarmonyAPI.get_smart_contract_byte_code(eth_address))
 
+    @classmethod
+    @lru_cache(maxsize=256)
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def _get_code(cls, address: str) -> Dict:
+        url = cls._get_code_request_url(address)
+        return requests.get(url).json()
+
+    @classmethod
+    def get_code(cls, address: str) -> Dict:
+        # this service appears to be taken offline permanently
+        try:
+            return cls._get_code(address)
+        except JSONDecodeError:
+            # 502 bad gateway
+            return {}
+
+
     @staticmethod
     def address_belongs_to_erc_20_token(eth_address: str) -> bool:
         return HarmonyAPI.address_belongs_to_smart_contract(
@@ -175,13 +193,6 @@ class HarmonyAPI:
         return pyhmy.account.get_transaction_count(
             eth_address, "latest", endpoint=HarmonyAPI._NET_HMY_MAIN
         )
-
-    @classmethod
-    @lru_cache(maxsize=256)
-    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_code(cls, address: str) -> Dict:
-        url = cls._get_code_request_url(address)
-        return requests.get(url).json()
 
     @classmethod
     def _get_code_request_url(cls, address: str) -> str:

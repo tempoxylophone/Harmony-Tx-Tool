@@ -1,0 +1,122 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",
+                "body": "{\"operationName\": \"pairs\", \"variables\": {\"lp_pair_id\": \"0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00\", \"ts_min\": 1656449945, \"ts_max\": 1656795545}, \"query\": \"\\n        query pairs($lp_pair_id: ID!, $ts_min: Int!, $ts_max: Int!) {\\n          pair(id: $lp_pair_id) {\\n            id\\n            liquidityPositionSnapshots(orderBy: timestamp, where: {timestamp_gte: $ts_min, timestamp_lte: $ts_max}) {\\n              timestamp\\n              block\\n              reserve0\\n              reserve1\\n              token0PriceUSD\\n              token1PriceUSD\\n              reserveUSD\\n              liquidityTokenTotalSupply\\n            }\\n            token0 {\\n            id\\n            symbol\\n            name\\n            __typename\\n          }\\n            token1 {\\n            id\\n            symbol\\n            name\\n            __typename\\n          }\\n            __typename\\n          }\\n        }\\n        \"}",
+                "headers": {
+                    "user-agent": [
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.81 Safari/537.38"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "authority": [
+                        "graph.viper.exchange"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "sec-ch-ua": [
+                        "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\""
+                    ],
+                    "dnt": [
+                        "1"
+                    ],
+                    "sec-ch-ua-mobile": [
+                        "?0"
+                    ],
+                    "sec-ch-ua-platform": [
+                        "\"macOS\""
+                    ],
+                    "origin": [
+                        "https://info.viper.exchange"
+                    ],
+                    "sec-fetch-site": [
+                        "same-site"
+                    ],
+                    "sec-fetch-mode": [
+                        "cors"
+                    ],
+                    "sec-fetch-dest": [
+                        "empty"
+                    ],
+                    "referer": [
+                        "https://info.viper.exchange"
+                    ],
+                    "accept-language": [
+                        "en-US,en;q=0.9"
+                    ],
+                    "Content-Length": [
+                        "919"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "5497"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "access-control-allow-headers": [
+                        "Content-Type, User-Agent"
+                    ],
+                    "Server": [
+                        "nginx/1.21.4"
+                    ],
+                    "Content-Security-Policy": [
+                        "upgrade-insecure-requests"
+                    ],
+                    "access-control-allow-methods": [
+                        "GET, OPTIONS, POST"
+                    ],
+                    "X-Frame-Options": [
+                        "DENY"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=63072000; includeSubdomains; preload"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Date": [
+                        "Tue, 02 Aug 2022 16:25:33 GMT"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "graph-attestable": [
+                        "true"
+                    ],
+                    "Set-Cookie": []
+                },
+                "body": {
+                    "string": "{\"data\":{\"pair\":{\"__typename\":\"Pair\",\"id\":\"0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00\",\"liquidityPositionSnapshots\":[{\"block\":28321854,\"liquidityTokenTotalSupply\":\"0.134321236722478208\",\"reserve0\":\"100943.750669\",\"reserve1\":\"802575.655938225014167729\",\"reserveUSD\":\"203089.4131517163765004441514911933\",\"timestamp\":1656586403,\"token0PriceUSD\":\"1.005953374061052625877063899784195\",\"token1PriceUSD\":\"0.1265235318621154111338422451765385\"},{\"block\":28321854,\"liquidityTokenTotalSupply\":\"0.134321236722478208\",\"reserve0\":\"100943.501169\",\"reserve1\":\"802573.67223319295930079\",\"reserveUSD\":\"203085.7133377396662128707407827792\",\"timestamp\":1656586403,\"token0PriceUSD\":\"1.005953384855876390931739931664077\",\"token1PriceUSD\":\"0.1265235332198316470962098018656843\"},{\"block\":28321897,\"liquidityTokenTotalSupply\":\"0.134321236722478208\",\"reserve0\":\"100943.750669\",\"reserve1\":\"802575.655938225014167729\",\"reserveUSD\":\"203089.4131517163765004441514911933\",\"timestamp\":1656586513,\"token0PriceUSD\":\"1.005953374061052625877063899784195\",\"token1PriceUSD\":\"0.1265235318621154111338422451765385\"},{\"block\":28321897,\"liquidityTokenTotalSupply\":\"0.134321236722478208\",\"reserve0\":\"100943.750669\",\"reserve1\":\"802575.655938225014167729\",\"reserveUSD\":\"203089.4131517163765004441514911933\",\"timestamp\":1656586513,\"token0PriceUSD\":\"1.005953374061052625877063899784195\",\"token1PriceUSD\":\"0.1265235318621154111338422451765385\"},{\"block\":28322286,\"liquidityTokenTotalSupply\":\"0.133918922586342733\",\"reserve0\":\"101519.75315\",\"reserve1\":\"793728.677893508066033994\",\"reserveUSD\":\"203336.0490568248904689030928100777\",\"timestamp\":1656587431,\"token0PriceUSD\":\"1.001460517523061424371199295070773\",\"token1PriceUSD\":\"0.1280891409873600479611748703982607\"},{\"block\":28330799,\"liquidityTokenTotalSupply\":\"0.133918922586342733\",\"reserve0\":\"102524.245176\",\"reserve1\":\"786597.857625670556112386\",\"reserveUSD\":\"203886.0482011466875300303857669465\",\"timestamp\":1656622745,\"token0PriceUSD\":\"0.9943308914449563307752510507834424\",\"token1PriceUSD\":\"0.1295999259498192175012088263192543\"},{\"block\":28330799,\"liquidityTokenTotalSupply\":\"0.133918922586342733\",\"reserve0\":\"102524.245176\",\"reserve1\":\"786597.857625670556112386\",\"reserveUSD\":\"203886.0482011466875300303857669465\",\"timestamp\":1656622745,\"token0PriceUSD\":\"0.9943308914449563307752510507834424\",\"token1PriceUSD\":\"0.1295999259498192175012088263192543\"},{\"block\":28331264,\"liquidityTokenTotalSupply\":\"0.133939681345948073\",\"reserve0\":\"102370.675902\",\"reserve1\":\"787792.170413238671836768\",\"reserveUSD\":\"203563.1905661679740367021077577828\",\"timestamp\":1656625324,\"token0PriceUSD\":\"0.9942456117074000465296942890051977\",\"token1PriceUSD\":\"0.1291985362455356156903557261691719\"},{\"block\":28331264,\"liquidityTokenTotalSupply\":\"0.13388199855798424\",\"reserve0\":\"102330.881918\",\"reserve1\":\"787485.936333038235040393\",\"reserveUSD\":\"203483.7254309842979057187545227623\",\"timestamp\":1656625324,\"token0PriceUSD\":\"0.994243974140867415101635743740734\",\"token1PriceUSD\":\"0.1291983234510288033138295028451452\"},{\"block\":28331406,\"liquidityTokenTotalSupply\":\"0.133860446592846917\",\"reserve0\":\"102316.01373\",\"reserve1\":\"787371.518385270555306666\",\"reserveUSD\":\"203454.4772650422719493094608695842\",\"timestamp\":1656626001,\"token0PriceUSD\":\"0.9942455234912437784889719279605099\",\"token1PriceUSD\":\"0.1291985247842616890114892109198797\"},{\"block\":28369949,\"liquidityTokenTotalSupply\":\"0.133860446592846917\",\"reserve0\":\"102359.635205\",\"reserve1\":\"789880.155074564590344942\",\"reserveUSD\":\"204046.0067454194633982896206601879\",\"timestamp\":1656785278,\"token0PriceUSD\":\"0.9967112833919730038485419036629317\",\"token1PriceUSD\":\"0.1291626365307010056713735886419975\"},{\"block\":28369949,\"liquidityTokenTotalSupply\":\"0.133860446592846917\",\"reserve0\":\"102359.635205\",\"reserve1\":\"789880.155074564590344942\",\"reserveUSD\":\"204046.0067454194633982896206601879\",\"timestamp\":1656785278,\"token0PriceUSD\":\"0.9967112833919730038485419036629317\",\"token1PriceUSD\":\"0.1291626365307010056713735886419975\"},{\"block\":28369949,\"liquidityTokenTotalSupply\":\"0.133860446592846917\",\"reserve0\":\"102359.635205\",\"reserve1\":\"789880.155074564590344942\",\"reserveUSD\":\"204046.0067454194633982896206601879\",\"timestamp\":1656785278,\"token0PriceUSD\":\"0.9967112833919730038485419036629317\",\"token1PriceUSD\":\"0.1291626365307010056713735886419975\"},{\"block\":28369988,\"liquidityTokenTotalSupply\":\"0.133949586011026215\",\"reserve0\":\"102359.635205\",\"reserve1\":\"789880.155074564590344942\",\"reserveUSD\":\"204046.0067454194633982896206601879\",\"timestamp\":1656785504,\"token0PriceUSD\":\"0.9967112833919730038485419036629317\",\"token1PriceUSD\":\"0.1291626365307010056713735886419975\"},{\"block\":28369988,\"liquidityTokenTotalSupply\":\"0.133183579523535487\",\"reserve0\":\"101831.277789\",\"reserve1\":\"785802.971356335963487987\",\"reserveUSD\":\"202990.2244444038055256900491294888\",\"timestamp\":1656785504,\"token0PriceUSD\":\"0.9966987985018252372982115537690398\",\"token1PriceUSD\":\"0.1291610186291560696383964913961433\"},{\"block\":28370274,\"liquidityTokenTotalSupply\":\"0.133094894376306895\",\"reserve0\":\"101552.06976\",\"reserve1\":\"787026.759573410582503216\",\"reserveUSD\":\"202666.2139760584428212108019213083\",\"timestamp\":1656786565,\"token0PriceUSD\":\"0.9978438374275555623161471343373843\",\"token1PriceUSD\":\"0.1287543349135351612968740787708086\"}],\"token0\":{\"__typename\":\"Token\",\"id\":\"0x985458e523db3d53125813ed68c274899e9dfab4\",\"name\":\"USD Coin\",\"symbol\":\"1USDC\"},\"token1\":{\"__typename\":\"Token\",\"id\":\"0xcf664087a5bb0237a0bad6742852ec6c8d69a27a\",\"name\":\"Wrapped ONE\",\"symbol\":\"WONE\"}}}}"
+                }
+            }
+        }
+    ]
+}

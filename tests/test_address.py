@@ -1,5 +1,9 @@
 import pytest  # noqa
 from txtool.harmony import HarmonyAddress
+from .utils import get_vcr
+
+vcr = get_vcr(__file__)
+
 
 TEST_ADDRESS_ETH_STR = HarmonyAddress.clean_eth_address_str(
     "0xebcd16e8c1d8f493ba04e99a56474122d81a9c58"
@@ -25,6 +29,7 @@ def test_convert_hex_to_one():
     )
 
 
+@vcr.use_cassette()
 def test_address_object():
     address = HarmonyAddress.get_harmony_address(TEST_ADDRESS_ETH_STR)
     assert address.eth == TEST_ADDRESS_ETH_STR
