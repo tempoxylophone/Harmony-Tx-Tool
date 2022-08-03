@@ -14,10 +14,10 @@ class UniswapV2ForkGraph:
     _UNIX_TS_1_DAY_APPROX = 86400
 
     def __init__(
-            self,
-            subgraph_url: str,
-            authority: Optional[str] = "",
-            origin: Optional[str] = "",
+        self,
+        subgraph_url: str,
+        authority: Optional[str] = "",
+        origin: Optional[str] = "",
     ):
         self.subgraph_url = subgraph_url
         self.authority = authority
@@ -32,8 +32,10 @@ class UniswapV2ForkGraph:
         try:
             return r["data"]
         except KeyError as e:
-            if "errors" in r and "Store error: database unavailable" in [x["message"] for x in r["errors"]]:
-                raise DatabaseUnavailableError
+            if "errors" in r and "Store error: database unavailable" in [
+                x["message"] for x in r["errors"]
+            ]:
+                raise DatabaseUnavailableError from e
 
             raise RuntimeError(
                 f"Could not get data for subgraph from URL: {self.subgraph_url} "
@@ -50,7 +52,7 @@ class UniswapV2ForkGraph:
             "dnt": "1",
             "sec-ch-ua-mobile": "?0",
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.81 Safari/537.38",
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.81 Safari/537.38",
             "sec-ch-ua-platform": '"macOS"',
             "origin": str(self.origin),
             "sec-fetch-site": "same-site",
@@ -170,7 +172,7 @@ class UniswapV2ForkGraph:
 
     @classmethod
     def _q_get_graph_ql_price_payload(
-            cls, token_address: str, block_nums: Iterable[int]
+        cls, token_address: str, block_nums: Iterable[int]
     ) -> Dict:
         """
         More info here: https://docs.uniswap.org/protocol/V2/reference/API/queries
@@ -186,7 +188,7 @@ class UniswapV2ForkGraph:
 
     @classmethod
     def _q_get_graph_ql_lp_pair_payload(
-            cls, lp_pair_address: str, tx_start_ts: int, tx_end_ts: int
+        cls, lp_pair_address: str, tx_start_ts: int, tx_end_ts: int
     ) -> Dict:
         ts_min, ts_max = cls._compute_ts_bounds(tx_start_ts, tx_end_ts)
         query = """
@@ -231,7 +233,7 @@ class UniswapV2ForkGraph:
         }
 
     def _get_graph_ql_pair_data(
-            self, lp_pair_address: str, tx_start_ts: int, tx_end_ts: int
+        self, lp_pair_address: str, tx_start_ts: int, tx_end_ts: int
     ) -> Dict[str, Dict]:
         if tx_start_ts > tx_end_ts:
             raise ValueError(
@@ -253,7 +255,7 @@ class UniswapV2ForkGraph:
         )
 
     def _get_graph_ql_price_query_data(
-            self, token_address: str, block_nums: Iterable[int]
+        self, token_address: str, block_nums: Iterable[int]
     ) -> Dict[str, Dict]:
         return self._graph_ql_request(
             self._q_get_graph_ql_price_payload(token_address, block_nums)
@@ -261,7 +263,7 @@ class UniswapV2ForkGraph:
 
     @classmethod
     def _graph_ql_price_result_to_block_price_timeseries(
-            cls, block_nums: Iterable[int], price_query_data: Dict
+        cls, block_nums: Iterable[int], price_query_data: Dict
     ) -> Tuple[Dict[int, Decimal], bool]:
         ts = {}
         all_zero = True
@@ -278,14 +280,14 @@ class UniswapV2ForkGraph:
         return ts, all_zero
 
     def get_token_price_by_block_timeseries(
-            self, token_address: str, block_nums: Iterable[int]
+        self, token_address: str, block_nums: Iterable[int]
     ) -> Tuple[Dict[int, Decimal], bool]:
         return self._graph_ql_price_result_to_block_price_timeseries(
             block_nums, self._get_graph_ql_price_query_data(token_address, block_nums)
         )
 
     def get_lp_token_price_by_block_timeseries(
-            self, lp_token_address: str, min_ts: int, max_ts: int, block_nums: Iterable[int]
+        self, lp_token_address: str, min_ts: int, max_ts: int, block_nums: Iterable[int]
     ) -> Dict[int, Decimal]:
         price_query_data = self._get_graph_ql_pair_data(
             lp_token_address, min_ts, max_ts

@@ -32,6 +32,7 @@ def test_token_tx_with_intermediate_transfers():
     assert not root.is_token_transfer
     assert root.to_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
 
+    # Farmers Only LP sends 31 WONE to Venom LP
     assert float(it_0.coin_amount) == 31.03846109621060256
     assert it_0.coin_type.is_native_token
     assert it_0.is_token_transfer
@@ -43,6 +44,7 @@ def test_token_tx_with_intermediate_transfers():
     assert it_0.to_addr.token.name == "Venom LP Token"
     assert it_0.from_addr.belongs_to_token
 
+    # Farmers Only LP sends 16 FOX to Farmers Only LP
     assert float(it_1.coin_amount) == 16.260903347728752291
     assert it_1.coin_type.symbol == "FOX"
     assert it_1.is_token_transfer
@@ -53,6 +55,7 @@ def test_token_tx_with_intermediate_transfers():
     assert it_1.to_addr.eth == "0x670240Cd8f514EBaD7e375EcBa7e9e6b761e893A"
     assert it_1.to_addr.token.name == "FarmersOnly LP Token"
 
+    # Original Contract sends 7 USDC to Farmers Only LP
     assert float(it_2.coin_amount) == 7.34645
     assert it_2.coin_type.symbol == "1USDC"
     assert it_2.coin_type.universal_symbol == "USDC"
@@ -64,7 +67,7 @@ def test_token_tx_with_intermediate_transfers():
     assert it_2.to_addr.eth == "0xe83eE2547613327300732D9B35238A6bCf168B21"
     assert it_2.to_addr.token.name == "FarmersOnly LP Token"
 
-    # ultimate destination is another LP token on a different DEX
+    # Venom LP sends 7 USDC to Original Contract
     assert float(leaf.coin_amount) == 7.355363
     assert leaf.coin_type.symbol == "1USDC"
     assert leaf.coin_type.universal_symbol == "USDC"
@@ -94,24 +97,26 @@ def test_token_tx_ignore_intermediate_transfers():
         wallet_address, tx_hash, exclude_intermediate_tx=True
     )
 
-    assert len(txs) == 2
+    assert len(txs) == 3
 
-    root = txs[0]
-    leaf = txs[1]
+    cost = txs[0]
+    send_one = txs[1]
+    get_usdc = txs[2]
 
-    assert root.coin_type.is_native_token
-    assert root.coin_amount == 0
-    assert root.tx_fee_in_native_token > 0
-    assert root.is_sender
+    assert cost.coin_type.is_native_token
+    assert cost.coin_amount == 0
+    assert cost.tx_fee_in_native_token > 0
+    assert cost.is_sender
 
-    assert float(leaf.coin_amount) == 7.355363
-    assert leaf.coin_type.symbol == "1USDC"
-    assert leaf.to_addr.belongs_to_non_token_smart_contract
-    assert leaf.to_addr == root.to_addr
+    assert float(send_one.coin_amount) == 31.03846109621060256
+    assert send_one.coin_type.symbol == "ONE"
+    assert send_one.to_addr.token.is_lp_token
 
-    # from unknown contract so can't decode its signature
-    assert (False, None) == root.tx_payload
-    assert "" == root.get_tx_function_signature()
+    assert float(get_usdc.coin_amount) == 7.355363
+    assert get_usdc.coin_type.symbol == "1USDC"
+    assert get_usdc.to_addr.belongs_to_non_token_smart_contract
+    assert get_usdc.to_addr == cost.to_addr
+    assert get_usdc.from_addr.token.is_lp_token
 
 
 @vcr.use_cassette()

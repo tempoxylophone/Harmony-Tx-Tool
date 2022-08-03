@@ -103,70 +103,39 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def _get_token_transfers(
         root_tx: WalletActivity, exclude_intermediate_tx: Optional[bool] = True
     ) -> List[WalletActivity]:
-        # TODO: refactor this
-        wallet = root_tx.account
         receipt = root_tx.receipt
-        destination = root_tx.to_addr.eth
 
         transfers: List[WalletActivity] = []
         logs = list(HarmonyAPI.get_tx_transfer_logs(receipt))
 
-        is_uniswap_swap = WalletActivity._appears_to_be_uniswap_swap_tx(root_tx)
-
         for i, log in enumerate(logs, start=1):
-            from_addr = log["args"]["from"]
-            to_addr = log["args"]["to"]
-
+            # parse all transactions
             MAIN_LOGGER.info("\tExtracting sub-tx %s/%s...", i, len(logs))
 
-            if exclude_intermediate_tx and (
-                wallet.eth not in (from_addr, to_addr) and
-                destination not in (from_addr, to_addr) and
-                not is_uniswap_swap
-            ):
-                # some intermediate tx
-                MAIN_LOGGER.info("\t\tSkipping intermediate transaction...")
-                continue
-
             # in reverse order
-            transfers.insert(0, WalletActivity._create_token_tx_from_log(root_tx, log))
+            token_tx = WalletActivity._create_token_tx_from_log(root_tx, log)
+            transfers.insert(0, token_tx)
 
         if WalletActivity._appears_to_be_uniswap_swap_tx(root_tx):
+            # handle specific case where it looks like a uniswap activity
             MAIN_LOGGER.info("\tTX: %s looks like a Uniswap Swap...", root_tx.tx_hash)
-            _, to_token_address = WalletActivity._get_uniswap_path(root_tx)
 
-            # wallet originally called uniswap contract
-            uniswap_contract_address = root_tx.to_addr
-
-            # create tx that is the contract sending you what you requested
-            return_tx = WalletActivity(
-                uniswap_contract_address,
-                # technically this is not the same hash, but we want it to show up
-                root_tx.tx_hash,
-                to_token_address.token,  # type: ignore
-            )
-            return_tx.to_addr = wallet
-            return_tx.from_addr = root_tx.to_addr
-
-            # get the coin value from the transfer that is to the contract, sending
-            # the second currency that the contract should send back
-            amount_tx = next(
-                (
-                    x
-                    for x in transfers
-                    if x.to_addr == uniswap_contract_address
-                    and x.coin_type == to_token_address.token
-                )
-            )
-
-            return_tx.coin_amount = amount_tx.coin_amount
-            return_tx.got_amount = return_tx.coin_amount
-            return_tx.got_currency_symbol = return_tx.coin_type.symbol
-
+            return_tx = WalletActivity._get_contract_deposit_tx(root_tx, transfers)
             transfers.append(return_tx)
 
-            if exclude_intermediate_tx:
-                transfers = [x for x in transfers if wallet.eth in (x.to_addr.eth, x.from_addr.eth)]
+        if exclude_intermediate_tx and len(transfers) > 1:
+            # keep the first and last transactions that are not the root transaction
+            # if asked to exclude intermediate transactions
+            first_non_ultimate_token_transfer = next(
+                # need to find the transaction that was NOT the currency received by the caller
+                # in the event that this is a Uniswap interaction. Default to the first transaction
+                # in the logs if cannot find any of unlike token
+                (x for x in transfers if x.coin_type != transfers[-1].coin_type),
+                transfers[0],
+            )
+
+            # keep first and last
+            transfers = [first_non_ultimate_token_transfer, transfers[-1]]
 
         return transfers
 
@@ -205,6 +174,42 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             HarmonyAddress.get_harmony_address(address_from),
             HarmonyAddress.get_harmony_address(address_to),
         )
+
+    @staticmethod
+    def _get_contract_deposit_tx(
+        root_tx: WalletActivity, transfers_so_far: List[WalletActivity]
+    ) -> WalletActivity:
+        _, to_token_address = WalletActivity._get_uniswap_path(root_tx)
+
+        # wallet originally called uniswap contract
+        uniswap_contract_address = root_tx.to_addr
+
+        # create tx that is the contract sending you what you requested
+        return_tx = WalletActivity(
+            uniswap_contract_address,
+            # technically this is not the same hash, but we want it to show up
+            root_tx.tx_hash,
+            to_token_address.token,  # type: ignore
+        )
+        return_tx.to_addr = root_tx.account
+        return_tx.from_addr = root_tx.to_addr
+
+        # get the coin value from the transfer that is to the contract, sending
+        # the second currency that the contract should send back
+        amount_tx = next(
+            (
+                x
+                for x in transfers_so_far
+                if x.to_addr == uniswap_contract_address
+                and x.coin_type == to_token_address.token
+            )
+        )
+
+        return_tx.coin_amount = amount_tx.coin_amount
+        return_tx.got_amount = return_tx.coin_amount
+        return_tx.got_currency_symbol = return_tx.coin_type.symbol
+
+        return return_tx
 
     @staticmethod
     def _create_token_tx_from_log(

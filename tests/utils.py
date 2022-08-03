@@ -1,7 +1,7 @@
 from typing import List, Dict, Union, Callable
 import pathlib
 import json
-import vcr
+import vcr  # type: ignore
 
 from txtool.harmony import DexPriceManager
 from txtool.transactions import WalletActivity
@@ -9,8 +9,11 @@ from txtool.koinly import is_cost
 
 
 def get_non_cost_transactions_from_txt_hash(
-        wallet_address: str, tx_hash: str
+    wallet_address: str, tx_hash: str
 ) -> List[WalletActivity]:
+    # side effect
+    DexPriceManager.clear_state()
+
     non_cost_txs = [
         x
         for x in WalletActivity.extract_all_wallet_activity_from_transaction(
@@ -29,6 +32,7 @@ class NestedBytesSerializer:
     """
     Based on: https://github.com/kevin1024/vcrpy/blob/master/vcr/serializers/jsonserializer.py
     """
+
     ENCODING = "ISO-8859-1"
     BYTES_DELIMITER = "bytes_"
 
@@ -37,16 +41,19 @@ class NestedBytesSerializer:
         self._cast(
             cassette_dict,
             lambda x: isinstance(x, bytes),
-            lambda x: self.BYTES_DELIMITER + x.decode(encoding=self.ENCODING)
+            lambda x: self.BYTES_DELIMITER + x.decode(encoding=self.ENCODING),
         )
 
         # dump to string
         return json.dumps(cassette_dict, indent=4) + "\n"
 
-    def _cast(self, json_body: Union[List, Dict, str], cond: Callable, operation: Callable) -> None:
+    def _cast(
+        self, json_body: Union[List, Dict, str], cond: Callable, operation: Callable
+    ) -> None:
         # mutate dictionary object by reference
         if isinstance(json_body, list):
-            [self._cast(x, cond, operation) for x in json_body]
+            for x in json_body:
+                self._cast(x, cond, operation)
         elif isinstance(json_body, dict):
             for k, v in json_body.items():
                 if cond(v):
@@ -61,7 +68,7 @@ class NestedBytesSerializer:
         self._cast(
             cassette_dict,
             lambda x: isinstance(x, str) and x.startswith(self.BYTES_DELIMITER),
-            lambda x: bytes(x[len(self.BYTES_DELIMITER):], encoding=self.ENCODING)
+            lambda x: bytes(x[len(self.BYTES_DELIMITER) :], encoding=self.ENCODING),
         )
 
         # return as dictionary object
@@ -69,21 +76,21 @@ class NestedBytesSerializer:
 
 
 def remove_set_cookie() -> Callable:
-    def before_record_response(response) -> Dict:
-        response['headers']['Set-Cookie'] = []
+    def before_record_response(response: Dict) -> Dict:
+        response["headers"]["Set-Cookie"] = []
         return response
 
     return before_record_response
 
 
 def get_vcr(
-        file_obj,
+    file_obj,
 ) -> vcr.VCR:
-    fixture_path = f'{pathlib.Path(file_obj).parent.absolute()}/fixtures'
+    fixture_path = f"{pathlib.Path(file_obj).parent.absolute()}/fixtures"
 
     # return vcr object with configuration
     v = vcr.VCR(cassette_library_dir=fixture_path)
-    v.register_serializer('bytes', NestedBytesSerializer())
+    v.register_serializer("bytes", NestedBytesSerializer())
     v.serializer = "bytes"
     v.filter_headers = ["Cookie"]
     v.before_record_response = remove_set_cookie()

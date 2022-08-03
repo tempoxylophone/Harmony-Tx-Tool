@@ -1,6 +1,5 @@
 from datetime import timezone
 from txtool.koinly import KoinlyReportCreator
-from txtool.transactions import WalletActivity
 from .utils import get_vcr
 
 vcr = get_vcr(__file__)
@@ -30,25 +29,3 @@ def test_create_koinly_report_creator():
     assert report.dt_ub.strftime("%Y-%m-%d") == ub_str
     assert report.dt_lb.tzinfo == timezone.utc
     assert report.dt_ub.tzinfo == timezone.utc
-
-
-@vcr.use_cassette()
-def test_omit_costs():
-    # random TX from explorers with smart contract interaction
-    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
-    wallet_address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"
-    txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        wallet_address,
-        tx_hash,
-    )
-
-    assert len(txs) == 2
-
-    no_cost_config = KoinlyReportCreator(omit_cost=True)
-    no_cost_report = no_cost_config.get_csv_from_transactions(txs)
-
-    cost_config = KoinlyReportCreator(omit_cost=False)
-    cost_report = cost_config.get_csv_from_transactions(txs)
-
-    # should include extra row
-    assert len(cost_report) > len(no_cost_report)

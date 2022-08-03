@@ -77,12 +77,12 @@ def test_lp_token_info():
     assert token_info["pair"]["token0"]["symbol"] == "1USDC"
     assert token_info["pair"]["token1"]["symbol"] == "WONE"
     assert (
-            token_info["pair"]["token0"]["id"]
-            == "0x985458e523db3d53125813ed68c274899e9dfab4"
+        token_info["pair"]["token0"]["id"]
+        == "0x985458e523db3d53125813ed68c274899e9dfab4"
     )
     assert (
-            token_info["pair"]["token1"]["id"]
-            == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
+        token_info["pair"]["token1"]["id"]
+        == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
     )
 
     token_object = HarmonyToken(token_address)

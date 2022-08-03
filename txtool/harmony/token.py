@@ -62,6 +62,20 @@ class DexPriceManager:
         DexPriceManager._build_transactions_directory(transactions)
         DexPriceManager._build_transactions_fiat_price_lookup()
 
+    @classmethod
+    def clear_state(cls) -> None:
+        DexPriceManager._TX_LOOKUP = defaultdict(
+            lambda: {
+                "blocks": [],
+                "timestamps": [],
+                "timestamp_range": {
+                    "max": float("-inf"),
+                    "min": float("+inf"),
+                },
+                "fiat_prices_by_block": {},
+            }
+        )
+
     @staticmethod
     def _build_transactions_directory(
         transactions: Iterable[Transaction],
@@ -367,8 +381,8 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         )
 
     def __str__(self) -> str:  # pragma: no cover
-        return "HarmonyToken: {0} ({1}) [{2}]".format(
-            self.symbol, self.name, self.address.eth
+        return "HarmonyToken: {0} ({1}) [{2}] is_lp_token={3}".format(
+            self.symbol, self.name, self.address.eth, self.is_lp_token
         )
 
     def __eq__(self, other) -> bool:

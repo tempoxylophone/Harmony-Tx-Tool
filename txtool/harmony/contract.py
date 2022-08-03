@@ -12,7 +12,15 @@ T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
 
 class HarmonyEVMSmartContract:
     # test each ABI until you reach the end or find a match for decoding
-    POSSIBLE_ABIS = ["ERC20", "ERC721", "UniswapV2Router02", "UniswapV2Factory", "USD Coin", "Wrapped ONE"]
+    POSSIBLE_ABIS = [
+        "ERC20",
+        "ERC721",
+        "UniswapV2Router02",
+        "UniswapV2Factory",
+        "UniswapV2Pair",
+        "USD Coin",
+        "Wrapped ONE",
+    ]
 
     @classmethod
     @lru_cache(maxsize=256)
@@ -47,3 +55,6 @@ class HarmonyEVMSmartContract:
             self.contract = HarmonyAPI.get_contract(self.address, self.abi)
             self.abi_attempt_idx += 1
             return self.decode_input(tx_input)
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"Harmony Smart Contract at Address: {self.address}"

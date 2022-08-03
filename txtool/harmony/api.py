@@ -128,7 +128,6 @@ class HarmonyAPI:
             # 502 bad gateway
             return {}
 
-
     @staticmethod
     def address_belongs_to_erc_20_token(eth_address: str) -> bool:
         return HarmonyAPI.address_belongs_to_smart_contract(
