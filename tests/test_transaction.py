@@ -16,13 +16,14 @@ def test_token_tx_with_intermediate_transfers():
         wallet_address, tx_hash, exclude_intermediate_tx=False
     )
 
-    assert len(txs) == 5
+    assert len(txs) == 6
 
     root = txs[0]
     it_0 = txs[1]
     it_1 = txs[2]
     it_2 = txs[3]
     leaf = txs[4]
+    get = txs[5]
 
     assert root.coin_type.is_native_token
     assert root.coin_amount == 0
@@ -32,17 +33,15 @@ def test_token_tx_with_intermediate_transfers():
     assert not root.is_token_transfer
     assert root.to_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
 
-    # Farmers Only LP sends 31 WONE to Venom LP
+    # Account sends 31 WONE to Venom LP
     assert float(it_0.coin_amount) == 31.03846109621060256
     assert it_0.coin_type.is_native_token
     assert it_0.is_token_transfer
     assert not it_0.is_receiver
-    assert not it_0.is_sender
-    assert it_0.from_addr.eth == "0x670240Cd8f514EBaD7e375EcBa7e9e6b761e893A"
-    assert it_0.from_addr.token.name == "FarmersOnly LP Token"
+    assert it_0.is_sender
+    assert it_0.from_addr == root.account
     assert it_0.to_addr.eth == "0xF170016d63fb89e1d559e8F87a17BCC8B7CD9c00"
     assert it_0.to_addr.token.name == "Venom LP Token"
-    assert it_0.from_addr.belongs_to_token
 
     # Farmers Only LP sends 16 FOX to Farmers Only LP
     assert float(it_1.coin_amount) == 16.260903347728752291
@@ -81,6 +80,16 @@ def test_token_tx_with_intermediate_transfers():
     assert leaf.to_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
     assert leaf.to_addr.belongs_to_non_token_smart_contract
 
+    # Original Contract sends you 7 USDC
+    assert float(get.coin_amount) == 7.355363
+    assert get.coin_type.symbol == "1USDC"
+    assert get.coin_type.universal_symbol == "USDC"
+    assert not get.coin_type.is_lp_token
+    assert get.is_token_transfer
+    assert get.from_addr == root.to_addr
+    assert get.to_addr == root.account
+    assert not get.to_addr.belongs_to_non_token_smart_contract
+
     # this is the last TX, it reaches the target address
     # after a few hops
     # the block explorer actually displays this out of order...
@@ -108,15 +117,19 @@ def test_token_tx_ignore_intermediate_transfers():
     assert cost.tx_fee_in_native_token > 0
     assert cost.is_sender
 
+    # send ONE
     assert float(send_one.coin_amount) == 31.03846109621060256
     assert send_one.coin_type.symbol == "ONE"
-    assert send_one.to_addr.token.is_lp_token
+    assert send_one.from_addr == cost.from_addr
+    assert send_one.sent_amount == send_one.coin_amount
+    assert send_one.sent_currency_symbol == send_one.coin_type.symbol
 
+    # get USDC
     assert float(get_usdc.coin_amount) == 7.355363
     assert get_usdc.coin_type.symbol == "1USDC"
-    assert get_usdc.to_addr.belongs_to_non_token_smart_contract
-    assert get_usdc.to_addr == cost.to_addr
-    assert get_usdc.from_addr.token.is_lp_token
+    assert get_usdc.to_addr == cost.from_addr
+    assert get_usdc.got_currency_symbol == "1USDC"
+    assert get_usdc.got_amount == get_usdc.coin_amount
 
 
 @vcr.use_cassette()
