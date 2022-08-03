@@ -3,9 +3,6 @@ from typing import List, Dict, Optional, Tuple, Iterable
 from decimal import Decimal
 from functools import lru_cache
 
-import requests
-from requests.exceptions import JSONDecodeError
-
 from hexbytes import HexBytes
 from web3.contract import Contract
 from web3.logs import DISCARD
@@ -36,9 +33,6 @@ class HarmonyAPI:
     )
 
     API_NOT_FOUND_MESSAGES = {"Not found", "contract not found"}
-    ABI_API_ENDPOINT = (
-        "https://ctrver.t.hmny.io/fetchContractCode?contractAddress={0}&shard=0"
-    )
 
     @classmethod
     @lru_cache(maxsize=128)
@@ -112,22 +106,6 @@ class HarmonyAPI:
         # this will return True if this is the address of ERC20 token
         return bool(HarmonyAPI.get_smart_contract_byte_code(eth_address))
 
-    @classmethod
-    @lru_cache(maxsize=256)
-    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def _get_code(cls, address: str) -> Dict:
-        url = cls._get_code_request_url(address)
-        return requests.get(url).json()
-
-    @classmethod
-    def get_code(cls, address: str) -> Dict:
-        # this service appears to be taken offline permanently
-        try:
-            return cls._get_code(address)
-        except JSONDecodeError:
-            # 502 bad gateway
-            return {}
-
     @staticmethod
     def address_belongs_to_erc_20_token(eth_address: str) -> bool:
         return HarmonyAPI.address_belongs_to_smart_contract(
@@ -192,10 +170,6 @@ class HarmonyAPI:
         return pyhmy.account.get_transaction_count(
             eth_address, "latest", endpoint=HarmonyAPI._NET_HMY_MAIN
         )
-
-    @classmethod
-    def _get_code_request_url(cls, address: str) -> str:
-        return cls.ABI_API_ENDPOINT.format(address)
 
     @classmethod
     def get_contract(cls, address: str, abi: str) -> Contract:

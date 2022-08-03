@@ -35,7 +35,7 @@ class UniswapV2ForkGraph:
             if "errors" in r and "Store error: database unavailable" in [
                 x["message"] for x in r["errors"]
             ]:
-                raise DatabaseUnavailableError from e
+                raise DatabaseUnavailableError("Database unavailable") from e
 
             raise RuntimeError(
                 f"Could not get data for subgraph from URL: {self.subgraph_url} "
@@ -63,7 +63,7 @@ class UniswapV2ForkGraph:
         }
 
     @classmethod
-    def _q_get_graph_ql_token_or_pair_info(cls, token_or_pair_address: str):
+    def _q_get_graph_ql_token_or_pair_info(cls, token_or_pair_address: str) -> Dict:
         query = """
         query coininfo($token_address: ID!)  {
             pair(id: $token_address) {
@@ -248,7 +248,7 @@ class UniswapV2ForkGraph:
         )
 
     @staticmethod
-    def _compute_ts_bounds(ts_min, ts_max):
+    def _compute_ts_bounds(ts_min, ts_max) -> Tuple[int, int]:
         return (
             ts_min - UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX,
             ts_max + UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX,

@@ -36,7 +36,10 @@ class NestedBytesSerializer:
     ENCODING = "ISO-8859-1"
     BYTES_DELIMITER = "bytes_"
 
-    def serialize(self, cassette_dict: Dict) -> str:
+    def serialize(self, cassette_dict: Dict) -> str:  # pragma: no cover
+        # omitted from coverage because this never runs if all functions that use
+        # cassettes already use them
+
         # encode bytes in response body
         self._cast(
             cassette_dict,

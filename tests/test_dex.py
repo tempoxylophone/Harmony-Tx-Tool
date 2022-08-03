@@ -5,7 +5,7 @@ from unittest.mock import patch
 from web3 import Web3
 import pytest  # noqa
 
-from txtool.dex import UniswapV2ForkGraph
+from txtool.dex import UniswapV2ForkGraph, DatabaseUnavailableError
 from txtool.harmony import HarmonyToken, HarmonyEVMTransaction, DexPriceManager
 
 from .utils import get_non_cost_transactions_from_txt_hash, get_vcr
@@ -203,3 +203,17 @@ def test_dex_json_empty_exception():
             VIPER_SWAP.get_token_or_pair_info("")
 
         assert "Could not get data" in str(e)
+
+
+@vcr.use_cassette()
+def test_dex_database_error():
+    with patch("requests.Response.json") as req_mock:
+        # null response
+        req_mock.return_value = {
+            "errors": [{"message": "Store error: database unavailable"}]
+        }
+
+        with pytest.raises(DatabaseUnavailableError) as e:
+            VIPER_SWAP.get_token_or_pair_info("")
+
+        assert "Database unavailable" in str(e)
