@@ -229,7 +229,9 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             )
 
         _, func_inputs = func_data
-        address_from, address_to = func_inputs["path"]
+        address_from = func_inputs["path"][0]
+        address_to = func_inputs["path"][-1]
+
         return (
             HarmonyAddress.get_harmony_address(address_from),
             HarmonyAddress.get_harmony_address(address_to),
