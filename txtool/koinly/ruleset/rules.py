@@ -10,11 +10,11 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_amount": ("==", noop, 0),
                 "got_amount": ("==", noop, 0),
                 "tx_fee_in_native_token": ("==", bool, True),
-                "sent_currency_symbol": (
-                    "==",
-                    noop,
-                    HarmonyToken.get_native_token().symbol,
-                ),
+                # "sent_currency_symbol": (
+                #     "==",
+                #     noop,
+                #     HarmonyToken.get_native_token().symbol,
+                # ),
             },
         )
     ],

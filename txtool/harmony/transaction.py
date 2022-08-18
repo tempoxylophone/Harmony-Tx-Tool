@@ -8,7 +8,7 @@ from web3.types import TxReceipt, HexStr
 from .api import HarmonyAPI
 from .abc import Transaction
 from .contract import HarmonyEVMSmartContract
-from .address import HarmonyAddress
+from .address import HarmonyAddress, BadAddressException
 from .token import HarmonyToken, DexPriceManager
 
 
@@ -20,7 +20,13 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
 
         # get transaction data
         tx_data = HarmonyAPI.get_transaction(tx_hash)
-        self.to_addr = HarmonyAddress.get_harmony_address(tx_data["to"])
+
+        try:
+            self.to_addr = HarmonyAddress.get_harmony_address(tx_data["to"])
+        except BadAddressException as e:
+            # bad address
+            raise BadAddressException(f"Harmony EVM Transaction {tx_hash} had a null or invalid to address.") from e
+
         self.from_addr = HarmonyAddress.get_harmony_address(tx_data["from"])
 
         # temporal data
@@ -58,7 +64,11 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         return self.EXPLORER_TX_URL.format(self.tx_hash)
 
     def get_token_price(self) -> Decimal:
-        return DexPriceManager.get_price_of_token_at_block(self.coin_type, self.block)
+        try:
+            return DexPriceManager.get_price_of_token_at_block(self.coin_type, self.block)
+        except KeyError:
+            # no luck finding price for this coin at this block
+            return Decimal(0.0)
 
     def get_fee_price(self) -> Decimal:
         return DexPriceManager.get_price_of_token_at_block(

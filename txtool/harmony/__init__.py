@@ -1,6 +1,6 @@
 from .api import HarmonyAPI
 from .address import (
-    HarmonyAddress,
+    HarmonyAddress, BadAddressException
 )
 from .contract import HarmonyEVMSmartContract
 from .token import HarmonyToken, DexPriceManager

@@ -20,6 +20,7 @@ class HarmonyAPI:
     _CUSTOM_EXCEPTIONS: List = [
         pyhmy.rpc.exceptions.RPCError,
         pyhmy.rpc.exceptions.RequestsError,
+        pyhmy.rpc.exceptions.RequestsTimeoutError,
     ]
     _NET_HMY_MAIN = "https://a.api.s0.t.hmny.io/"
     _NET_HMY_WEB3 = "https://a.api.s0.t.hmny.io/"

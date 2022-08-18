@@ -1,5 +1,5 @@
 import pytest  # noqa
-from txtool.harmony import HarmonyAddress
+from txtool.harmony import HarmonyAddress, BadAddressException
 from .utils import get_vcr
 
 vcr = get_vcr(__file__)
@@ -56,7 +56,7 @@ def test_address_object_constructor_requirements():
         HarmonyAddress(TEST_ADDRESS_ONE_STR)
     assert "Use ETH address" in str(e)
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(BadAddressException) as e:
         HarmonyAddress("???asdjfkasd")
     assert "Bad address" in str(e)
 
@@ -69,5 +69,5 @@ def test_detect_formats():
         TEST_ADDRESS_ONE_STR
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(BadAddressException):
         HarmonyAddress.get_address_string_format("???asdjfkasdj")

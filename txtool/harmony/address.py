@@ -7,6 +7,8 @@ from txtool.utils import MAIN_LOGGER
 from .api import HarmonyAPI
 from .abc import Token
 
+class BadAddressException(Exception):
+    pass
 
 class HarmonyAddress:
     FORMAT_ETH = "eth"
@@ -30,7 +32,7 @@ class HarmonyAddress:
                 "Use ETH address, not ONE address! Got: {0}".format(eth_address)
             )
         else:
-            raise ValueError("Bad address! Got: {0}".format(eth_address))
+            raise BadAddressException("Bad address! Got: {0}".format(eth_address))
 
         MAIN_LOGGER.info(
             "Encountered new address: %s. Address book now contains: %s addresses",
@@ -80,8 +82,8 @@ class HarmonyAddress:
             return cls.FORMAT_ONE
         if cls.is_valid_eth_address(address_string):
             return cls.FORMAT_ETH
-        raise ValueError(
-            "Bad address, neither eth or one! Got: {0}".format(address_string)
+        raise BadAddressException(
+            "get_address_string_format(): Bad address, neither eth or one! Got: {0}".format(address_string)
         )
 
     @classmethod
@@ -126,10 +128,16 @@ class HarmonyAddress:
 
     @classmethod
     def is_valid_one_address(cls, address: str) -> bool:
+        if not address:
+            # empty or null
+            return False
         return pyhmy.account.is_valid_address(address)
 
     @classmethod
     def is_valid_eth_address(cls, address: str) -> bool:
+        if not address:
+            # empty or null
+            return False
         return HarmonyAPI.is_eth_address(address)
 
     @staticmethod

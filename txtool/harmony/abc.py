@@ -47,11 +47,11 @@ class Transaction(ABC):  # pylint: disable=R0902
         # (placeholder values)
         # token sent in this tx (outgoing)
         self.sent_amount = Decimal(0)
-        self.sent_currency_symbol = ""
+        self.sent_currency: Union[Token, None] = None
 
         # token received in this tx (incoming)
         self.got_amount = Decimal(0)
-        self.got_currency_symbol = ""
+        self.got_currency: Union[Token, None] = None
 
     def get_fiat_value(self, exclude_fee: Optional[bool] = False) -> Decimal:
         t_val = self.coin_amount * self.get_token_price()

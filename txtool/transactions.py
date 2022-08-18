@@ -66,15 +66,15 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
             self.sent_amount = Decimal(0)
-            self.sent_currency_symbol = ""
+            self.sent_currency = None
             self.got_amount = self.coin_amount
-            self.got_currency_symbol = self.coin_type.symbol
+            self.got_currency = self.coin_type
         else:
             # this wallet sent some currency
             self.sent_amount = self.coin_amount
-            self.sent_currency_symbol = self.coin_type.symbol
+            self.sent_currency = self.coin_type
             self.got_amount = Decimal(0)
-            self.got_currency_symbol = ""
+            self.got_currency = None
 
     def _is_payment(self) -> bool:
         return self.from_addr.eth in DFK_PAYMENT_WALLET_ADDRESSES
@@ -155,8 +155,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             if original_transfer:
                 original_transfer.from_addr = root_tx.account
                 original_transfer.sent_amount = original_transfer.coin_amount
-                original_transfer.sent_currency_symbol = (
-                    original_transfer.coin_type.symbol
+                original_transfer.sent_currency = (
+                    original_transfer.coin_type
                 )
 
             # special handlers for Uniswap stuff
@@ -268,7 +268,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
             return_tx.coin_amount = d.coin_amount
             return_tx.got_amount = d.coin_amount
-            return_tx.got_currency_symbol = d.coin_type.symbol
+            return_tx.got_currency = d.coin_type
             return_tx.is_token_transfer = True
 
             parsed_debts.append(return_tx)

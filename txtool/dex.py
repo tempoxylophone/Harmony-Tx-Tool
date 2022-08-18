@@ -292,7 +292,13 @@ class UniswapV2ForkGraph:
         price_query_data = self._get_graph_ql_pair_data(
             lp_token_address, min_ts, max_ts
         )
-        price_blocks: List[Dict] = price_query_data["pair"][
+        pair_data = price_query_data["pair"]
+
+        if not pair_data:
+            # no data to be found
+            return {}
+
+        price_blocks: List[Dict] = pair_data[
             "liquidityPositionSnapshots"
         ]
         ts = {}

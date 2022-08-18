@@ -77,12 +77,12 @@ def test_lp_token_info():
     assert token_info["pair"]["token0"]["symbol"] == "1USDC"
     assert token_info["pair"]["token1"]["symbol"] == "WONE"
     assert (
-        token_info["pair"]["token0"]["id"]
-        == "0x985458e523db3d53125813ed68c274899e9dfab4"
+            token_info["pair"]["token0"]["id"]
+            == "0x985458e523db3d53125813ed68c274899e9dfab4"
     )
     assert (
-        token_info["pair"]["token1"]["id"]
-        == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
+            token_info["pair"]["token1"]["id"]
+            == "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
     )
 
     token_object = HarmonyToken(token_address)
@@ -183,6 +183,17 @@ def test_get_approx_block_match_for_lp_token():
 
     price_block = price_blocks[VIPER_SWAP._get_best_block_idx(28322290, price_blocks)]
     assert price_block["block"] == 28322286
+
+
+def test_try_to_get_unknown_lp_token_value():
+    # token is unknown, can't lookup price in Uniswap Graph
+    lp_token_address = "0xaD65D5fCE1D9634ca33D9dB47d2Ea7569f35e13C"
+
+    price_query_data = VIPER_SWAP.get_lp_token_price_by_block_timeseries(
+        lp_token_address, 1_577_854_800, 1_640_926_800, [28322290, 28321800, 28322290]
+    )
+
+    assert price_query_data == {}
 
 
 def test_invalid_timestamp_range_request():

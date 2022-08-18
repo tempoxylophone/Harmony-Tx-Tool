@@ -122,13 +122,13 @@ def test_token_tx_ignore_intermediate_transfers():
     assert send_one.coin_type.symbol == "ONE"
     assert send_one.from_addr == cost.from_addr
     assert send_one.sent_amount == send_one.coin_amount
-    assert send_one.sent_currency_symbol == send_one.coin_type.symbol
+    assert send_one.sent_currency.symbol == send_one.coin_type.symbol
 
     # get USDC
     assert float(get_usdc.coin_amount) == 7.355363
     assert get_usdc.coin_type.symbol == "1USDC"
     assert get_usdc.to_addr == cost.from_addr
-    assert get_usdc.got_currency_symbol == "1USDC"
+    assert get_usdc.got_currency.symbol == "1USDC"
     assert get_usdc.got_amount == get_usdc.coin_amount
 
 

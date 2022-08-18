@@ -151,7 +151,7 @@ class DexPriceManager:
             d_idx = 0
             ts: Dict = {}
 
-            while not DexPriceManager._is_valid_price_timeseries(ts):
+            while not DexPriceManager._is_valid_price_timeseries(ts) and d_idx < len(DexPriceManager._DEX_GRAPHS):
                 dex = DexPriceManager._DEX_GRAPHS[d_idx]
 
                 # try to get token information from any dex we can until we get useful
