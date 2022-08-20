@@ -14,7 +14,7 @@ install:
 	pipenv install
 
 test:
-	pytest -v -s
+	pytest -v -s -rx --random-order
 
 lint:
 	mypy .

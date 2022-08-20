@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import List, Dict, Optional, Tuple, Iterable
+from typing import List, Dict, Optional, Tuple, Iterable, Union
 from decimal import Decimal
 from functools import lru_cache
+
+import requests
+from requests.exceptions import JSONDecodeError
 
 from hexbytes import HexBytes
 from web3.contract import Contract
@@ -34,6 +37,15 @@ class HarmonyAPI:
     )
 
     API_NOT_FOUND_MESSAGES = {"Not found", "contract not found"}
+    ABI_API_ENDPOINT = (
+        "https://ctrver.t.hmny.io/fetchContractCode?contractAddress={0}&shard=0"
+    )
+    INCORRECT_CONTRACT_ABI_ADDRESSES = (
+        # Tranquil Finance 'Comproller' Contract has
+        # "ComptrollerErrorReporter" source code linked to
+        # its address in the Harmony Explorer
+        "0x6a82A17B48EF6be278BBC56138F35d04594587E3",
+    )
 
     @classmethod
     @lru_cache(maxsize=128)
@@ -101,6 +113,34 @@ class HarmonyAPI:
     def get_smart_contract_byte_code(cls, eth_address: str) -> HexBytes:
         return cls._w3.eth.get_code(eth_address)
 
+    @classmethod
+    @lru_cache(maxsize=256)
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def _get_code(cls, address: str) -> Dict:
+        url = cls._get_code_request_url(address)
+        return requests.get(url).json()
+
+    @classmethod
+    def get_code(cls, address: str) -> Dict:
+        # this service appears to be taken offline permanently
+        try:
+            return cls._get_code(address)
+        except JSONDecodeError:
+            # 502 bad gateway
+            return {}
+
+    @classmethod
+    def get_abi(cls, address: str) -> Union[Dict, None]:
+        if address in cls.INCORRECT_CONTRACT_ABI_ADDRESSES:
+            # hacky handler for incorrect ABIs uploaded to Harmony API
+            return None
+        source_code = cls.get_code(address)
+        return source_code.get("abi")
+
+    @classmethod
+    def _get_code_request_url(cls, address: str) -> str:
+        return cls.ABI_API_ENDPOINT.format(address)
+
     @staticmethod
     def address_belongs_to_smart_contract(eth_address: str) -> bool:
         # null byte if address belongs to a wallet
@@ -126,6 +166,7 @@ class HarmonyAPI:
 
         while has_more and p_idx < num_pages:
             results = HarmonyAPI._get_tx_page(eth_address, p_idx, page_size)
+
             in_bounds_txs = [
                 x["hash"] for x in results if dt_ts_lb <= x["timestamp"] <= dt_ts_ub
             ]
@@ -139,7 +180,11 @@ class HarmonyAPI:
             )
 
             # the last tx on current page is in time bounds
-            has_more = bool(results) and results[-1]["hash"] == in_bounds_txs[-1]
+            has_more = bool(results) and not (
+                # request upper bound is greater than returned lower bound
+                results[0]["timestamp"]
+                < dt_ts_lb
+            )
             p_idx += 1
 
         # de-dupe tx hashes in order, sometimes API returns duplicates in pagination
@@ -173,7 +218,7 @@ class HarmonyAPI:
         )
 
     @classmethod
-    def get_contract(cls, address: str, abi: str) -> Contract:
+    def get_contract(cls, address: str, abi: Dict) -> Contract:
         return cls._w3.eth.contract(Web3.toChecksumAddress(address), abi=abi)
 
     @classmethod

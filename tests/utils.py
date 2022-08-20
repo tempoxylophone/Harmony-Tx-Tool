@@ -11,9 +11,6 @@ from txtool.koinly import is_cost
 def get_non_cost_transactions_from_txt_hash(
     wallet_address: str, tx_hash: str
 ) -> List[WalletActivity]:
-    # side effect
-    DexPriceManager.clear_state()
-
     non_cost_txs = [
         x
         for x in WalletActivity.extract_all_wallet_activity_from_transaction(
@@ -22,7 +19,6 @@ def get_non_cost_transactions_from_txt_hash(
         if not is_cost(x)
     ]
 
-    # side effect
     DexPriceManager.initialize_static_price_manager(non_cost_txs)
 
     return non_cost_txs

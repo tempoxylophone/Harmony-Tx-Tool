@@ -148,3 +148,13 @@ def test_build_prices_for_null_coin_type():
         DexPriceManager.initialize_static_price_manager(txs)
 
     assert "null coin type" in str(e)
+
+
+@vcr.use_cassette()
+def test_get_function_name_for_unknown_abi_in_transaction():
+    tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
+    address = "0x9bC54Db115f9a362B5E6b9eFfcaf9c7c2486Bf16"
+    txs = WalletActivity.extract_all_wallet_activity_from_transaction(address, tx_hash)
+
+    # check that we can get the signature even if we don't know the contract ABI
+    assert all(x.method == "claimReward(uint8,address)" for x in txs)

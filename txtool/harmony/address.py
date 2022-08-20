@@ -7,8 +7,10 @@ from txtool.utils import MAIN_LOGGER
 from .api import HarmonyAPI
 from .abc import Token
 
+
 class BadAddressException(Exception):
     pass
+
 
 class HarmonyAddress:
     FORMAT_ETH = "eth"
@@ -55,6 +57,10 @@ class HarmonyAddress:
 
         self.token: Union[Token, None] = None
 
+    @classmethod
+    def clear_directory(cls) -> None:
+        cls._ADDRESS_DIRECTORY = {}
+
     def get_address_str(self, address_format: str) -> str:
         return self.addresses[address_format]
 
@@ -83,7 +89,9 @@ class HarmonyAddress:
         if cls.is_valid_eth_address(address_string):
             return cls.FORMAT_ETH
         raise BadAddressException(
-            "get_address_string_format(): Bad address, neither eth or one! Got: {0}".format(address_string)
+            "get_address_string_format(): Bad address, neither eth or one! Got: {0}".format(
+                address_string
+            )
         )
 
     @classmethod

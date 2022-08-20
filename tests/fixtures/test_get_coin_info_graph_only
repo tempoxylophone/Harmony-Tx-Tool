@@ -72,38 +72,29 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "access-control-allow-origin": [
-                        "*"
-                    ],
-                    "Server": [
-                        "nginx/1.21.4"
-                    ],
-                    "access-control-allow-headers": [
-                        "Content-Type, User-Agent"
-                    ],
                     "X-Content-Type-Options": [
                         "nosniff"
                     ],
-                    "access-control-allow-methods": [
-                        "GET, OPTIONS, POST"
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "Date": [
+                        "Fri, 19 Aug 2022 05:51:11 GMT"
                     ],
                     "X-Frame-Options": [
                         "DENY"
                     ],
-                    "Date": [
-                        "Wed, 03 Aug 2022 14:25:22 GMT"
-                    ],
-                    "Content-Security-Policy": [
-                        "upgrade-insecure-requests"
+                    "access-control-allow-headers": [
+                        "Content-Type, User-Agent"
                     ],
                     "graph-attestable": [
                         "true"
                     ],
-                    "Content-Length": [
-                        "346"
+                    "access-control-allow-methods": [
+                        "GET, OPTIONS, POST"
                     ],
-                    "Connection": [
-                        "keep-alive"
+                    "Server": [
+                        "nginx/1.21.4"
                     ],
                     "Strict-Transport-Security": [
                         "max-age=63072000; includeSubdomains; preload"
@@ -111,10 +102,19 @@
                     "Content-Type": [
                         "application/json"
                     ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Security-Policy": [
+                        "upgrade-insecure-requests"
+                    ],
+                    "Content-Length": [
+                        "347"
+                    ],
                     "Set-Cookie": []
                 },
                 "body": {
-                    "string": "{\"data\":{\"pair\":null,\"token\":{\"__typename\":\"Token\",\"decimals\":\"18\",\"derivedETH\":\"0.1300614246193924865104673352466533\",\"id\":\"0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79\",\"name\":\"Viper\",\"symbol\":\"VIPER\",\"totalLiquidity\":\"40462950.434419971497233809\",\"totalSupply\":\"8504\",\"tradeVolumeUSD\":\"364218890.4053422146326214193575059\",\"txCount\":\"3874418\"}}}"
+                    "string": "{\"data\":{\"pair\":null,\"token\":{\"__typename\":\"Token\",\"decimals\":\"18\",\"derivedETH\":\"0.08995736996500183037723597340427025\",\"id\":\"0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79\",\"name\":\"Viper\",\"symbol\":\"VIPER\",\"totalLiquidity\":\"47669510.400103687601142398\",\"totalSupply\":\"8504\",\"tradeVolumeUSD\":\"366124364.3077711494856475178584781\",\"txCount\":\"3906098\"}}}"
                 }
             }
         }

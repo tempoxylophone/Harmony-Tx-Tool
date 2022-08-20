@@ -1,6 +1,7 @@
-from typing import List, Type, Callable
+from typing import List, Type, Callable, Optional, Dict
 import logging
 import os
+from json import loads
 from requests.exceptions import (
     HTTPError,
     ConnectionError as HTTPConnectionError,
@@ -55,11 +56,11 @@ def _build_exceptions(exceptions: List[T_EXCEPTION], i: int = 0) -> RetryChain:
     )
 
 
-def api_retry(custom_exceptions: List[T_EXCEPTION]) -> Callable:
-    return retry_on_exceptions(COMMON_API_EXCEPTIONS + custom_exceptions)
+def api_retry(custom_exceptions: Optional[List[T_EXCEPTION]] = None) -> Callable:
+    return retry_on_exceptions(COMMON_API_EXCEPTIONS + (custom_exceptions or []))
 
 
-def get_local_abi(abi_json_filename: str) -> str:
+def get_local_abi(abi_json_filename: str) -> Dict:
     """
     Copyright 2021 Paul Willworth <ioscode@gmail.com>
     """
@@ -71,4 +72,4 @@ def get_local_abi(abi_json_filename: str) -> str:
     with open(path, "r", encoding="UTF-8") as f:
         abi = f.read()
 
-    return abi
+    return loads(abi)

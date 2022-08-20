@@ -4,7 +4,11 @@ from eth_typing import HexStr
 
 from .koinly import KoinlyReportCreator
 from .transactions import WalletActivity
-from .harmony import HarmonyAPI, HarmonyEVMTransaction, DexPriceManager, BadAddressException
+from .harmony import (
+    HarmonyAPI,
+    HarmonyEVMTransaction,
+    DexPriceManager,
+)
 from .utils import MAIN_LOGGER
 
 
@@ -67,11 +71,9 @@ def get_events(
                 wallet_address, tx_hash_string
             )
             events += results
-        except Exception as e:
-            MAIN_LOGGER.warn(
-                "Transaction %s threw error: %s ...",
-                tx_hash_string,
-                str(e)
+        except Exception as e:  # pylint: disable=W0703 pragma: no cover
+            MAIN_LOGGER.warning(
+                "Transaction %s threw error: %s ...", tx_hash_string, str(e)
             )
 
     return events

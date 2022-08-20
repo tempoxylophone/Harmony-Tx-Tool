@@ -1,11 +1,13 @@
 from __future__ import annotations
 from typing import Dict, Union, Tuple, Any
 from functools import lru_cache
+
 from web3.contract import ContractFunction
 from web3.types import HexStr
 from txtool.utils import get_local_abi
 
 from .api import HarmonyAPI
+from .address import HarmonyAddress
 
 T_DECODED_ETH_SIG = Tuple[ContractFunction, Dict[str, Any]]
 
@@ -18,26 +20,36 @@ class HarmonyEVMSmartContract:
         "UniswapV2Router02",
         "UniswapV2Factory",
         "UniswapV2Pair",
-        "USD Coin",
-        "Wrapped ONE",
+        "USDCoin",
+        "WrappedONE",
+        "TranquilComptroller",
     ]
 
     @classmethod
     @lru_cache(maxsize=256)
     def lookup_harmony_smart_contract_by_address(
-        cls, address: str, name: str = ""
+        cls, address: Union[str, HarmonyAddress]
     ) -> HarmonyEVMSmartContract:
-        return HarmonyEVMSmartContract(address, name)
+        return HarmonyEVMSmartContract(HarmonyAddress.get_harmony_address(address))
 
-    def __init__(self, address: str, assigned_name: str):
-        self.address = address
-        self.name = assigned_name
+    def __init__(self, address: HarmonyAddress):
+        self.address: HarmonyAddress = address
 
         # contract function requires us to know interface of source
-        self.has_code = HarmonyAPI.address_belongs_to_smart_contract(self.address)
-        self.abi = get_local_abi(self.POSSIBLE_ABIS[0])
-        self.abi_attempt_idx = 1
-        self.contract = HarmonyAPI.get_contract(self.address, self.abi)
+        self.has_code = HarmonyAPI.address_belongs_to_smart_contract(self.address.eth)
+        self.abi_attempt_idx = 0
+
+        if network_abi := HarmonyAPI.get_abi(self.address.eth):
+            # see if you can pull the API from the internet
+            self.abi = network_abi
+        else:
+            # otherwise, default to some well known ABIs that are used
+            # frequently with forks of popular protocols
+            self.abi = get_local_abi(self.POSSIBLE_ABIS[0])
+            self.abi_attempt_idx += 1
+
+        # create contract object
+        self.contract = HarmonyAPI.get_contract(self.address.eth, self.abi)
 
     def decode_input(
         self, tx_input: HexStr
@@ -52,7 +64,7 @@ class HarmonyEVMSmartContract:
         except ValueError:
             # can't decode this input, keep shuffling different ABIs until get match, then stop
             self.abi = get_local_abi(self.POSSIBLE_ABIS[self.abi_attempt_idx])
-            self.contract = HarmonyAPI.get_contract(self.address, self.abi)
+            self.contract = HarmonyAPI.get_contract(self.address.eth, self.abi)
             self.abi_attempt_idx += 1
             return self.decode_input(tx_input)
 

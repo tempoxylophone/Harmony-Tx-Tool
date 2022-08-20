@@ -6,7 +6,11 @@ from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
 
 from txtool.transactions import HarmonyEVMTransaction
 
-from .ruleset import get_label_for_tx_and_description, is_cost, KOINLY_UNSUPPORTED_COIN_NAMES
+from .ruleset import (
+    get_label_for_tx_and_description,
+    is_cost,
+    KOINLY_UNSUPPORTED_COIN_NAMES,
+)
 
 
 class KoinlyReportCreator:  # pylint: disable=R0902
@@ -50,15 +54,15 @@ class KoinlyReportCreator:  # pylint: disable=R0902
     )
 
     def __init__(  # pylint: disable=R0913
-            self,
-            address_format: Optional[str] = HarmonyAddress.FORMAT_ONE,
-            omit_tracked_fiat_prices: Optional[bool] = True,
-            omit_cost: Optional[bool] = True,
-            date_lb_str: Optional[str] = "",
-            date_ub_str: Optional[str] = "",
-            # none is unlimited
-            tx_limit: Union[int, None] = None,
-            fiat_type: Optional[str] = "usd",
+        self,
+        address_format: Optional[str] = HarmonyAddress.FORMAT_ONE,
+        omit_tracked_fiat_prices: Optional[bool] = True,
+        omit_cost: Optional[bool] = True,
+        date_lb_str: Optional[str] = "",
+        date_ub_str: Optional[str] = "",
+        # none is unlimited
+        tx_limit: Union[int, None] = None,
+        fiat_type: Optional[str] = "usd",
     ):
         self.address_format: str = address_format or HarmonyAddress.FORMAT_ONE
         self.omit_tracked_fiat_prices = omit_tracked_fiat_prices
@@ -116,12 +120,12 @@ class KoinlyReportCreator:  # pylint: disable=R0902
     @staticmethod
     def currency_is_tracked(coin_symbol: str) -> bool:
         return (
-                coin_symbol.upper() in KoinlyReportCreator._KOINLY_TRACKED_CURRENCY_SYMBOLS
+            coin_symbol.upper() in KoinlyReportCreator._KOINLY_TRACKED_CURRENCY_SYMBOLS
         )
 
     def to_csv_row(self, tx: HarmonyEVMTransaction) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
-                tx.coin_type.universal_symbol
+            tx.coin_type.universal_symbol
         ):
             fiat_value = ""
         else:
@@ -161,7 +165,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
             )
         )
 
-    def format_coin_symbol(self, currency: HarmonyToken) -> str:
+    def format_coin_symbol(self, currency: Optional[HarmonyToken]) -> str:
         if currency:
             symbol = currency.universal_symbol
             return KOINLY_UNSUPPORTED_COIN_NAMES.get(symbol, symbol)

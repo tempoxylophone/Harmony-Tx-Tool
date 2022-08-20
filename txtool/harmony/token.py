@@ -151,7 +151,9 @@ class DexPriceManager:
             d_idx = 0
             ts: Dict = {}
 
-            while not DexPriceManager._is_valid_price_timeseries(ts) and d_idx < len(DexPriceManager._DEX_GRAPHS):
+            while not DexPriceManager._is_valid_price_timeseries(ts) and d_idx < len(
+                DexPriceManager._DEX_GRAPHS
+            ):
                 dex = DexPriceManager._DEX_GRAPHS[d_idx]
 
                 # try to get token information from any dex we can until we get useful
@@ -282,6 +284,10 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         HarmonyToken._TOKEN_DIRECTORY[self.address] = self
 
     @classmethod
+    def clear_directory(cls) -> None:
+        cls._TOKEN_DIRECTORY = {}
+
+    @classmethod
     def get_native_token(cls) -> HarmonyToken:
         return cls.get_harmony_token_by_address(NATIVE_TOKEN_ETH_ADDRESS_STR)
 
@@ -372,7 +378,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         if not HarmonyAPI.address_belongs_to_erc_20_token(addr_obj.eth):
             raise ValueError(
                 f"This address does not appear to belong to an ERC/HRC20 token. "
-                f"Got address: {address}"
+                f"Got address: {address} (type = {type(address)})"
             )
 
         return HarmonyToken._TOKEN_DIRECTORY.get(addr_obj) or HarmonyToken(

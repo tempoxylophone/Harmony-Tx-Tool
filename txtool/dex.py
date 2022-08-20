@@ -298,9 +298,7 @@ class UniswapV2ForkGraph:
             # no data to be found
             return {}
 
-        price_blocks: List[Dict] = pair_data[
-            "liquidityPositionSnapshots"
-        ]
+        price_blocks: List[Dict] = pair_data["liquidityPositionSnapshots"]
         ts = {}
 
         for block_num in block_nums:

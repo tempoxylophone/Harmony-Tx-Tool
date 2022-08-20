@@ -14,6 +14,7 @@ from txtool.harmony import (
 
 from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 from txtool.utils import MAIN_LOGGER
+from .interpreters import interpret_multi_transaction
 
 
 class WalletAction(str, Enum):
@@ -93,11 +94,13 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(wallet_address, HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx, exclude_intermediate_tx)
-        return [
-            root_tx,
-            # token transfers will appear in sub-transactions
-            *leaf_tx,
-        ]
+        return interpret_multi_transaction(
+            [
+                root_tx,
+                # token transfers will appear in sub-transactions
+                *leaf_tx,
+            ]
+        )
 
     @staticmethod
     def _get_token_transfers(
@@ -155,9 +158,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             if original_transfer:
                 original_transfer.from_addr = root_tx.account
                 original_transfer.sent_amount = original_transfer.coin_amount
-                original_transfer.sent_currency = (
-                    original_transfer.coin_type
-                )
+                original_transfer.sent_currency = original_transfer.coin_type
 
             # special handlers for Uniswap stuff
             transfers += WalletActivity._parse_uniswap_contract_debts(

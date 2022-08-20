@@ -76,3 +76,19 @@ def test_ambiguous_token_or_lp_position():
     assert token.is_lp_token
     assert token.lp_token_0.symbol == "JENN"
     assert token.lp_token_1.symbol == "ONE"
+
+
+@vcr.use_cassette()
+def test_get_harmony_token_by_address_for_vcr_1():
+    token = HarmonyToken.get_harmony_token_by_address(
+        "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a"
+    )
+    assert token.symbol == "ONE"
+
+
+@vcr.use_cassette()
+def test_get_harmony_token_by_address_for_vcr_2():
+    token = HarmonyToken.get_harmony_token_by_address(
+        "0x3a4EDcf3312f44EF027acfd8c21382a5259936e7"
+    )
+    assert token.symbol == "DFKGOLD"
