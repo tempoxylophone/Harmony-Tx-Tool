@@ -13,8 +13,12 @@ install-dev:
 install:
 	pipenv install
 
+update-requirements:
+	pipenv lock -r > requirements.txt
+	pipenv lock -r --dev > requirements-dev.txt
+
 test:
-	pytest -v -s -rx --random-order
+	pytest -v -s -rx --random-order -m "not slow"
 
 lint:
 	mypy .

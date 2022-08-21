@@ -7,7 +7,6 @@ from .transactions import WalletActivity
 from .harmony import (
     HarmonyAPI,
     HarmonyEVMTransaction,
-    DexPriceManager,
 )
 from .utils import MAIN_LOGGER
 
@@ -32,9 +31,6 @@ def get_harmony_tx_from_wallet_as_csv(
     MAIN_LOGGER.info("Done interpreting transactions.")
 
     # --- WRITE TO FILE ---
-    # get fiat prices
-    DexPriceManager.initialize_static_price_manager(tx_events)
-
     # build CSV
     MAIN_LOGGER.info("Writing results to file...")
     result_csv = report.get_csv_from_transactions(tx_events)

@@ -1,6 +1,6 @@
 import pytest  # noqa
 
-from txtool.coingecko.api import get_coin_info_by_symbol, get_coingecko_chart_data
+from txtool.fiat.coingecko.api import get_coin_info_by_symbol, get_coingecko_chart_data
 from .utils import get_vcr
 
 vcr = get_vcr(__file__)

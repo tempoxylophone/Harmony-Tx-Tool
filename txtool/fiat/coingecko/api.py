@@ -1,0 +1,105 @@
+from typing import Dict, List
+from collections import defaultdict
+from functools import lru_cache
+
+import requests
+
+
+@lru_cache(maxsize=1)
+def get_coingecko_search_directory() -> Dict:
+    headers = {
+        "authority": "api.coingecko.com",
+        "pragma": "no-cache",
+        "cache-control": "no-cache",
+        "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "dnt": "1",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.42.81 Safari/512.31",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,"
+        "image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "sec-fetch-site": "none",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-user": "?1",
+        "sec-fetch-dest": "document",
+        "accept-language": "en-US,en;q=0.9",
+    }
+
+    params = {
+        "locale": "en",
+    }
+
+    response = requests.get(
+        "https://api.coingecko.com/api/v3/search", params=params, headers=headers
+    )
+
+    return response.json()
+
+
+def get_coingecko_coin_directory() -> Dict:
+    directory = get_coingecko_search_directory()
+    formatted_directory = defaultdict(list)
+
+    for d in directory["coins"]:
+        formatted_directory[d["symbol"]].append(
+            {**d, "internal_id": d["thumb"].split("/images/")[-1].split("/")[0]}
+        )
+
+    return formatted_directory
+
+
+@lru_cache(maxsize=256)
+def get_coin_info_by_symbol(coin_symbol: str) -> Dict:
+    possible_matches = get_coingecko_coin_directory().get(coin_symbol)
+    return next(iter(possible_matches or []), {})
+
+
+def get_coingecko_chart_data(
+    coingecko_coin_object: Dict, unix_timestamp_lb: int, unix_timestamp_ub: int
+) -> List[List]:
+    if not coingecko_coin_object:
+        # bad coin info given
+        return []
+
+    coin_internal_id = coingecko_coin_object["internal_id"]
+    coin_id = coingecko_coin_object["id"]
+
+    headers = {
+        "authority": "www.coingecko.com",
+        "pragma": "no-cache",
+        "cache-control": "no-cache",
+        "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+        "dnt": "1",
+        "sec-ch-ua-mobile": "?0",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.42.81 Safari/512.31",
+        "sec-ch-ua-platform": '"macOS"',
+        "accept": "*/*",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-dest": "empty",
+        "referer": f"https://www.coingecko.com/en/coins/{coin_id}",
+        "accept-language": "en-US,en;q=0.9",
+    }
+
+    params = {
+        "from": str(unix_timestamp_lb),
+        "to": str(unix_timestamp_ub),
+    }
+
+    response = requests.get(
+        f"https://www.coingecko.com/price_charts/{coin_internal_id}/usd/custom.json",
+        params=params,
+        headers=headers,
+    )
+    chart_data = response.json()
+
+    return chart_data["stats"]
+
+
+def get_coingecko_chart_data_by_symbol(
+    coin_symbol: str, ts_lb: int, ts_ub: int
+) -> List[List]:
+    return get_coingecko_chart_data(get_coin_info_by_symbol(coin_symbol), ts_lb, ts_ub)

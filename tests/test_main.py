@@ -1,4 +1,6 @@
 import logging
+import pytest  # noqa
+
 from txtool.koinly import KoinlyReportCreator
 from txtool.harmony import HarmonyAddress
 from txtool.main import get_harmony_tx_from_wallet_as_csv
@@ -9,7 +11,8 @@ from .utils import get_vcr
 vcr = get_vcr(__file__)
 
 
-@vcr.use_cassette()
+@pytest.mark.slow
+# @vcr.use_cassette()
 def test_export_full_tx_log_for_koinly():
     # turn logging on
     MAIN_LOGGER.setLevel(logging.INFO)

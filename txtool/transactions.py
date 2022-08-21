@@ -116,7 +116,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             MAIN_LOGGER.info("\tExtracting sub-tx %s/%s...", i, len(logs))
 
             # in reverse order
-            token_tx = WalletActivity._create_token_tx_from_log(root_tx, log)
+            token_tx = WalletActivity._create_token_tx_from_log(root_tx, log, i)
             transfers.insert(0, token_tx)
 
         if (
@@ -278,13 +278,13 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
     @staticmethod
     def _create_token_tx_from_log(
-        root_tx: WalletActivity, log: Dict[str, Any]
+        root_tx: WalletActivity, log: Dict[str, Any], log_idx: int
     ) -> WalletActivity:
         token = HarmonyToken.get_harmony_token_by_address(log["address"])
         value = token.get_value_from_wei(log["args"]["value"])
 
         r = WalletActivity(root_tx.account, root_tx.tx_hash, token)
-
+        r.log_idx = log_idx
         r.coin_amount = value
         r.event = log["event"]
         r.is_token_transfer = r.event == "Transfer"

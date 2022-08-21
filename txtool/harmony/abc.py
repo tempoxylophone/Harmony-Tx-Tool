@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC
-from typing import Any, Optional, Union
+from typing import Any, Union
 from datetime import datetime
 from decimal import Decimal
 
@@ -31,7 +31,7 @@ class Token(ABC):
         raise NotImplementedError
 
 
-class Transaction(ABC):  # pylint: disable=R0902
+class Transaction(ABC):  # pylint: disable=R0902,R0903
     def __init__(self, account: Any, tx_hash: Any):
         self.tx_hash = tx_hash
         self.account = account
@@ -52,18 +52,3 @@ class Transaction(ABC):  # pylint: disable=R0902
         # token received in this tx (incoming)
         self.got_amount = Decimal(0)
         self.got_currency: Union[Token, None] = None
-
-    def get_fiat_value(self, exclude_fee: Optional[bool] = False) -> Decimal:
-        t_val = self.coin_amount * self.get_token_price()
-        f_val = (
-            Decimal(0)
-            if exclude_fee
-            else self.tx_fee_in_native_token * self.get_fee_price()
-        )
-        return t_val + f_val
-
-    def get_token_price(self) -> Decimal:  # pragma: no cover
-        raise NotImplementedError
-
-    def get_fee_price(self) -> Decimal:  # pragma: no cover
-        raise NotImplementedError

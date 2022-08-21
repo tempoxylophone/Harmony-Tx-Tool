@@ -1,10 +1,11 @@
 from typing import Optional, Union, Sequence
+from decimal import Decimal
 from datetime import timezone, datetime
 
 from txtool.harmony import HarmonyAddress, HarmonyAPI, HarmonyToken
 from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
-
 from txtool.transactions import HarmonyEVMTransaction
+from txtool.fiat.get_prices import get_token_prices_for_transactions, T_PRICE_DATA_DICT
 
 from .ruleset import (
     get_label_for_tx_and_description,
@@ -94,7 +95,13 @@ class KoinlyReportCreator:  # pylint: disable=R0902
         if self.omit_cost:
             events = [x for x in events if not is_cost(x)]
 
-        return self.get_csv_row_header() + "".join(self.to_csv_row(tx) for tx in events)
+        # get prices to use later
+        price_lookup = get_token_prices_for_transactions(events)
+
+        # build the csv
+        return self.get_csv_row_header() + "".join(
+            self.to_csv_row(tx, price_lookup) for tx in events
+        )
 
     def timestamp_is_in_bounds(self, ts: int) -> bool:
         return self.dt_lb_ts <= ts <= self.dt_ub_ts
@@ -123,14 +130,24 @@ class KoinlyReportCreator:  # pylint: disable=R0902
             coin_symbol.upper() in KoinlyReportCreator._KOINLY_TRACKED_CURRENCY_SYMBOLS
         )
 
-    def to_csv_row(self, tx: HarmonyEVMTransaction) -> str:
+    def get_tx_fiat_value(
+        self, tx: HarmonyEVMTransaction, price_lookup: T_PRICE_DATA_DICT
+    ) -> Decimal:
+        token_usd_price = price_lookup[tx][tx.coin_type]
+        token_quantity = tx.coin_amount
+        return token_quantity * token_usd_price
+
+    def to_csv_row(
+        self, tx: HarmonyEVMTransaction, price_lookup: T_PRICE_DATA_DICT
+    ) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
             tx.coin_type.universal_symbol
         ):
+            # leave blank so Koinly will fill it in automatically
             fiat_value = ""
         else:
-            # if 0, make it blank
-            fiat_value = str(tx.get_fiat_value(self.omit_cost) or "")
+            # use price_lookup to determine fiat value
+            fiat_value = str(self.get_tx_fiat_value(tx, price_lookup))
 
         label, desc = get_label_for_tx_and_description(tx)
 
@@ -149,7 +166,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 "0" if self.omit_cost else str(tx.tx_fee_in_native_token),
                 NATIVE_TOKEN_SYMBOL,
                 # fiat conversion, if $0, leave blank in CSV
-                fiat_value or "",
+                fiat_value,
                 str(self.fiat_type),
                 # human readable stuff
                 label,
@@ -165,7 +182,8 @@ class KoinlyReportCreator:  # pylint: disable=R0902
             )
         )
 
-    def format_coin_symbol(self, currency: Optional[HarmonyToken]) -> str:
+    @staticmethod
+    def format_coin_symbol(currency: Optional[HarmonyToken]) -> str:
         if currency:
             symbol = currency.universal_symbol
             return KOINLY_UNSUPPORTED_COIN_NAMES.get(symbol, symbol)

@@ -1,8 +1,9 @@
 import gc
 import functools
 import pytest  # noqa
-from txtool.harmony import DexPriceManager, HarmonyAddress, HarmonyToken
 
+from txtool.fiat import DexPriceManager
+from txtool.harmony import HarmonyAddress, HarmonyToken
 
 # file must be called "conftest" in order to be shared by all in this directory
 # see: https://docs.pytest.org/en/6.2.x/fixture.html#scope-sharing-fixtures-across-classes-modules-packages-or-session
@@ -12,7 +13,6 @@ from txtool.harmony import DexPriceManager, HarmonyAddress, HarmonyToken
 def run_before_and_after_tests():
     # this must be cleared on each test, otherwise requests are inconsistent
     # and vcrpy records inconsistent behavior
-    DexPriceManager.clear_state()
     HarmonyAddress.clear_directory()
     HarmonyToken.clear_directory()
 
@@ -20,7 +20,9 @@ def run_before_and_after_tests():
 
     gc.collect()
     wrappers = [
-        a for a in gc.get_objects() if isinstance(a, functools._lru_cache_wrapper)
+        a
+        for a in gc.get_objects()
+        if isinstance(a, functools._lru_cache_wrapper)  # noqa
     ]
 
     for wrapper in wrappers:

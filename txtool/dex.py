@@ -117,6 +117,27 @@ class UniswapV2ForkGraph:
         }
 
     def get_token_or_pair_info(self, token_or_pair_address: str) -> Dict:
+        # try to get token information from any dex we can until we get useful
+        # data back
+        info = self._get_token_or_pair_info(token_or_pair_address)
+
+        if self._is_valid_token_or_pair_info(info):
+            return info
+
+        return {}
+
+    @staticmethod
+    def _is_valid_token_or_pair_info(token_or_pair_info: Dict) -> bool:
+        pair_info = token_or_pair_info["pair"]
+        token_info = token_or_pair_info["token"]
+
+        if not bool(pair_info) and not bool(token_info):
+            # at least one must be non-null for this to be considered a reasonable response
+            return False
+
+        return True
+
+    def _get_token_or_pair_info(self, token_or_pair_address: str) -> Dict:
         data = self._graph_ql_request(
             self._q_get_graph_ql_token_or_pair_info(token_or_pair_address)
         )
@@ -240,12 +261,10 @@ class UniswapV2ForkGraph:
                 "Invalid timestamp range for liquidity position price query! "
                 "Date: ({0}, {1})".format(tx_start_ts, tx_end_ts)
             )
-
-        return self._graph_ql_request(
-            self._q_get_graph_ql_lp_pair_payload(
-                lp_pair_address, tx_start_ts, tx_end_ts
-            )
+        query = self._q_get_graph_ql_lp_pair_payload(
+            lp_pair_address, tx_start_ts, tx_end_ts
         )
+        return self._graph_ql_request(query)
 
     @staticmethod
     def _compute_ts_bounds(ts_min, ts_max) -> Tuple[int, int]:

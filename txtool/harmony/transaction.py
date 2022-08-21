@@ -1,7 +1,6 @@
 from __future__ import annotations
 from datetime import date
-from decimal import Decimal
-from typing import Union
+from typing import Union, Sequence
 
 from web3.types import TxReceipt, HexStr
 
@@ -9,7 +8,7 @@ from .api import HarmonyAPI
 from .abc import Transaction
 from .contract import HarmonyEVMSmartContract
 from .address import HarmonyAddress, BadAddressException
-from .token import HarmonyToken, DexPriceManager
+from .token import HarmonyToken
 from .signature import get_function_name_by_signature
 
 
@@ -62,6 +61,18 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         self.sent_currency: Union[HarmonyToken, None] = None
         self.got_currency: Union[HarmonyToken, None] = None
 
+        # position of transaction in logs
+        self.log_idx = 0
+
+    def get_relevant_tokens(self) -> Sequence[HarmonyToken]:
+        coins = {
+            self.coin_type,
+            self.got_currency,
+            self.sent_currency,
+            HarmonyToken.get_native_token(),
+        } - {None}
+        return list(coins)  # type: ignore
+
     @property
     def receipt(self) -> TxReceipt:
         return HarmonyAPI.get_tx_receipt(self.tx_hash)
@@ -90,20 +101,6 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
     def to_addr_str(self) -> str:
         return self.to_addr.eth
 
-    def get_token_price(self) -> Decimal:
-        try:
-            return DexPriceManager.get_price_of_token_at_block(
-                self.coin_type, self.block
-            )
-        except KeyError:
-            # no luck finding price for this coin at this block
-            return Decimal(0.0)
-
-    def get_fee_price(self) -> Decimal:
-        return DexPriceManager.get_price_of_token_at_block(
-            HarmonyToken.get_native_token(), self.block
-        )
-
     def get_tx_function_signature(self) -> str:
         decode_successful, function_info = self.tx_payload
         if decode_successful and function_info:
@@ -121,3 +118,11 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         func_signature = input_data[:10]
 
         return get_function_name_by_signature(func_signature)
+
+    def __eq__(self, other) -> bool:
+        # two transactions are considered equal if they are of the same
+        # parent hash and are of the same position on the logs
+        return self.tx_hash == other.tx_hash and self.log_idx == other.log_idx
+
+    def __hash__(self) -> int:
+        return hash(f"{self.tx_hash}-{self.log_idx}")

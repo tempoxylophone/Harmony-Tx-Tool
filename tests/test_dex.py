@@ -5,18 +5,15 @@ from unittest.mock import patch
 from web3 import Web3
 import pytest  # noqa
 
-from txtool.dex import UniswapV2ForkGraph, DatabaseUnavailableError
-from txtool.harmony import HarmonyToken, HarmonyEVMTransaction, DexPriceManager
+from txtool.dex import DatabaseUnavailableError
+from txtool.harmony import HarmonyToken, HarmonyEVMTransaction
+from txtool.fiat import DexPriceManager
 
 from .utils import get_non_cost_transactions_from_txt_hash, get_vcr
 
 vcr = get_vcr(__file__)
 
-VIPER_SWAP = UniswapV2ForkGraph(
-    "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",
-    "graph.viper.exchange",
-    "https://info.viper.exchange",
-)
+VIPER_SWAP = HarmonyToken._VIPERSWAP  # noqa
 
 
 @vcr.use_cassette()
@@ -52,10 +49,13 @@ def test_get_coin_info():
     tx: HarmonyEVMTransaction = txs[0]
     assert tx.coin_amount == 5
 
-    token_price = DexPriceManager.get_price_of_token_at_block(tx.coin_type, tx.block)
-    assert float(token_price) == 0.02140439349414948193925037049
+    price_data = DexPriceManager.get_price_data(txs)
+    token_price = DexPriceManager.get_price_of_token_at_block(
+        tx.coin_type, tx.block, price_data
+    )
+    assert token_price == Decimal("0.02140439349414948193925037049")
 
-    fiat_val = tx.get_fiat_value(exclude_fee=True)
+    fiat_val = DexPriceManager.get_tx_fiat_value(tx, price_data, exclude_fee=True)
 
     # test exact
     assert fiat_val == tx.coin_amount * token_price
@@ -151,8 +151,11 @@ def test_lp_token_info():
 
     tx: HarmonyEVMTransaction = txs[0]
     assert float(tx.coin_amount) == 0.000057682787963833
+    assert tx.coin_type.symbol == "VENOM-LP"
+    assert tx.coin_type.is_lp_token
 
-    fiat_val_usd = tx.get_fiat_value(exclude_fee=True)
+    price_data = DexPriceManager.get_price_data(txs)
+    fiat_val_usd = DexPriceManager.get_tx_fiat_value(tx, price_data, exclude_fee=True)
 
     # check exact
     assert fiat_val_usd == price_per_lp_token * tx.coin_amount
@@ -217,6 +220,7 @@ def test_dex_json_empty_exception():
 
 
 @vcr.use_cassette()
+@pytest.mark.slow
 def test_dex_database_error():
     with patch("requests.Response.json") as req_mock:
         # null response

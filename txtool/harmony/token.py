@@ -1,10 +1,6 @@
 from __future__ import annotations
-from typing import List, Dict, Union, Tuple, Iterable, TypedDict, Optional
+from typing import Dict, Union, Optional
 from decimal import Decimal
-from collections import defaultdict
-
-from txtool.utils import MAIN_LOGGER, make_yellow
-from txtool.dex import UniswapV2ForkGraph
 
 from .constants import (
     NATIVE_TOKEN_ETH_ADDRESS_STR,
@@ -12,226 +8,10 @@ from .constants import (
 )
 from .api import HarmonyAPI
 from .address import HarmonyAddress
-from .abc import Token, Transaction
+from .abc import Token
 
-
-class DexPriceManager:
-    class DexPriceInfo(TypedDict):
-        blocks: List[int]
-        timestamps: List[int]
-        timestamp_range: Dict[str, Union[float, int]]
-        fiat_prices_by_block: Dict[int, Decimal]
-
-    _TX_LOOKUP: Dict[Token, DexPriceInfo] = defaultdict(
-        lambda: {
-            "blocks": [],
-            "timestamps": [],
-            "timestamp_range": {
-                "max": float("-inf"),
-                "min": float("+inf"),
-            },
-            "fiat_prices_by_block": {},
-        }
-    )
-    _DEX_GRAPH_URLS = [
-        # order matters, attempts for lookups made first at the front
-        # VIPERSWAP
-        (
-            "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",
-            "graph.viper.exchange",
-            "https://info.viper.exchange",
-        ),
-        # # DEFIKINGDOMS
-        # UPDATE: not a uniswap graph
-        # # see docs: https://devs.defikingdoms.com/api/community-graphql-api/getting-started
-        # (
-        #     "https://defi-kingdoms-community-api-gateway-co06z8vi.uc.gateway.dev/graphql",
-        # ),
-    ]
-    _DEX_GRAPHS = [UniswapV2ForkGraph(*x) for x in _DEX_GRAPH_URLS]
-
-    @classmethod
-    def get_price_of_token_at_block(cls, token: HarmonyToken, block: int) -> Decimal:
-        return cls._TX_LOOKUP[token]["fiat_prices_by_block"][block]
-
-    @classmethod
-    def initialize_static_price_manager(
-        cls,
-        transactions: Iterable[Transaction],
-    ) -> None:
-        DexPriceManager._build_transactions_directory(transactions)
-        DexPriceManager._build_transactions_fiat_price_lookup()
-
-    @classmethod
-    def clear_state(cls) -> None:
-        DexPriceManager._TX_LOOKUP = defaultdict(
-            lambda: {
-                "blocks": [],
-                "timestamps": [],
-                "timestamp_range": {
-                    "max": float("-inf"),
-                    "min": float("+inf"),
-                },
-                "fiat_prices_by_block": {},
-            }
-        )
-
-    @staticmethod
-    def _build_transactions_directory(
-        transactions: Iterable[Transaction],
-    ) -> None:
-        for t in transactions:
-            if not t.coin_type:
-                # token is undefined or not set
-                raise ValueError(
-                    f"Transaction {t} has a null coin type! Can't build prices map."
-                )
-
-            # ensure ONE is included for this block so we can look up gas
-            native_token: List[Token] = (
-                not (t.coin_type and t.coin_type.is_native_token)
-                and [t.coin_type.get_native_token()]
-                or []
-            )
-            tokens = [t.coin_type] + native_token
-
-            for token in tokens:
-                timestamp = t.timestamp
-                p = DexPriceManager._TX_LOOKUP[token]
-                p["blocks"].append(t.block)
-                p["timestamps"].append(timestamp)
-                p["timestamp_range"]["max"] = max(
-                    p["timestamp_range"]["max"], timestamp
-                )
-                p["timestamp_range"]["min"] = min(
-                    p["timestamp_range"]["min"], timestamp
-                )
-
-    @classmethod
-    def get_token_or_pair_info(cls, token_or_pair_address: str) -> Dict:
-        for dex in DexPriceManager._DEX_GRAPHS:
-            # try to get token information from any dex we can until we get useful
-            # data back
-            info = cls._try_to_get_token_or_pair_info_from_dexes(
-                dex, token_or_pair_address
-            )
-
-            if DexPriceManager._is_valid_token_or_pair_info(info):
-                return info
-
-        return {}
-
-    @classmethod
-    def _try_to_get_token_or_pair_info_from_dexes(
-        cls, dex_graph: UniswapV2ForkGraph, token_address: str
-    ) -> Dict:
-        return dex_graph.get_token_or_pair_info(
-            token_address,
-        )
-
-    @staticmethod
-    def _is_valid_token_or_pair_info(token_or_pair_info: Dict) -> bool:
-        pair_info = token_or_pair_info["pair"]
-        token_info = token_or_pair_info["token"]
-
-        if not bool(pair_info) and not bool(token_info):
-            # at least one must be non-null for this to be considered a reasonable response
-            return False
-
-        return True
-
-    @classmethod
-    def _build_transactions_fiat_price_lookup(cls) -> None:
-        MAIN_LOGGER.info("Building fiat price lookup directory...")
-
-        total_tokens = len(DexPriceManager._TX_LOOKUP)
-        for i, (harmony_token, token_properties) in enumerate(
-            DexPriceManager._TX_LOOKUP.items(), start=1
-        ):
-            d_idx = 0
-            ts: Dict = {}
-
-            while not DexPriceManager._is_valid_price_timeseries(ts) and d_idx < len(
-                DexPriceManager._DEX_GRAPHS
-            ):
-                dex = DexPriceManager._DEX_GRAPHS[d_idx]
-
-                # try to get token information from any dex we can until we get useful
-                # data back
-                if harmony_token.is_lp_token:
-                    MAIN_LOGGER.info(
-                        "Looking up prices for LP token: %s (%s/%s) in dex: %s...",
-                        harmony_token,
-                        i,
-                        total_tokens,
-                        dex,
-                    )
-                    ts = DexPriceManager._try_to_get_lp_prices_from_dexes(
-                        dex,
-                        harmony_token.address.eth,
-                        int(token_properties["timestamp_range"]["min"]),
-                        int(token_properties["timestamp_range"]["max"]),
-                        token_properties["blocks"],
-                    )
-                else:
-                    MAIN_LOGGER.info(
-                        "Looking up prices for ERC20 token: %s (%s/%s) in dex: %s...",
-                        harmony_token,
-                        i,
-                        total_tokens,
-                        dex,
-                    )
-                    ts, failure = DexPriceManager._try_to_get_token_prices_from_dexes(
-                        dex,
-                        harmony_token.address.eth,
-                        token_properties["blocks"],
-                    )
-
-                    if failure:
-                        MAIN_LOGGER.info(
-                            make_yellow(
-                                "\tNo prices found for token: %s from %s",
-                            ),
-                            harmony_token,
-                            dex,
-                        )
-                    else:
-                        MAIN_LOGGER.info(
-                            "\tSuccessfully got prices for token: %s from %s",
-                            harmony_token,
-                            dex,
-                        )
-
-                token_properties["fiat_prices_by_block"] = ts
-                d_idx += 1
-
-    @staticmethod
-    def _try_to_get_token_prices_from_dexes(
-        dex_graph: UniswapV2ForkGraph, token_address: str, blocks: Iterable[int]
-    ) -> Tuple[Dict, bool]:
-        return dex_graph.get_token_price_by_block_timeseries(
-            token_address,
-            blocks,
-        )
-
-    @staticmethod
-    def _try_to_get_lp_prices_from_dexes(
-        dex_graph: UniswapV2ForkGraph,
-        token_address: str,
-        min_ts: int,
-        max_ts: int,
-        blocks: Iterable[int],
-    ) -> Dict:
-        return dex_graph.get_lp_token_price_by_block_timeseries(
-            token_address,
-            min_ts,
-            max_ts,
-            blocks,
-        )
-
-    @staticmethod
-    def _is_valid_price_timeseries(ts: Dict) -> bool:
-        return bool(ts)
+from ..dex import UniswapV2ForkGraph
+from .constants import VIPERSWAP_GRAPH_CONFIG
 
 
 class HarmonyToken(Token):  # pylint: disable=R0902
@@ -249,6 +29,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         "0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f",
         "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
     }
+    _VIPERSWAP = UniswapV2ForkGraph(*VIPERSWAP_GRAPH_CONFIG)
 
     def __init__(
         self,
@@ -305,7 +86,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         return addr_obj
 
     def _set_is_lp_token_guess(self) -> None:
-        dex_info = DexPriceManager.get_token_or_pair_info(self.address.eth)
+        dex_info = self._VIPERSWAP.get_token_or_pair_info(self.address.eth)
 
         if not dex_info:
             # cannot get API response - guess based on the name
