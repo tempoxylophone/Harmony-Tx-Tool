@@ -7,6 +7,18 @@ from txtool.harmony import DexPriceManager
 from txtool.transactions import WalletActivity
 from txtool.koinly import is_cost
 
+HEADERS_TO_REMOVE = (
+    "Set-Cookie",
+    "ETag",
+    "CF-RAY",
+    "Alternate-Protocol",
+    "Date",
+    "X-Request-Id",
+    "Expires",
+    "X-Runtime",
+    "Expect-CT",
+)
+
 
 def get_non_cost_transactions_from_txt_hash(
     wallet_address: str, tx_hash: str
@@ -74,9 +86,19 @@ class NestedBytesSerializer:
         return cassette_dict
 
 
-def remove_set_cookie() -> Callable:
+def remove_sensitive_responses() -> Callable:
     def before_record_response(response: Dict) -> Dict:
-        response["headers"]["Set-Cookie"] = []
+        response_headers = response["headers"]
+        for h in HEADERS_TO_REMOVE:
+            headers = [x for x in response_headers]
+            try:
+                # case insensitive replace header with nothing, HTTP headers
+                # do need to have consistent case
+                idx = [x.lower() for x in headers].index(h.lower())
+                response_headers[headers[idx]] = []
+            except ValueError:
+                # header to remove not contained in response
+                pass
         return response
 
     return before_record_response
@@ -92,5 +114,5 @@ def get_vcr(
     v.register_serializer("bytes", NestedBytesSerializer())
     v.serializer = "bytes"
     v.filter_headers = ["Cookie"]
-    v.before_record_response = remove_set_cookie()
+    v.before_record_response = remove_sensitive_responses()
     return v

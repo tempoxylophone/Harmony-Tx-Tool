@@ -71,7 +71,8 @@ def get_events(
                 wallet_address, tx_hash_string
             )
             events += results
-        except Exception as e:  # pylint: disable=W0703 pragma: no cover
+        except Exception as e:  # pylint: disable=W0703
+            # pragma: no cover
             MAIN_LOGGER.warning(
                 "Transaction %s threw error: %s ...", tx_hash_string, str(e)
             )
