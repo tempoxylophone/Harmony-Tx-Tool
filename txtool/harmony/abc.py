@@ -32,9 +32,8 @@ class Token(ABC):
 
 
 class Transaction(ABC):  # pylint: disable=R0902,R0903
-    def __init__(self, account: Any, tx_hash: Any):
+    def __init__(self, tx_hash: Any):
         self.tx_hash = tx_hash
-        self.account = account
 
         self.block = 1
         self.timestamp = -1

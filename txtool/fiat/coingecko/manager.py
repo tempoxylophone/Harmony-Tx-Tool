@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Dict, Iterable, List, TypedDict, Union
-from decimal import Decimal
 from collections import defaultdict
+from decimal import Decimal
 
 from ...harmony import HarmonyEVMTransaction, HarmonyToken
 from .api import get_coingecko_chart_data_by_symbol
@@ -30,17 +30,13 @@ class CoinGeckoPriceManager:
 
         # find time bounds extremes for transactions by currency
         for t in transactions:
-            if not t.coin_type:
-                raise ValueError(
-                    f"Transaction {t} has a null coin type! Can't build prices map."
-                )
-
             timestamp = t.timestamp
 
-            p = price_lookup[t.coin_type]
-            p["timestamps"].append(timestamp)
-            p["timestamp_max"] = max(p["timestamp_max"], timestamp)
-            p["timestamp_min"] = min(p["timestamp_min"], timestamp)
+            for token in t.get_relevant_tokens():
+                p = price_lookup[token]
+                p["timestamps"].append(timestamp)
+                p["timestamp_max"] = max(p["timestamp_max"], timestamp)
+                p["timestamp_min"] = min(p["timestamp_min"], timestamp)
 
         # have what we need to look it up in the API
         for token_obj, p in price_lookup.items():
@@ -75,21 +71,25 @@ class CoinGeckoPriceManager:
     @staticmethod
     def _find_best_fit_price_by_timestamp(timestamp: int, full_ts: List) -> float:
         # binary search for closest timestamp returned from API
+        # javascript has more precision than python by default
+        js_ts = timestamp * 1000
+
         lb = 0
         ub = len(full_ts) - 1
         best_fit_info = (0, float("inf"))
+
         while lb <= ub:
             c = (lb + ub) // 2
 
             block_ts, block_usd_val = full_ts[c]
-            error = abs(timestamp - block_ts)
+            error = abs(js_ts - block_ts)
             best_fit_info = (
                 (block_usd_val, error) if error < best_fit_info[1] else best_fit_info
             )
 
-            if timestamp < block_ts:
+            if js_ts < block_ts:
                 ub = c - 1
-            elif timestamp > block_ts:
+            elif js_ts > block_ts:
                 lb = c + 1
             else:
                 # exact match for price
@@ -102,4 +102,4 @@ class CoinGeckoPriceManager:
     def get_price_of_token_at_timestamp(
         cls, token: HarmonyToken, timestamp: int, price_data: Dict
     ) -> Decimal:
-        return Decimal(price_data[token]["fiat_prices_by_timestamp"][timestamp])
+        return Decimal(repr(price_data[token]["fiat_prices_by_timestamp"][timestamp]))

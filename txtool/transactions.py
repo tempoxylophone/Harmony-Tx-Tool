@@ -28,12 +28,11 @@ class WalletAction(str, Enum):
 class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def __init__(
         self,
-        wallet_address: Union[HarmonyAddress, str],
         tx_hash: HexStr,
         harmony_token: Optional[HarmonyToken] = None,
     ):
         # get information about this tx
-        super().__init__(wallet_address, tx_hash)
+        super().__init__(tx_hash)
 
         # set custom token if it is given
         self.coin_type = harmony_token or self.coin_type
@@ -61,9 +60,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         # unknown
         return WalletAction.NULL
 
-    def reinterpret_action(self):
+    def reinterpret_action(self) -> None:
         self.action = self._get_action()
-
         if self.action == WalletAction.DEPOSIT:
             # this wall got some currency
             self.sent_amount = Decimal(0)
@@ -88,12 +86,12 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     @classmethod
     def extract_all_wallet_activity_from_transaction(
         cls,
-        wallet_address: str,
         tx_hash: Union[HexStr, str],
         exclude_intermediate_tx: Optional[bool] = True,
     ) -> List[WalletActivity]:
-        root_tx = WalletActivity(wallet_address, HexStr(tx_hash))
+        root_tx = WalletActivity(HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx, exclude_intermediate_tx)
+
         return interpret_multi_transaction(
             [
                 root_tx,
@@ -247,8 +245,6 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
         for d in contract_debts:
             # wallet originally called uniswap contract
-            uniswap_contract_address = root_tx.to_addr
-
             if [
                 x
                 for x in transfers
@@ -259,7 +255,6 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
             # create tx that is the contract sending you what you requested
             return_tx = WalletActivity(
-                uniswap_contract_address,
                 # technically this is not the same hash, but we want it to show up
                 root_tx.tx_hash,
                 d.coin_type,  # type: ignore
@@ -283,7 +278,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         token = HarmonyToken.get_harmony_token_by_address(log["address"])
         value = token.get_value_from_wei(log["args"]["value"])
 
-        r = WalletActivity(root_tx.account, root_tx.tx_hash, token)
+        r = WalletActivity(root_tx.tx_hash, token)
         r.log_idx = log_idx
         r.coin_amount = value
         r.event = log["event"]
@@ -297,10 +292,11 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         return r
 
     def __str__(self) -> str:  # pragma: no cover
-        return "tx: {0} --[{1} {2}]--> {3} ({4})".format(
+        return "tx: {0} --[{1} {2}]--> {3} ({4}) - log idx = {5}".format(
             self.from_addr.eth,
             self.coin_amount,
             self.coin_type and self.coin_type.symbol or "(NULL COIN TYPE)",
             self.to_addr.eth,
             self.tx_hash,
+            self.log_idx,
         )

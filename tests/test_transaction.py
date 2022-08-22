@@ -12,7 +12,7 @@ def test_token_tx_with_intermediate_transfers():
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
     wallet_address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        wallet_address, tx_hash, exclude_intermediate_tx=False
+        tx_hash, exclude_intermediate_tx=False
     )
 
     assert len(txs) == 6
@@ -100,9 +100,8 @@ def test_token_tx_ignore_intermediate_transfers():
     # random TX from explorers
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
-    wallet_address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        wallet_address, tx_hash, exclude_intermediate_tx=True
+        tx_hash, exclude_intermediate_tx=True
     )
 
     assert len(txs) == 3
@@ -134,8 +133,7 @@ def test_token_tx_ignore_intermediate_transfers():
 @vcr.use_cassette()
 def test_get_function_name_for_unknown_abi_in_transaction():
     tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
-    address = "0x9bC54Db115f9a362B5E6b9eFfcaf9c7c2486Bf16"
-    txs = WalletActivity.extract_all_wallet_activity_from_transaction(address, tx_hash)
+    txs = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
 
     # check that we can get the signature even if we don't know the contract ABI
     assert all(x.method == "claimReward(uint8,address)" for x in txs)

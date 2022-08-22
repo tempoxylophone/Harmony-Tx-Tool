@@ -1,8 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from collections import defaultdict
 from functools import lru_cache
 
 import requests
+
+SECONDS_IN_DAY = 86400
 
 
 @lru_cache(maxsize=1)
@@ -84,9 +86,10 @@ def get_coingecko_chart_data(
         "accept-language": "en-US,en;q=0.9",
     }
 
+    lb, ub = adjust_bounds(unix_timestamp_lb, unix_timestamp_ub)
     params = {
-        "from": str(unix_timestamp_lb),
-        "to": str(unix_timestamp_ub),
+        "from": str(lb),
+        "to": str(ub),
     }
 
     response = requests.get(
@@ -94,9 +97,23 @@ def get_coingecko_chart_data(
         params=params,
         headers=headers,
     )
+
     chart_data = response.json()
 
     return chart_data["stats"]
+
+
+def adjust_bounds(lb: int, ub: int) -> Tuple[int, int]:
+    if lb == ub:
+        # widen by 1 day
+        return (lb - SECONDS_IN_DAY // 2, ub + SECONDS_IN_DAY // 2)
+
+    if ub - lb < SECONDS_IN_DAY:
+        # snap to 1 day
+        return lb - (SECONDS_IN_DAY - (ub - lb)), ub
+
+    # doesn't need to be changed
+    return lb, ub
 
 
 def get_coingecko_chart_data_by_symbol(

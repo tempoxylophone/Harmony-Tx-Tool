@@ -157,13 +157,8 @@ class HarmonyAddress:
         return self.get_eth_address()
 
     def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, HarmonyAddress)
-            and bool(self.get_eth_address())
-            and (
-                self.get_eth_address() == other.get_eth_address()
-                or self.get_one_address() == other.get_one_address()
-            )
+        return isinstance(other, HarmonyAddress) and (
+            self.eth == other.eth and self.one == other.one
         )
 
     def __hash__(self) -> int:

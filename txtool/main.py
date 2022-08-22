@@ -26,7 +26,7 @@ def get_harmony_tx_from_wallet_as_csv(
     )[: report.tx_limit]
 
     # --- GET + PARSE DATA FROM BLOCKCHAIN ---
-    tx_events = get_events(tx_hashes, wallet_address_eth_str)
+    tx_events = get_events(tx_hashes)
 
     MAIN_LOGGER.info("Done interpreting transactions.")
 
@@ -41,9 +41,7 @@ def get_harmony_tx_from_wallet_as_csv(
     return result_csv, _file_name
 
 
-def get_events(
-    tx_hashes_strings: List[HexStr], wallet_address: str
-) -> Sequence[HarmonyEVMTransaction]:
+def get_events(tx_hashes_strings: List[HexStr]) -> Sequence[HarmonyEVMTransaction]:
     events = []
 
     total_tx = len(tx_hashes_strings)
@@ -64,7 +62,7 @@ def get_events(
         # token transfers and fees associated with them
         try:
             results = WalletActivity.extract_all_wallet_activity_from_transaction(
-                wallet_address, tx_hash_string
+                tx_hash_string
             )
             events += results
         except Exception as e:  # pylint: disable=W0703

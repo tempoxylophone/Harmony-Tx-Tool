@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import date
+from datetime import datetime
 from typing import Union, Sequence
 
 from web3.types import TxReceipt, HexStr
@@ -15,8 +15,8 @@ from .signature import get_function_name_by_signature
 class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
     EXPLORER_TX_URL = "https://explorer.harmony.one/tx/{0}"
 
-    def __init__(self, account: Union[HarmonyAddress, str], tx_hash: HexStr):
-        super().__init__(HarmonyAddress.get_harmony_address(account), tx_hash)
+    def __init__(self, tx_hash: HexStr):
+        super().__init__(tx_hash)
 
         # get transaction data
         self.tx_data = HarmonyAPI.get_transaction(tx_hash)
@@ -30,11 +30,12 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
             ) from e
 
         self.from_addr = HarmonyAddress.get_harmony_address(self.tx_data["from"])
+        self.account = self.from_addr
 
         # temporal data
         self.block = self.tx_data["blockNumber"]
         self.timestamp = HarmonyAPI.get_timestamp(self.block)
-        self.block_date = date.fromtimestamp(self.timestamp)
+        self.block_date = datetime.fromtimestamp(self.timestamp)
 
         # event data
         self.action = ""
@@ -119,7 +120,10 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
 
         return get_function_name_by_signature(func_signature)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, HarmonyEVMTransaction):
+            return False
+
         # two transactions are considered equal if they are of the same
         # parent hash and are of the same position on the logs
         return self.tx_hash == other.tx_hash and self.log_idx == other.log_idx

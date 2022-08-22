@@ -172,7 +172,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
             self.symbol, self.name, self.address.eth, self.is_lp_token
         )
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, HarmonyToken) and self.address == other.address
 
     def __hash__(self) -> int:

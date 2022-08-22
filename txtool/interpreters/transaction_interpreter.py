@@ -35,7 +35,7 @@ class Editor(ABC):
 class TranquilFinanceEditor(Editor):
     CONTRACT_ADDRESSES = [
         # Unitroller
-        "0x6a82a17b48ef6be278bbc56138f35d04594587e3",
+        "0x6a82A17B48EF6be278BBC56138F35d04594587E3",
     ]
 
     def __init__(self):

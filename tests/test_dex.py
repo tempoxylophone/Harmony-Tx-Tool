@@ -42,7 +42,7 @@ def test_get_coin_info():
     # random tx from explorer
     wallet_address = "0x60b206dFD4af82FaFdbA5Af3C619D0c48129b3a1"
     tx_hash = "0x7fd33525c96258963fcfb0bba74ada0f2b52b40d01a746e9d184dda66df6b52f"
-    txs = get_non_cost_transactions_from_txt_hash(wallet_address, tx_hash)
+    txs = get_non_cost_transactions_from_txt_hash(tx_hash)
 
     assert len(txs) == 1
 
@@ -145,7 +145,7 @@ def test_lp_token_info():
 
     assert lp_price_ts[price_block["block"]] == price_per_lp_token
 
-    txs = get_non_cost_transactions_from_txt_hash(wallet_address, tx_hash)
+    txs = get_non_cost_transactions_from_txt_hash(tx_hash)
 
     assert len(txs) == 1
 
