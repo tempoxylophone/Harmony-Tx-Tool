@@ -24,13 +24,13 @@ class UniswapV2ForkGraph:
         self.origin = origin
 
     @api_retry(custom_exceptions=[DatabaseUnavailableError])
-    def _graph_ql_request(self, payload: Dict[str, str]) -> Dict:
+    def _graph_ql_request(self, payload: Dict[str, str]) -> Dict[str, Dict]:
         r = requests.post(
             self.subgraph_url, headers=self._get_graph_ql_headers(), json=payload
         ).json()
 
         try:
-            return r["data"]
+            return dict(r["data"])
         except KeyError as e:
             if "errors" in r and "Store error: database unavailable" in [
                 x["message"] for x in r["errors"]
@@ -138,7 +138,7 @@ class UniswapV2ForkGraph:
         return True
 
     def _get_token_or_pair_info(self, token_or_pair_address: str) -> Dict:
-        data = self._graph_ql_request(
+        data: Dict = self._graph_ql_request(
             self._q_get_graph_ql_token_or_pair_info(token_or_pair_address)
         )
 
@@ -267,7 +267,7 @@ class UniswapV2ForkGraph:
         return self._graph_ql_request(query)
 
     @staticmethod
-    def _compute_ts_bounds(ts_min, ts_max) -> Tuple[int, int]:
+    def _compute_ts_bounds(ts_min: int, ts_max: int) -> Tuple[int, int]:
         return (
             ts_min - UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX,
             ts_max + UniswapV2ForkGraph._UNIX_TS_1_DAY_APPROX,

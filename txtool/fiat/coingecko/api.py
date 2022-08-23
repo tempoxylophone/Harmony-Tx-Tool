@@ -1,10 +1,14 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, NewType
 from collections import defaultdict
 from functools import lru_cache
 
 import requests
 
-SECONDS_IN_DAY = 86400
+SECONDS_IN_DAY = 86_400
+T_COINGECKO_DATAPOINT = Tuple[int, float]
+CoingeckoPriceTimeseries = NewType(
+    "CoingeckoPriceTimeseries", List[T_COINGECKO_DATAPOINT]
+)
 
 
 @lru_cache(maxsize=1)
@@ -33,11 +37,11 @@ def get_coingecko_search_directory() -> Dict:
         "locale": "en",
     }
 
-    response = requests.get(
+    response: Dict = requests.get(
         "https://api.coingecko.com/api/v3/search", params=params, headers=headers
-    )
+    ).json()
 
-    return response.json()
+    return response
 
 
 def get_coingecko_coin_directory() -> Dict:
@@ -60,10 +64,10 @@ def get_coin_info_by_symbol(coin_symbol: str) -> Dict:
 
 def get_coingecko_chart_data(
     coingecko_coin_object: Dict, unix_timestamp_lb: int, unix_timestamp_ub: int
-) -> List[List]:
+) -> CoingeckoPriceTimeseries:
     if not coingecko_coin_object:
         # bad coin info given
-        return []
+        return CoingeckoPriceTimeseries([])
 
     coin_internal_id = coingecko_coin_object["internal_id"]
     coin_id = coingecko_coin_object["id"]
@@ -98,15 +102,17 @@ def get_coingecko_chart_data(
         headers=headers,
     )
 
-    chart_data = response.json()
+    chart_data: Dict[str, List[List]] = response.json()
 
-    return chart_data["stats"]
+    return CoingeckoPriceTimeseries(
+        [(int(x[0]), float(x[1])) for x in chart_data["stats"]]
+    )
 
 
 def adjust_bounds(lb: int, ub: int) -> Tuple[int, int]:
     if lb == ub:
         # widen by 1 day
-        return (lb - SECONDS_IN_DAY // 2, ub + SECONDS_IN_DAY // 2)
+        return lb - SECONDS_IN_DAY // 2, ub + SECONDS_IN_DAY // 2
 
     if ub - lb < SECONDS_IN_DAY:
         # snap to 1 day
@@ -118,5 +124,5 @@ def adjust_bounds(lb: int, ub: int) -> Tuple[int, int]:
 
 def get_coingecko_chart_data_by_symbol(
     coin_symbol: str, ts_lb: int, ts_ub: int
-) -> List[List]:
+) -> CoingeckoPriceTimeseries:
     return get_coingecko_chart_data(get_coin_info_by_symbol(coin_symbol), ts_lb, ts_ub)

@@ -8,7 +8,7 @@ vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_token_object_equality():
+def test_token_object_equality() -> None:
     native_token = HarmonyToken.get_native_token()
 
     # should not invoke the constructor directly, but if two instances are
@@ -19,7 +19,7 @@ def test_token_object_equality():
 
 
 @vcr.use_cassette()
-def test_merge_wone():
+def test_merge_wone() -> None:
     native_token = HarmonyToken.get_native_token()
     wone_address = "0x005caC9eEd29CceC0F9Cca3A0A2052DeFF584667"
 
@@ -39,7 +39,7 @@ def test_merge_wone():
 
 
 @vcr.use_cassette()
-def test_create_token_from_non_erc20_address():
+def test_create_token_from_non_erc20_address() -> None:
     # this is a smart contract address
     # random address from explorer
     with pytest.raises(ValueError) as e:
@@ -58,7 +58,7 @@ def test_create_token_from_non_erc20_address():
 
 
 @vcr.use_cassette()
-def test_create_token_from_erc20_address():
+def test_create_token_from_erc20_address() -> None:
     rune_token = HarmonyToken.get_harmony_token_by_address(
         "0x66F5BfD910cd83d3766c4B39d13730C911b2D286"
     )
@@ -70,16 +70,16 @@ def test_create_token_from_erc20_address():
 
 
 @vcr.use_cassette()
-def test_ambiguous_token_or_lp_position():
+def test_ambiguous_token_or_lp_position() -> None:
     dual_address = "0x0ea67cfe61d2847e1b14a374a884a35529267818"
     token = HarmonyToken.get_harmony_token_by_address(dual_address)
     assert token.is_lp_token
-    assert token.lp_token_0.symbol == "JENN"
-    assert token.lp_token_1.symbol == "ONE"
+    assert token.lp_token_0 and token.lp_token_0.symbol == "JENN"
+    assert token.lp_token_1 and token.lp_token_1.symbol == "ONE"
 
 
 @vcr.use_cassette()
-def test_get_harmony_token_by_address_for_vcr_1():
+def test_get_harmony_token_by_address_for_vcr_1() -> None:
     token = HarmonyToken.get_harmony_token_by_address(
         "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a"
     )
@@ -87,7 +87,7 @@ def test_get_harmony_token_by_address_for_vcr_1():
 
 
 @vcr.use_cassette()
-def test_get_harmony_token_by_address_for_vcr_2():
+def test_get_harmony_token_by_address_for_vcr_2() -> None:
     token = HarmonyToken.get_harmony_token_by_address(
         "0x3a4EDcf3312f44EF027acfd8c21382a5259936e7"
     )

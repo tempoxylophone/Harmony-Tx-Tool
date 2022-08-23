@@ -3,8 +3,8 @@ from typing import Dict, Iterable, List, TypedDict, Union
 from collections import defaultdict
 from decimal import Decimal
 
-from ...harmony import HarmonyEVMTransaction, HarmonyToken
-from .api import get_coingecko_chart_data_by_symbol
+from ...harmony import WalletActivity, HarmonyToken
+from .api import get_coingecko_chart_data_by_symbol, CoingeckoPriceTimeseries
 
 
 class CoinGeckoPriceLookupBounds(TypedDict):
@@ -17,7 +17,7 @@ class CoinGeckoPriceLookupBounds(TypedDict):
 class CoinGeckoPriceManager:
     @classmethod
     def get_price_history_for_transactions(
-        cls, transactions: Iterable[HarmonyEVMTransaction]
+        cls, transactions: Iterable[WalletActivity]
     ) -> Dict:
         price_lookup: Dict[HarmonyToken, CoinGeckoPriceLookupBounds] = defaultdict(
             lambda: {
@@ -58,7 +58,7 @@ class CoinGeckoPriceManager:
 
     @classmethod
     def get_best_estimate_at_timestamp_from_coingecko_data(
-        cls, timestamps: List[int], full_ts: List
+        cls, timestamps: List[int], full_ts: CoingeckoPriceTimeseries
     ) -> Dict:
         # assuming full_ts is in order and is a list of timestamp pairs of
         # [unix_timestamp, fiat (USD) price]
@@ -69,14 +69,16 @@ class CoinGeckoPriceManager:
         }
 
     @staticmethod
-    def _find_best_fit_price_by_timestamp(timestamp: int, full_ts: List) -> float:
+    def _find_best_fit_price_by_timestamp(
+        timestamp: int, full_ts: CoingeckoPriceTimeseries
+    ) -> float:
         # binary search for closest timestamp returned from API
         # javascript has more precision than python by default
         js_ts = timestamp * 1000
 
         lb = 0
         ub = len(full_ts) - 1
-        best_fit_info = (0, float("inf"))
+        best_fit_info = (0.0, float("inf"))
 
         while lb <= ub:
             c = (lb + ub) // 2

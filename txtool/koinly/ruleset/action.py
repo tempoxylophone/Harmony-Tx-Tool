@@ -1,8 +1,8 @@
-from txtool.harmony import HarmonyEVMTransaction
+from txtool.harmony import WalletActivity
 from .rules import *  # pylint: disable=W0614,W0401
 
 
-def get_label_for_tx_and_description(tx: HarmonyEVMTransaction) -> Tuple[str, str]:
+def get_label_for_tx_and_description(tx: WalletActivity) -> Tuple[str, str]:
     for label, rules in KOINLY_LABEL_RULES.items():
         for rule in rules:
             is_match = True
@@ -25,6 +25,6 @@ def get_label_for_tx_and_description(tx: HarmonyEVMTransaction) -> Tuple[str, st
     return KoinlyLabel.NULL, ""
 
 
-def is_cost(tx: HarmonyEVMTransaction) -> bool:
+def is_cost(tx: WalletActivity) -> bool:
     label, _ = get_label_for_tx_and_description(tx)
     return label == KoinlyLabel.COST

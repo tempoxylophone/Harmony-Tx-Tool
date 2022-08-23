@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from txtool.koinly import get_label_for_tx_and_description, KoinlyLabel
-from txtool.transactions import WalletActivity
+from txtool.activity import get_interpreted_transaction_from_hash
 
 from txtool.koinly.ruleset.constants import (
     TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
@@ -13,13 +13,11 @@ vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_consolidate_tranquil_multi_rewards_deposit():
+def test_consolidate_tranquil_multi_rewards_deposit() -> None:
     # random tx from explorer
     tx_hash = "0x15e02d4af324d81a5b61899662a5c88ef30f3f42c4a38e9522fdbcfe57ceeb55"
     caller_address = "0xb3439976446c7237E4Aa49b7ED63277564DFE6A1"
-    txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        tx_hash, exclude_intermediate_tx=True
-    )
+    txs = get_interpreted_transaction_from_hash(tx_hash)
 
     # should 'compress' them into 1 reward transaction
     assert len(txs) == 2

@@ -2,9 +2,13 @@ from typing import Optional, Union, Sequence
 from decimal import Decimal
 from datetime import timezone, datetime
 
-from txtool.harmony import HarmonyAddress, HarmonyAPI, HarmonyToken
+from txtool.harmony import (
+    HarmonyAddress,
+    HarmonyAPI,
+    HarmonyToken,
+    WalletActivity,
+)
 from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
-from txtool.transactions import HarmonyEVMTransaction
 from txtool.fiat.get_prices import get_token_prices_for_transactions, T_PRICE_DATA_DICT
 
 from .ruleset import (
@@ -87,7 +91,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
         # currency to write to CSV
         self.fiat_type = fiat_type
 
-    def get_csv_from_transactions(self, events: Sequence[HarmonyEVMTransaction]) -> str:
+    def get_csv_from_transactions(self, events: Sequence[WalletActivity]) -> str:
         # remove out of range
         events = [x for x in events if self.timestamp_is_in_bounds(x.timestamp)]
 
@@ -131,15 +135,13 @@ class KoinlyReportCreator:  # pylint: disable=R0902
         )
 
     def get_tx_fiat_value(
-        self, tx: HarmonyEVMTransaction, price_lookup: T_PRICE_DATA_DICT
+        self, tx: WalletActivity, price_lookup: T_PRICE_DATA_DICT
     ) -> Decimal:
         token_usd_price = price_lookup[tx][tx.coin_type]
         token_quantity = tx.coin_amount
         return token_quantity * token_usd_price
 
-    def to_csv_row(
-        self, tx: HarmonyEVMTransaction, price_lookup: T_PRICE_DATA_DICT
-    ) -> str:
+    def to_csv_row(self, tx: WalletActivity, price_lookup: T_PRICE_DATA_DICT) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
             tx.coin_type.universal_symbol
         ):

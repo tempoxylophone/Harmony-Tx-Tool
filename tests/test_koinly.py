@@ -5,20 +5,20 @@ from .utils import get_vcr
 vcr = get_vcr(__file__)
 
 
-def test_koinly_tracked_currency():
+def test_koinly_tracked_currency() -> None:
     assert KoinlyReportCreator.currency_is_tracked("ONE")
     assert KoinlyReportCreator.currency_is_tracked("USDC")
     assert KoinlyReportCreator.currency_is_tracked("ETH")
     assert not KoinlyReportCreator.currency_is_tracked("JENN")
 
 
-def test_timestamp_conversions():
+def test_timestamp_conversions() -> None:
     assert "2022-07-30 14:05:28 UTC" == KoinlyReportCreator.format_utc_ts_as_str(
         1659189928
     )
 
 
-def test_create_koinly_report_creator():
+def test_create_koinly_report_creator() -> None:
     lb_str = "2019-05-01"
     ub_str = "2022-01-01"
     report = KoinlyReportCreator(

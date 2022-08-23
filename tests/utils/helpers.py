@@ -1,6 +1,6 @@
 from typing import List
 
-from txtool.transactions import WalletActivity
+from txtool.harmony import WalletActivity
 from txtool.koinly import is_cost
 
 

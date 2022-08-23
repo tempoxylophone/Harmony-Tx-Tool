@@ -6,7 +6,7 @@ from web3 import Web3
 import pytest  # noqa
 
 from txtool.dex import DatabaseUnavailableError
-from txtool.harmony import HarmonyToken, HarmonyEVMTransaction
+from txtool.harmony import HarmonyToken, WalletActivity
 from txtool.fiat import DexPriceManager
 
 from .utils import get_non_cost_transactions_from_txt_hash, get_vcr
@@ -17,7 +17,7 @@ VIPER_SWAP = HarmonyToken._VIPERSWAP  # noqa
 
 
 @vcr.use_cassette()
-def test_get_coin_info_graph_only():
+def test_get_coin_info_graph_only() -> None:
     token_address = "0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79"
     token_info = VIPER_SWAP.get_token_or_pair_info(token_address)
 
@@ -29,7 +29,7 @@ def test_get_coin_info_graph_only():
 
 
 @vcr.use_cassette()
-def test_get_coin_info():
+def test_get_coin_info() -> None:
     token_address = "0xea589e93ff18b1a1f1e9bac7ef3e86ab62addc79"
     token_object = HarmonyToken(token_address)
 
@@ -46,7 +46,7 @@ def test_get_coin_info():
 
     assert len(txs) == 1
 
-    tx: HarmonyEVMTransaction = txs[0]
+    tx: WalletActivity = txs[0]
     assert tx.coin_amount == 5
 
     price_data = DexPriceManager.get_price_data(txs)
@@ -68,7 +68,7 @@ def test_get_coin_info():
 
 
 @vcr.use_cassette()
-def test_lp_token_info():
+def test_lp_token_info() -> None:
     token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
     token_info = VIPER_SWAP.get_token_or_pair_info(token_address)
 
@@ -149,7 +149,7 @@ def test_lp_token_info():
 
     assert len(txs) == 1
 
-    tx: HarmonyEVMTransaction = txs[0]
+    tx: WalletActivity = txs[0]
     assert float(tx.coin_amount) == 0.000057682787963833
     assert tx.coin_type.symbol == "VENOM-LP"
     assert tx.coin_type.is_lp_token
@@ -169,7 +169,7 @@ def test_lp_token_info():
 
 
 @vcr.use_cassette()
-def test_get_approx_block_match_for_lp_token():
+def test_get_approx_block_match_for_lp_token() -> None:
     lp_token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
 
     price_query_data = VIPER_SWAP._get_graph_ql_pair_data(
@@ -188,7 +188,7 @@ def test_get_approx_block_match_for_lp_token():
     assert price_block["block"] == 28322286
 
 
-def test_try_to_get_unknown_lp_token_value():
+def test_try_to_get_unknown_lp_token_value() -> None:
     # token is unknown, can't lookup price in Uniswap Graph
     lp_token_address = "0xaD65D5fCE1D9634ca33D9dB47d2Ea7569f35e13C"
 
@@ -199,7 +199,7 @@ def test_try_to_get_unknown_lp_token_value():
     assert price_query_data == {}
 
 
-def test_invalid_timestamp_range_request():
+def test_invalid_timestamp_range_request() -> None:
     with pytest.raises(ValueError) as e:
         lp_token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
 
@@ -208,7 +208,7 @@ def test_invalid_timestamp_range_request():
     assert "Invalid timestamp range" in str(e)
 
 
-def test_dex_json_empty_exception():
+def test_dex_json_empty_exception() -> None:
     with patch("requests.Response.json") as req_mock:
         # null response
         req_mock.return_value = {}
@@ -221,7 +221,7 @@ def test_dex_json_empty_exception():
 
 @vcr.use_cassette()
 @pytest.mark.slow
-def test_dex_database_error():
+def test_dex_database_error() -> None:
     with patch("requests.Response.json") as req_mock:
         # null response
         req_mock.return_value = {

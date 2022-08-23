@@ -1,20 +1,18 @@
 from __future__ import annotations
-from typing import List, Optional, Union, Dict, Any, Tuple
+from typing import List, Optional, Union, Tuple
 from enum import Enum
 from decimal import Decimal
 
 from eth_typing import HexStr
-
-from txtool.harmony import (
-    HarmonyToken,
-    HarmonyAddress,
-    HarmonyEVMTransaction,
-    HarmonyAPI,
-)
+from web3.types import EventData
 
 from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 from txtool.utils import MAIN_LOGGER
-from .interpreters import interpret_multi_transaction
+
+from .token import HarmonyToken
+from .api import HarmonyAPI
+from .address import HarmonyAddress
+from .transaction import HarmonyEVMTransaction
 
 
 class WalletAction(str, Enum):
@@ -91,14 +89,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx, exclude_intermediate_tx)
-
-        return interpret_multi_transaction(
-            [
-                root_tx,
-                # token transfers will appear in sub-transactions
-                *leaf_tx,
-            ]
-        )
+        return [root_tx, *leaf_tx]
 
     @staticmethod
     def _get_token_transfers(
@@ -239,7 +230,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     @staticmethod
     def _parse_uniswap_contract_debts(
         root_tx: WalletActivity, transfers: List[WalletActivity]
-    ):
+    ) -> List[WalletActivity]:
         contract_debts = [x for x in transfers if x.to_addr == root_tx.to_addr]
         parsed_debts = []
 
@@ -257,7 +248,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             return_tx = WalletActivity(
                 # technically this is not the same hash, but we want it to show up
                 root_tx.tx_hash,
-                d.coin_type,  # type: ignore
+                d.coin_type,
             )
             return_tx.to_addr = root_tx.account
             return_tx.from_addr = root_tx.to_addr
@@ -273,7 +264,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
     @staticmethod
     def _create_token_tx_from_log(
-        root_tx: WalletActivity, log: Dict[str, Any], log_idx: int
+        root_tx: WalletActivity, log: EventData, log_idx: int
     ) -> WalletActivity:
         token = HarmonyToken.get_harmony_token_by_address(log["address"])
         value = token.get_value_from_wei(log["args"]["value"])

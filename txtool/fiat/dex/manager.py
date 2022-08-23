@@ -6,7 +6,7 @@ from collections import defaultdict
 from txtool.utils import MAIN_LOGGER, make_yellow
 from txtool.dex import UniswapV2ForkGraph
 from txtool.harmony.constants import VIPERSWAP_GRAPH_CONFIG
-from txtool.harmony import HarmonyEVMTransaction, HarmonyToken
+from txtool.harmony import WalletActivity, HarmonyToken
 
 
 class DexPriceInfo(TypedDict):
@@ -44,7 +44,7 @@ class DexPriceManager:
     @classmethod
     def get_tx_fiat_value(
         cls,
-        tx: HarmonyEVMTransaction,
+        tx: WalletActivity,
         price_data: Dict,
         exclude_fee: Optional[bool] = False,
     ) -> Decimal:
@@ -74,7 +74,7 @@ class DexPriceManager:
 
     @staticmethod
     def _get_tx_lookup(
-        transactions: Iterable[HarmonyEVMTransaction],
+        transactions: Iterable[WalletActivity],
     ) -> Dict:
         tx_lookup: Dict[HarmonyToken, DexPriceLookupBounds] = defaultdict(
             lambda: {

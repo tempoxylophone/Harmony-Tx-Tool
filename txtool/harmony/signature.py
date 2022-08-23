@@ -55,7 +55,7 @@ def _do_request(function_signature: str) -> str:
     k = re.search(_CAPTURE_METHOD_NAME_REGEX, r.text)
 
     # if you can't find it, signature is invalid, return blank
-    return k.group(1) if k else ""
+    return str(k.group(1)) if k else ""
 
 
 def _get_url(function_signature: str) -> str:

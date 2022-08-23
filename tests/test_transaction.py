@@ -1,12 +1,12 @@
 import pytest  # noqa
-from txtool.transactions import WalletActivity
+from txtool.harmony import WalletActivity
 from .utils import get_vcr
 
 vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_token_tx_with_intermediate_transfers():
+def test_token_tx_with_intermediate_transfers() -> None:
     # random TX from explorer
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
@@ -40,7 +40,7 @@ def test_token_tx_with_intermediate_transfers():
     assert it_0.is_sender
     assert it_0.from_addr == root.account
     assert it_0.to_addr.eth == "0xF170016d63fb89e1d559e8F87a17BCC8B7CD9c00"
-    assert it_0.to_addr.token.name == "Venom LP Token"
+    assert it_0.to_addr.token and it_0.to_addr.token.name == "Venom LP Token"
 
     # Farmers Only LP sends 16 FOX to Farmers Only LP
     assert float(it_1.coin_amount) == 16.260903347728752291
@@ -49,9 +49,9 @@ def test_token_tx_with_intermediate_transfers():
     assert not it_1.is_receiver
     assert not it_1.is_sender
     assert it_1.from_addr.eth == "0xe83eE2547613327300732D9B35238A6bCf168B21"
-    assert it_1.from_addr.token.name == "FarmersOnly LP Token"
+    assert it_1.from_addr.token and it_1.from_addr.token.name == "FarmersOnly LP Token"
     assert it_1.to_addr.eth == "0x670240Cd8f514EBaD7e375EcBa7e9e6b761e893A"
-    assert it_1.to_addr.token.name == "FarmersOnly LP Token"
+    assert it_1.to_addr.token and it_1.to_addr.token.name == "FarmersOnly LP Token"
 
     # Original Contract sends 7 USDC to Farmers Only LP
     assert float(it_2.coin_amount) == 7.34645
@@ -63,7 +63,7 @@ def test_token_tx_with_intermediate_transfers():
     assert it_2.from_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
     assert it_2.from_addr.belongs_to_non_token_smart_contract
     assert it_2.to_addr.eth == "0xe83eE2547613327300732D9B35238A6bCf168B21"
-    assert it_2.to_addr.token.name == "FarmersOnly LP Token"
+    assert it_2.to_addr.token and it_2.to_addr.token.name == "FarmersOnly LP Token"
 
     # Venom LP sends 7 USDC to Original Contract
     assert float(leaf.coin_amount) == 7.355363
@@ -75,7 +75,7 @@ def test_token_tx_with_intermediate_transfers():
     assert not leaf.is_receiver
     assert leaf.from_addr.eth == "0xF170016d63fb89e1d559e8F87a17BCC8B7CD9c00"
     assert leaf.from_addr.belongs_to_token
-    assert leaf.from_addr.token.name == "Venom LP Token"
+    assert leaf.from_addr.token and leaf.from_addr.token.name == "Venom LP Token"
     assert leaf.to_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
     assert leaf.to_addr.belongs_to_non_token_smart_contract
 
@@ -96,7 +96,7 @@ def test_token_tx_with_intermediate_transfers():
 
 
 @vcr.use_cassette()
-def test_token_tx_ignore_intermediate_transfers():
+def test_token_tx_ignore_intermediate_transfers() -> None:
     # random TX from explorers
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
@@ -120,20 +120,41 @@ def test_token_tx_ignore_intermediate_transfers():
     assert send_one.coin_type.symbol == "ONE"
     assert send_one.from_addr == cost.from_addr
     assert send_one.sent_amount == send_one.coin_amount
-    assert send_one.sent_currency.symbol == send_one.coin_type.symbol
+    assert (
+        send_one.sent_currency
+        and send_one.sent_currency.symbol == send_one.coin_type.symbol
+    )
 
     # get USDC
     assert float(get_usdc.coin_amount) == 7.355363
     assert get_usdc.coin_type.symbol == "1USDC"
     assert get_usdc.to_addr == cost.from_addr
-    assert get_usdc.got_currency.symbol == "1USDC"
+    assert get_usdc.got_currency and get_usdc.got_currency.symbol == "1USDC"
     assert get_usdc.got_amount == get_usdc.coin_amount
 
 
 @vcr.use_cassette()
-def test_get_function_name_for_unknown_abi_in_transaction():
+def test_get_function_name_for_unknown_abi_in_transaction() -> None:
     tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
 
     # check that we can get the signature even if we don't know the contract ABI
     assert all(x.method == "claimReward(uint8,address)" for x in txs)
+
+
+@vcr.use_cassette()
+def test_transaction_equality() -> None:
+    tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
+    txs_1 = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+    txs_2 = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+
+    for t1, t2 in zip(txs_1, txs_2):
+        assert t1 == t2
+        assert id(t1) != id(t2)
+
+    for t1, t2 in zip(txs_1, reversed(txs_2)):
+        assert t1 != t2
+        assert id(t1) != id(t2)
+
+    # test non-tx object
+    assert "hello" != txs_1[0]

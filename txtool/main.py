@@ -3,11 +3,7 @@ from datetime import datetime
 from eth_typing import HexStr
 
 from .koinly import KoinlyReportCreator
-from .transactions import WalletActivity
-from .harmony import (
-    HarmonyAPI,
-    HarmonyEVMTransaction,
-)
+from .harmony import HarmonyAPI, WalletActivity
 from .utils import MAIN_LOGGER
 
 
@@ -41,7 +37,7 @@ def get_harmony_tx_from_wallet_as_csv(
     return result_csv, _file_name
 
 
-def get_events(tx_hashes_strings: List[HexStr]) -> Sequence[HarmonyEVMTransaction]:
+def get_events(tx_hashes_strings: List[HexStr]) -> Sequence[WalletActivity]:
     events = []
 
     total_tx = len(tx_hashes_strings)

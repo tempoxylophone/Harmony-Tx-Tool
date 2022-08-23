@@ -8,7 +8,7 @@ vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_bad_block_timestamp():
+def test_bad_block_timestamp() -> None:
     assert 1561736306 == HarmonyAPI.get_timestamp(1)
 
     with pytest.raises(ValueError) as e:
@@ -21,13 +21,13 @@ def test_bad_block_timestamp():
 
 
 @vcr.use_cassette()
-def test_bad_tx_hash_receipt():
+def test_bad_tx_hash_receipt() -> None:
     with pytest.raises(ValueError):
         HarmonyAPI.get_tx_receipt(HexStr("123"))
 
 
 @vcr.use_cassette()
-def test_get_tx_receipt_for_vcr_1():
+def test_get_tx_receipt_for_vcr_1() -> None:
     # random TX from explorer
     x = HarmonyAPI.get_tx_receipt(
         HexStr("0x2d4bf0e67024da714bce338243a0a4b49164131e6c4c832cc07fcba46848f344")
@@ -39,7 +39,7 @@ def test_get_tx_receipt_for_vcr_1():
 
 
 @vcr.use_cassette()
-def test_get_tx_receipt_for_vcr_2():
+def test_get_tx_receipt_for_vcr_2() -> None:
     # random TX from explorer
     x = HarmonyAPI.get_tx_receipt(
         HexStr("0x0d481f65b1b8084bfd246401f6787dba6e50a5d38f3bf57541c031262fab4be8")
@@ -51,14 +51,14 @@ def test_get_tx_receipt_for_vcr_2():
 
 
 @vcr.use_cassette()
-def test_belongs_to_contract_for_vcr_1():
+def test_belongs_to_contract_for_vcr_1() -> None:
     assert HarmonyAPI.address_belongs_to_smart_contract(
         "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a"
     )
 
 
 @vcr.use_cassette()
-def test_belongs_to_contract_for_vcr_2():
+def test_belongs_to_contract_for_vcr_2() -> None:
     assert HarmonyAPI.address_belongs_to_smart_contract(
         "0xFFab183292D95A40BC6217aeFE3Cf672418b6E62"
     )

@@ -7,7 +7,7 @@ vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_create_koinly_report_with_no_transactions():
+def test_create_koinly_report_with_no_transactions() -> None:
     # address from pyhmy test cases
     wallet_address = "0xeBCD16e8c1D8f493bA04E99a56474122D81A9c58"
 

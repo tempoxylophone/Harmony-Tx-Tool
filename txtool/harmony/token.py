@@ -74,7 +74,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
 
     @property
     def is_native_token(self) -> bool:
-        return self.address.eth == NATIVE_TOKEN_ETH_ADDRESS_STR
+        return bool(self.address.eth == NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     @classmethod
     def get_address_and_set_token(cls, eth_address_str: str) -> HarmonyAddress:

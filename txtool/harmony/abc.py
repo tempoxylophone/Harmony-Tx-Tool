@@ -16,7 +16,7 @@ class Token(ABC):
         self.decimals = 0
         self.is_lp_token = False
 
-    def __eq__(self, other) -> bool:  # pragma: no cover
+    def __eq__(self, other: object) -> bool:  # pragma: no cover
         return isinstance(other, Token) and self.address == other.address
 
     def __hash__(self) -> int:  # pragma: no cover
@@ -24,7 +24,7 @@ class Token(ABC):
 
     @property
     def is_native_token(self) -> bool:  # pragma: no cover
-        return False
+        raise NotImplementedError
 
     @classmethod
     def get_native_token(cls) -> Token:  # pragma: no cover

@@ -30,7 +30,7 @@ class HarmonyAddress:
             self.addresses[self.FORMAT_ETH] = eth_address
             self.addresses[self.FORMAT_ONE] = self.convert_hex_to_one(eth_address)
         elif self.is_valid_one_address(eth_address):
-            raise ValueError(
+            raise BadAddressException(
                 "Use ETH address, not ONE address! Got: {0}".format(eth_address)
             )
         else:
@@ -128,11 +128,11 @@ class HarmonyAddress:
 
     @classmethod
     def convert_one_to_hex(cls, one_string_hash: str) -> str:
-        return pyhmy.util.convert_one_to_hex(one_string_hash)
+        return str(pyhmy.util.convert_one_to_hex(one_string_hash))
 
     @classmethod
     def convert_hex_to_one(cls, eth_string_hash: str) -> str:
-        return pyhmy.util.convert_hex_to_one(eth_string_hash)
+        return str(pyhmy.util.convert_hex_to_one(eth_string_hash))
 
     @classmethod
     def is_valid_one_address(cls, address: str) -> bool:
@@ -156,7 +156,7 @@ class HarmonyAddress:
         # default to eth address format
         return self.get_eth_address()
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, HarmonyAddress) and (
             self.eth == other.eth and self.one == other.one
         )

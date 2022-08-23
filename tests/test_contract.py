@@ -7,20 +7,20 @@ vcr = get_vcr(__file__)
 
 
 @vcr.use_cassette()
-def test_get_function_signature_without_abi_claim():
+def test_get_function_signature_without_abi_claim() -> None:
     func_name = get_function_name_by_signature("0x1e83409a")
 
     assert func_name == "claim(address)"
 
 
-def test_get_function_signature_without_abi_claim_reward():
+def test_get_function_signature_without_abi_claim_reward() -> None:
     func_name = get_function_name_by_signature("0x0952c563")
 
     assert func_name == "claimReward(uint8,address)"
 
 
 @vcr.use_cassette()
-def test_get_function_signature_bad_signature():
+def test_get_function_signature_bad_signature() -> None:
     func_name = get_function_name_by_signature("q38rjdkfmcakdsnfaw")
 
     # don't throw an error just return nothing

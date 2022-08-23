@@ -1,11 +1,16 @@
 from abc import ABC
-from typing import List, Dict
+from typing import List, Dict, NewType
 from decimal import Decimal
+
 from txtool.harmony import (
     HarmonyEVMSmartContract,
     HarmonyAddress,
     HarmonyToken,
-    HarmonyEVMTransaction,
+    WalletActivity,
+)
+
+InterpretedTransactionGroup = NewType(
+    "InterpretedTransactionGroup", List[WalletActivity]
 )
 
 
@@ -21,14 +26,12 @@ class Editor(ABC):
             )
             self.CONTRACTS[smart_contract.address] = smart_contract
 
-    def should_interpret(self, transactions: List[HarmonyEVMTransaction]) -> bool:
+    def should_interpret(self, transactions: List[WalletActivity]) -> bool:
         # expects list of transactions that were extracted from base tx activity
         root_tx = transactions[0]
         return root_tx.to_addr in self.CONTRACTS
 
-    def interpret(
-        self, transactions: List[HarmonyEVMTransaction]
-    ) -> List[HarmonyEVMTransaction]:
+    def interpret(self, transactions: List[WalletActivity]) -> List[WalletActivity]:
         raise NotImplementedError
 
 
@@ -38,12 +41,10 @@ class TranquilFinanceEditor(Editor):
         "0x6a82A17B48EF6be278BBC56138F35d04594587E3",
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(self.CONTRACT_ADDRESSES)
 
-    def interpret(
-        self, transactions: List[HarmonyEVMTransaction]
-    ) -> List[HarmonyEVMTransaction]:
+    def interpret(self, transactions: List[WalletActivity]) -> List[WalletActivity]:
         if len(transactions) > 1 and all(
             isinstance(x.got_currency, HarmonyToken)
             and x.got_currency.symbol == "TRANQ"
@@ -72,10 +73,19 @@ EDITORS = [
 ]
 
 
-def interpret_multi_transaction(transactions: List[HarmonyEVMTransaction]):
+def interpret_multi_transaction(
+    transactions: List[WalletActivity],
+) -> List[WalletActivity]:
     for t in EDITORS:
         # try all interpreters, if find a relevant one, interpret the txs
         if t.should_interpret(transactions):
             return t.interpret(transactions)
 
     return transactions
+
+
+def get_interpreted_transaction_from_hash(
+    tx_hash: str,
+) -> InterpretedTransactionGroup:
+    txs = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+    return InterpretedTransactionGroup(interpret_multi_transaction(txs))

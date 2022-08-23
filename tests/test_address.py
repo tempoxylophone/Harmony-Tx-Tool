@@ -11,7 +11,7 @@ TEST_ADDRESS_ETH_STR = HarmonyAddress.clean_eth_address_str(
 TEST_ADDRESS_ONE_STR = "one1a0x3d6xpmr6f8wsyaxd9v36pytvp48zckswvv9"
 
 
-def test_convert_one_to_hex():
+def test_convert_one_to_hex() -> None:
     assert (
         HarmonyAddress.convert_one_to_hex(TEST_ADDRESS_ONE_STR) == TEST_ADDRESS_ETH_STR
     )
@@ -20,7 +20,7 @@ def test_convert_one_to_hex():
     )
 
 
-def test_convert_hex_to_one():
+def test_convert_hex_to_one() -> None:
     assert (
         HarmonyAddress.convert_hex_to_one(TEST_ADDRESS_ETH_STR) == TEST_ADDRESS_ONE_STR
     )
@@ -30,7 +30,7 @@ def test_convert_hex_to_one():
 
 
 @vcr.use_cassette()
-def test_address_object():
+def test_address_object() -> None:
     address = HarmonyAddress.get_harmony_address(TEST_ADDRESS_ETH_STR)
     assert address.eth == TEST_ADDRESS_ETH_STR
     assert str(address) == TEST_ADDRESS_ETH_STR
@@ -51,8 +51,8 @@ def test_address_object():
     assert token_address.eth == HarmonyAddress.convert_one_to_hex(TEST_ADDRESS_ONE_STR)
 
 
-def test_address_object_constructor_requirements():
-    with pytest.raises(ValueError) as e:
+def test_address_object_constructor_requirements() -> None:
+    with pytest.raises(BadAddressException) as e:
         HarmonyAddress(TEST_ADDRESS_ONE_STR)
     assert "Use ETH address" in str(e)
 
@@ -61,7 +61,7 @@ def test_address_object_constructor_requirements():
     assert "Bad address" in str(e)
 
 
-def test_detect_formats():
+def test_detect_formats() -> None:
     assert HarmonyAddress.FORMAT_ETH == HarmonyAddress.get_address_string_format(
         TEST_ADDRESS_ETH_STR
     )

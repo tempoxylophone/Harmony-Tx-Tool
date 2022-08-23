@@ -1,6 +1,7 @@
-from typing import List, Type, Callable, Optional, Dict
-import logging
+from typing import List, Type, Callable, Optional, Dict, Any, TypeVar
+
 import os
+import logging
 from json import loads
 from requests.exceptions import (
     HTTPError,
@@ -18,6 +19,10 @@ from tenacity import (
 
 T_EXCEPTION = Type[BaseException]
 
+# see here: https://mypy.readthedocs.io/en/stable/
+# generics.html?highlight=decorator#decorator-factories
+F = TypeVar("F", bound=Callable[..., Any])
+
 COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
     HTTPError,
     HTTPConnectionError,
@@ -27,7 +32,7 @@ COMMON_API_EXCEPTIONS: List[T_EXCEPTION] = [
 MAIN_LOGGER = logging.getLogger("main")
 
 
-def make_yellow(log_output: str) -> str:
+def make_yellow(log_output: str) -> str:  # pragma: no cover
     return "\x1b[33;20m" + log_output
 
 
@@ -36,7 +41,7 @@ def retry_on_exceptions(
     max_tries: int = 7,
     jitter_range_sec: int = 2,
     max_wait_sec: int = 120,
-) -> Callable:
+) -> Callable[[F], F]:
     return retry(
         retry=_build_exceptions(exceptions),
         reraise=True,
@@ -56,7 +61,9 @@ def _build_exceptions(exceptions: List[T_EXCEPTION], i: int = 0) -> RetryChain:
     )
 
 
-def api_retry(custom_exceptions: Optional[List[T_EXCEPTION]] = None) -> Callable:
+def api_retry(
+    custom_exceptions: Optional[List[T_EXCEPTION]] = None,
+) -> Callable[[F], F]:
     return retry_on_exceptions(COMMON_API_EXCEPTIONS + (custom_exceptions or []))
 
 
@@ -70,6 +77,7 @@ def get_local_abi(abi_json_filename: str) -> Dict:
     )
 
     with open(path, "r", encoding="UTF-8") as f:
-        abi = f.read()
+        abi: str = f.read()
 
-    return loads(abi)
+    parsed: Dict = loads(abi)
+    return parsed

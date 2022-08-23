@@ -13,7 +13,7 @@ vcr = get_vcr(__file__)
 
 @pytest.mark.slow
 # @vcr.use_cassette()
-def test_export_full_tx_log_for_koinly():
+def test_export_full_tx_log_for_koinly() -> None:
     # turn logging on
     MAIN_LOGGER.setLevel(logging.INFO)
 

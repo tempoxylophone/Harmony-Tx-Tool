@@ -55,7 +55,7 @@ class HarmonyAPI:
 
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_timestamp(cls, block: int):
+    def get_timestamp(cls, block: int) -> int:
         if block < 1:
             raise ValueError("Invalid block... must be at least 1")
 
@@ -83,9 +83,12 @@ class HarmonyAPI:
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_tx_transfer_logs(cls, tx_receipt: TxReceipt) -> Iterable[EventData]:
-        return cls._JEWEL_CONTRACT.events.Transfer().processReceipt(
+        events: Iterable[
+            EventData
+        ] = cls._JEWEL_CONTRACT.events.Transfer().processReceipt(
             tx_receipt, errors=DISCARD
         )
+        return events
 
     @classmethod
     @lru_cache(maxsize=256)
@@ -118,7 +121,8 @@ class HarmonyAPI:
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def _get_code(cls, address: str) -> Dict:
         url = cls._get_code_request_url(address)
-        return requests.get(url).json()
+        r: Dict = requests.get(url).json()
+        return r
 
     @classmethod
     def get_code(cls, address: str) -> Dict:

@@ -1,8 +1,9 @@
+from typing import Generator
 import gc
 import functools
 import pytest  # noqa
 
-from txtool.fiat import DexPriceManager
+
 from txtool.harmony import HarmonyAddress, HarmonyToken
 
 # file must be called "conftest" in order to be shared by all in this directory
@@ -10,14 +11,14 @@ from txtool.harmony import HarmonyAddress, HarmonyToken
 
 
 @pytest.fixture(autouse=True)
-def run_before_and_after_tests():
+def run_before_and_after_tests() -> Generator:
     # this must be cleared on each test, otherwise requests are inconsistent
     # and vcrpy records inconsistent behavior
     HarmonyAddress.clear_directory()
     HarmonyToken.clear_directory()
 
     # source: https://stackoverflow.com/a/50699209
-
+    # clear any cache state for lru_cache decorators in our entire program
     gc.collect()
     wrappers = [
         a

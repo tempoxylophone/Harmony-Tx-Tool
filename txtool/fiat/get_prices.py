@@ -2,7 +2,7 @@ from typing import Iterable, Dict
 from decimal import Decimal
 from datetime import datetime
 from collections import defaultdict
-from txtool.harmony import HarmonyEVMTransaction, HarmonyToken
+from txtool.harmony import WalletActivity, HarmonyToken
 
 from ..fiat.dex.manager import DexPriceManager
 from ..fiat.coingecko.manager import CoinGeckoPriceManager
@@ -13,11 +13,11 @@ from ..fiat.coingecko.manager import CoinGeckoPriceManager
 HARMONY_HACK_DATE = datetime.fromisoformat("2022-06-23T13:30:00")
 KOINLY_TRANQ_PRICE_AVAILABLE_AFTER_DATE = datetime.fromisoformat("2021-11-28T00:00:00")
 
-T_PRICE_DATA_DICT = Dict[HarmonyEVMTransaction, Dict[HarmonyToken, Decimal]]
+T_PRICE_DATA_DICT = Dict[WalletActivity, Dict[HarmonyToken, Decimal]]
 
 
 def get_token_prices_for_transactions(
-    txs: Iterable[HarmonyEVMTransaction],
+    txs: Iterable[WalletActivity],
 ) -> T_PRICE_DATA_DICT:
     # create mapping from transaction to all relevant price data
     all_price_data: T_PRICE_DATA_DICT = defaultdict(dict)
@@ -54,7 +54,7 @@ def get_token_prices_for_transactions(
     return all_price_data
 
 
-def is_coingecko_edge_case(tx: HarmonyEVMTransaction) -> bool:
+def is_coingecko_edge_case(tx: WalletActivity) -> bool:
     # some tokens don't exist in the dex, but also don't exist in Koinly.
     # in those cases, we will have to look them up on coingecko
     if (

@@ -62,7 +62,7 @@ class NestedBytesSerializer:
                     self._cast(v, cond, operation)
 
     def deserialize(self, cassette_string: str) -> Dict:
-        cassette_dict = json.loads(cassette_string)
+        cassette_dict: Dict = json.loads(cassette_string)
 
         # decode bytes in response body
         self._cast(
@@ -119,12 +119,11 @@ def edit_request_body(body_keys_to_remove: Iterable[str]) -> Callable:
 
 
 def get_vcr(
-    file_obj,
+    file_obj: str,
 ) -> vcr.VCR:
     """
     Called once at the top of any test file that uses request persisting
     """
-
     fixture_path = f"{pathlib.Path(file_obj).parent.absolute()}/fixtures"
 
     # return vcr object with configuration
