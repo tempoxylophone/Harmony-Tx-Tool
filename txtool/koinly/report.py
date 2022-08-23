@@ -173,7 +173,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
                 desc,
                 # transaction hash
                 tx.tx_hash,
-                tx.get_tx_function_signature(),
+                tx.method_for_csv_export,
                 # transfer information
                 tx.to_addr.get_address_str(self.address_format),
                 tx.from_addr.get_address_str(self.address_format),

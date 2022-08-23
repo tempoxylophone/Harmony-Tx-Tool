@@ -63,7 +63,7 @@ def test_get_coin_info():
     # test approx
     assert float(fiat_val) == 0.10702196747074741
 
-    assert '"transfer(address,uint256)"' == tx.get_tx_function_signature()
+    assert "transfer(address,uint256)" == tx.get_tx_function_signature()
     assert "https://explorer.harmony.one/tx/" + tx_hash == tx.explorer_url
 
 
@@ -164,7 +164,7 @@ def test_lp_token_info():
     assert float(fiat_val_usd) == 87.81967073837521837658654842
 
     # check properties
-    assert '"transfer(address,uint256)"' == tx.get_tx_function_signature()
+    assert "transfer(address,uint256)" == tx.get_tx_function_signature()
     assert "https://explorer.harmony.one/tx/" + tx_hash == tx.explorer_url
 
 

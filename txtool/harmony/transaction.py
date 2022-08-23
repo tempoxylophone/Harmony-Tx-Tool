@@ -87,6 +87,12 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         return self.get_tx_function_signature()
 
     @property
+    def method_for_csv_export(self) -> str:
+        # escape and strip class name in python to string
+        # need double quotes to prevent commas from next cell
+        return '"{0}"'.format(self.get_tx_function_signature())
+
+    @property
     def got_currency_symbol(self) -> str:
         return self.got_currency.symbol if self.got_currency else ""
 
@@ -107,9 +113,8 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         if decode_successful and function_info:
             f, _ = function_info
 
-            # escape and strip class name in python to string
-            # need double quotes to prevent commas from next cell
-            return '"{0}"'.format(str(f)[1:-1].split(" ")[1])
+            # got function name from ABI
+            return "{0}".format(str(f)[1:-1].split(" ")[1])
 
         # no luck trying to decode with an ABI... try to look up the
         # function signature in a database of known signatures

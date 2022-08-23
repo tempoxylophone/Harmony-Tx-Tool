@@ -360,5 +360,5 @@ class UniswapV2ForkGraph:
         # return the index of the best choice given the block number
         return best_block_info[0]
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return "DEX Graph at URL: " + self.subgraph_url
