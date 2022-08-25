@@ -48,6 +48,7 @@ websockets = "==9.1"
 yarl = "==1.7.2"
 zipp = "==3.8.1"
 tenacity = "*"
+pyhmy = "~=0.1.0"
 
 [dev-packages]
 pytest = "*"

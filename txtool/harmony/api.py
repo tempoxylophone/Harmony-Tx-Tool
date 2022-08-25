@@ -15,15 +15,17 @@ from web3.exceptions import BadFunctionCallOutput, TransactionNotFound, BlockNot
 from web3 import Web3
 from web3.types import TxReceipt, HexStr
 
-from txtool import pyhmy
+from pyhmy.rpc.exceptions import RPCError, RequestsError, RequestsTimeoutError
+from pyhmy import account
+
 from txtool.utils import MAIN_LOGGER, api_retry, get_local_abi
 
 
 class HarmonyAPI:
     _CUSTOM_EXCEPTIONS: List = [
-        pyhmy.rpc.exceptions.RPCError,
-        pyhmy.rpc.exceptions.RequestsError,
-        pyhmy.rpc.exceptions.RequestsTimeoutError,
+        RPCError,
+        RequestsError,
+        RequestsTimeoutError,
     ]
     _NET_HMY_MAIN = "https://a.api.s0.t.hmny.io/"
     _NET_HMY_WEB3 = "https://a.api.s0.t.hmny.io/"
@@ -203,7 +205,7 @@ class HarmonyAPI:
         # order can be: "DESC" or "ASC"
         # docs: https://api.hmny.io/#:~:text=POSThmyv2_getTransactionsHistory
         return (
-            pyhmy.account.get_transaction_history(
+            account.get_transaction_history(
                 eth_address,
                 page=page_num,
                 page_size=page_size,
@@ -217,8 +219,10 @@ class HarmonyAPI:
     @staticmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_num_tx_for_wallet(eth_address: str) -> int:
-        return pyhmy.account.get_transaction_count(
-            eth_address, "latest", endpoint=HarmonyAPI._NET_HMY_MAIN
+        return int(
+            account.get_transaction_count(
+                eth_address, "latest", endpoint=HarmonyAPI._NET_HMY_MAIN
+            )
         )
 
     @classmethod

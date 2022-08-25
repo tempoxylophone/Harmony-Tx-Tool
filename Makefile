@@ -1,11 +1,6 @@
 SHELL := /bin/bash
 PYTHONPATH :=./txtool
 
-update-pyhmy:
-	cd txtool/pyhmy
-	git pull https://github.com/tempoxylophone/pyhmy.git code-only
-	cd ../../
-
 install-dev:
 	pipenv install --dev
 	mypy --install-types
@@ -13,7 +8,7 @@ install-dev:
 install:
 	pipenv install
 
-update-requirements:
+requirements:
 	pipenv lock -r > requirements.txt
 	pipenv lock -r --dev > requirements-dev.txt
 

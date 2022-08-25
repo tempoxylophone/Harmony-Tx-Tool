@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Dict, Union
 
-from txtool import pyhmy
+from pyhmy import util, account
+
 from txtool.utils import MAIN_LOGGER
 from .api import HarmonyAPI
 from .abc import Token
@@ -128,18 +129,18 @@ class HarmonyAddress:
 
     @classmethod
     def convert_one_to_hex(cls, one_string_hash: str) -> str:
-        return str(pyhmy.util.convert_one_to_hex(one_string_hash))
+        return str(util.convert_one_to_hex(one_string_hash))
 
     @classmethod
     def convert_hex_to_one(cls, eth_string_hash: str) -> str:
-        return str(pyhmy.util.convert_hex_to_one(eth_string_hash))
+        return str(util.convert_hex_to_one(eth_string_hash))
 
     @classmethod
     def is_valid_one_address(cls, address: str) -> bool:
         if not address:
             # empty or null
             return False
-        return pyhmy.account.is_valid_address(address)
+        return bool(account.is_valid_address(address))
 
     @classmethod
     def is_valid_eth_address(cls, address: str) -> bool:
