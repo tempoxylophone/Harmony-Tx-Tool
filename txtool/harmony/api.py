@@ -13,7 +13,7 @@ from web3.types import EventData
 from web3.exceptions import BadFunctionCallOutput, TransactionNotFound, BlockNotFound
 
 from web3 import Web3
-from web3.types import TxReceipt, HexStr, TxData
+from web3.types import TxReceipt, HexStr
 
 from txtool import pyhmy
 from txtool.utils import MAIN_LOGGER, api_retry, get_local_abi
@@ -50,8 +50,8 @@ class HarmonyAPI:
     @classmethod
     @lru_cache(maxsize=128)
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
-    def get_transaction(cls, tx_hash: HexStr) -> TxData:
-        return cls._w3.eth.get_transaction(tx_hash)
+    def get_transaction(cls, tx_hash: HexStr) -> Dict:
+        return dict(cls._w3.eth.get_transaction(tx_hash))
 
     @classmethod
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
@@ -244,11 +244,11 @@ class HarmonyAPI:
         )
 
     @staticmethod
-    def get_coin_amount_from_tx_data(result: TxData) -> Decimal:
+    def get_coin_amount_from_tx_data(result: Dict) -> Decimal:
         return Decimal(Web3.fromWei(result["value"], "ether"))
 
     @staticmethod
-    def get_tx_fee_from_tx_data(result: TxData) -> Decimal:
+    def get_tx_fee_from_tx_data(result: Dict) -> Decimal:
         tx_receipt = HarmonyAPI.get_tx_receipt(result["hash"])
         return Web3.fromWei(result["gasPrice"], "ether") * Decimal(
             tx_receipt["gasUsed"]

@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple, Dict
 from enum import Enum
 from decimal import Decimal
+from copy import deepcopy
 
 from eth_typing import HexStr
 from web3.types import EventData
@@ -281,6 +282,28 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         r.reinterpret_action()
 
         return r
+
+    def __copy__(self) -> WalletActivity:
+        new_tx = WalletActivity(self.tx_hash, self.coin_type)
+        new_tx.__dict__.update(self.__dict__)
+        return new_tx
+
+    def __deepcopy__(self, memo: Dict) -> WalletActivity:
+        self_module: str = self.__class__.__module__.rsplit(".", 1)[0]
+
+        # create a copy of this transaction, set all important fields
+        wallet_copy = WalletActivity(self.tx_hash, self.coin_type)
+        memo[id(self)] = wallet_copy
+
+        for attr_name, attr in self.__dict__.items():
+            cls_module: str = attr.__class__.__module__.rsplit(".", 1)[0]
+            v = attr
+            if cls_module != self_module:
+                # actually copy other stuff
+                v = deepcopy(attr)
+            setattr(wallet_copy, attr_name, v)
+
+        return wallet_copy
 
     def __str__(self) -> str:  # pragma: no cover
         return "tx: {0} --[{1} {2}]--> {3} ({4}) - log idx = {5}".format(

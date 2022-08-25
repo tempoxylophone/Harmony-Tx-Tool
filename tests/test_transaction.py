@@ -1,4 +1,8 @@
+from typing import Any
+from datetime import datetime
+from copy import deepcopy
 import pytest  # noqa
+from txtool.activity.interpreter import get_interpreted_transaction_from_hash
 from txtool.harmony import WalletActivity
 from .utils import get_vcr
 
@@ -10,7 +14,6 @@ def test_token_tx_with_intermediate_transfers() -> None:
     # random TX from explorer
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
     tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
-    wallet_address = "0x974190a07ff72043bdeaa1f6bfe90bdd33172e51"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(
         tx_hash, exclude_intermediate_tx=False
     )
@@ -158,3 +161,45 @@ def test_transaction_equality() -> None:
 
     # test non-tx object
     assert "hello" != txs_1[0]
+
+
+@vcr.use_cassette()
+def test_wallet_deepcopy_transaction_activity() -> None:
+    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
+    txs = get_interpreted_transaction_from_hash(tx_hash)
+    copy_txs = [deepcopy(tx) for tx in txs]
+
+    # alter the fields in tx2 unless they are objects in our package
+    for tx1, tx2 in zip(txs, copy_txs):
+        for attr_name, attr in tx1.__dict__.items():
+            cls_module = attr.__class__.__module__.rsplit(".", 1)[0]
+
+            if "txtool.harmony" not in cls_module:
+                v: Any
+                if isinstance(attr, bool):
+                    v = not getattr(tx1, attr_name)
+                elif isinstance(attr, datetime):
+                    v = datetime.utcnow()
+                elif isinstance(attr, tuple):
+                    v = (1, 2)
+                elif hasattr(attr, "__setitem__"):
+                    v = getattr(tx2, attr_name)
+                    v["test_key"] = 1
+                elif attr is None:
+                    v = None
+                else:
+                    v = getattr(tx2, attr_name) + attr.__class__(1)
+
+                # change the value
+                setattr(tx2, attr_name, v)
+
+    # check that altering these fields has no bearing on the original variables
+    # they are supposed to copy
+    for tx1, tx2 in zip(txs, copy_txs):
+        for attr_name, attr in tx1.__dict__.items():
+            cls_module = attr.__class__.__module__.rsplit(".", 1)[0]
+
+            if "txtool.harmony" not in cls_module:
+                a = getattr(tx1, attr_name)
+                b = getattr(tx2, attr_name)
+                assert (a is None and b is None) or a != b

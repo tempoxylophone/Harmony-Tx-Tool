@@ -91,6 +91,19 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "got_amount": (">", noop, 0),
                 "got_currency_symbol": ("==", noop, "TRANQ"),
             },
-        )
+        ),
+        (
+            "Claim CRV rewards",
+            {
+                "from_addr_str": (
+                    "==",
+                    noop,
+                    CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
+                ),
+                "is_receiver": ("==", noop, True),
+                "got_amount": (">", noop, 0),
+                "method": ("==", noop, "claim_rewards(address)"),
+            },
+        ),
     ],
 }

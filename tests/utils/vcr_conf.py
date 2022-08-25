@@ -133,6 +133,7 @@ def get_vcr(
     v.register_serializer("bytes", NestedBytesSerializer())
     v.serializer = "bytes"
 
+    v.filter_headers = ["Cookie"]
     v.before_record_request = edit_request_body(REQUEST_BODY_PROPERTIES_TO_REMOVE)
     v.before_record_response = remove_sensitive_responses()
 
