@@ -6,7 +6,7 @@ from collections import defaultdict
 from txtool.utils import MAIN_LOGGER, make_yellow
 from txtool.dex import UniswapV2ForkGraph
 from txtool.harmony.constants import VIPERSWAP_GRAPH_CONFIG
-from txtool.harmony import WalletActivity, HarmonyToken
+from txtool.harmony import WalletActivity, HarmonyToken, Token
 
 
 class DexPriceInfo(TypedDict):
@@ -24,7 +24,7 @@ class DexPriceLookupBounds(TypedDict):
     timestamp_min: Union[float, int]
 
 
-T_DEX_PRICES = Dict[HarmonyToken, DexPriceInfo]
+T_DEX_PRICES = Dict[Token, DexPriceInfo]
 
 
 class DexPriceManager:
@@ -37,7 +37,7 @@ class DexPriceManager:
 
     @classmethod
     def get_price_of_token_at_block(
-        cls, token: HarmonyToken, block: int, price_data: T_DEX_PRICES
+        cls, token: Token, block: int, price_data: T_DEX_PRICES
     ) -> Decimal:
         return price_data[token]["fiat_prices_by_block"][block]
 

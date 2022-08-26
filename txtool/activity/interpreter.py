@@ -6,6 +6,7 @@ from txtool.harmony import (
 from .services.common import InterpretedTransactionGroup
 from .services.Curve import Curve3PoolLiquidityEditor
 from .services.TranquilFinance import TranquilFinanceEditor
+from .services.Euphoria import EuphoriaBondEditor
 from .services.ViperSwap import (
     ViperSwapXRewardsEditor,
     ViperSwapLiquidityEditor,
@@ -17,6 +18,8 @@ EDITORS = [
     ViperSwapClaimRewardsEditor(),
     ViperSwapXRewardsEditor(),
     ViperSwapLiquidityEditor(),
+    # Euphoria
+    EuphoriaBondEditor(),
     # Tranquil
     TranquilFinanceEditor(),
     # Curve

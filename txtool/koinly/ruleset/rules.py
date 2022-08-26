@@ -4,6 +4,68 @@ from .constants import *  # pylint: disable=W0401, W0614
 KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
     KoinlyLabel.NULL: [
         (
+            "Redeem WAGMI Bond",
+            {
+                "method": ("==", noop, "redeem(address,bool)"),
+                "got_amount": (">", noop, 0),
+            },
+        ),
+        (
+            "WAGMI Bond",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "deposit(uint256,uint256,address)",
+                ),
+                "sent_amount": (">", noop, 0),
+            },
+        ),
+        (
+            "Stake WAGMI for sWAGMI",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "stake(uint256,address)",
+                ),
+                "sent_currency_symbol": ("==", noop, "WAGMI"),
+            },
+        ),
+        (
+            "Get sWAGMI for WAGMI staking",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "stake(uint256,address)",
+                ),
+                "got_currency_symbol": ("==", noop, "sWAGMI"),
+            },
+        ),
+        (
+            "Unstake sWAGMI for WAGMI",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "unstake(uint256,bool)",
+                ),
+                "sent_currency_symbol": ("==", noop, "sWAGMI"),
+            },
+        ),
+        (
+            "Get WAGMI for sWAGMI unstaking",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "unstake(uint256,bool)",
+                ),
+                "got_currency_symbol": ("==", noop, "WAGMI"),
+            },
+        ),
+        (
             "Enter LP Position",
             {
                 "method": (

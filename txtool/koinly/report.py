@@ -5,6 +5,7 @@ from datetime import timezone, datetime
 from txtool.harmony import (
     HarmonyAddress,
     HarmonyAPI,
+    Token,
     HarmonyToken,
     WalletActivity,
 )
@@ -137,9 +138,13 @@ class KoinlyReportCreator:  # pylint: disable=R0902
     def get_tx_fiat_value(
         self, tx: WalletActivity, price_lookup: T_PRICE_DATA_DICT
     ) -> Decimal:
-        token_usd_price = price_lookup[tx][tx.coin_type]
-        token_quantity = tx.coin_amount
-        return token_quantity * token_usd_price
+        if isinstance(tx.coin_type, HarmonyToken):
+            token_usd_price = price_lookup[tx][tx.coin_type]
+            token_quantity = tx.coin_amount
+            return token_quantity * token_usd_price
+
+        # got placeholder token, don't look it up
+        return Decimal(0)
 
     def to_csv_row(self, tx: WalletActivity, price_lookup: T_PRICE_DATA_DICT) -> str:
         if self.omit_tracked_fiat_prices and self.currency_is_tracked(
@@ -185,7 +190,7 @@ class KoinlyReportCreator:  # pylint: disable=R0902
         )
 
     @staticmethod
-    def format_coin_symbol(currency: Optional[HarmonyToken]) -> str:
+    def format_coin_symbol(currency: Optional[Token]) -> str:
         if currency:
             symbol = currency.universal_symbol
             return KOINLY_UNSUPPORTED_COIN_NAMES.get(symbol, symbol)

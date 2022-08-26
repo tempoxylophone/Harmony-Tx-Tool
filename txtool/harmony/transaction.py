@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
-from typing import Union, Sequence
+from typing import Sequence, Optional
 
 from web3.types import TxReceipt, HexStr
 
@@ -8,7 +8,7 @@ from .api import HarmonyAPI
 from .abc import Transaction
 from .contract import HarmonyEVMSmartContract
 from .address import HarmonyAddress, BadAddressException
-from .token import HarmonyToken
+from .token import Token, HarmonyToken
 from .signature import get_function_name_by_signature
 
 
@@ -55,12 +55,12 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
 
         # assume it is ONE unless otherwise specified, inheritors of this class can change
         # this based data relevant to what they do
-        self.coin_type: HarmonyToken = HarmonyToken.get_native_token()
+        self.coin_type: Token = HarmonyToken.get_native_token()
         self.tx_fee_in_native_token = HarmonyAPI.get_tx_fee_from_tx_data(self.tx_data)
 
         # (placeholder values)
-        self.sent_currency: Union[HarmonyToken, None] = None
-        self.got_currency: Union[HarmonyToken, None] = None
+        self.sent_currency: Optional[Token] = None
+        self.got_currency: Optional[Token] = None
 
         # position of transaction in logs
         self.log_idx = 0
@@ -99,6 +99,10 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
     @property
     def sent_currency_symbol(self) -> str:
         return self.sent_currency.symbol if self.sent_currency else ""
+
+    @property
+    def coin_type_symbol(self) -> str:
+        return self.coin_type.symbol if self.coin_type else ""
 
     @property
     def from_addr_str(self) -> str:

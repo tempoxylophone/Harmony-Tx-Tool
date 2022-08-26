@@ -10,7 +10,7 @@ from web3.types import EventData
 from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 from txtool.utils import MAIN_LOGGER
 
-from .token import HarmonyToken
+from .token import HarmonyToken, Token
 from .api import HarmonyAPI
 from .address import HarmonyAddress
 from .transaction import HarmonyEVMTransaction
@@ -28,7 +28,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def __init__(
         self,
         tx_hash: HexStr,
-        harmony_token: Optional[HarmonyToken] = None,
+        harmony_token: Optional[Token] = None,
     ):
         # get information about this tx
         super().__init__(tx_hash)
@@ -108,6 +108,27 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             # in reverse order
             token_tx = WalletActivity._create_token_tx_from_log(root_tx, log, i)
             transfers.insert(0, token_tx)
+
+        if WalletActivity._appears_to_be_bond_tx(root_tx):
+            # there should be a tx where staking helper sends some amount of currency
+            # as an IOU on stable coin.
+            reserve_tx = next(
+                x
+                for x in transfers
+                if
+                # send to original contract
+                x.to_addr == root_tx.to_addr and
+                # but the thing sending it is not original wallet
+                x.from_addr != root_tx.from_addr
+            )
+
+            if exclude_intermediate_tx:
+                transfers = [
+                    x for x in transfers if root_tx.account in (x.to_addr, x.from_addr)
+                ]
+
+            # preserve that IOU transaction
+            return [*transfers, reserve_tx]
 
         if (
             WalletActivity._appears_to_be_uniswap_swap_tx(root_tx)
@@ -262,6 +283,16 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             parsed_debts.append(return_tx)
 
         return parsed_debts
+
+    @staticmethod
+    def _appears_to_be_bond_tx(root_tx: WalletActivity) -> bool:
+        # rebase token / OHM-like transaction for bond
+        return (
+            root_tx.method == "deposit(uint256,uint256,address)"
+            and
+            # Euphoria BondDepository contract
+            root_tx.to_addr.eth == "0x202c598E93F69dbe3a5e5706DfB85bdc598bb16F"
+        )
 
     @staticmethod
     def _create_token_tx_from_log(

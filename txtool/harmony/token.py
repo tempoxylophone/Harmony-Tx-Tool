@@ -153,3 +153,27 @@ class HarmonyToken(Token):  # pylint: disable=R0902
 
     def __hash__(self) -> int:
         return hash("harmony_token" + str(self.address.__hash__()))
+
+
+class HarmonyPlaceholderToken(Token):
+    def __init__(
+        self,
+        wrapped_token: HarmonyToken,
+        placeholder_name: str,
+        placeholder_symbol: str,
+        address: str,
+    ) -> None:
+        # address need not be real address
+        super().__init__(address)
+
+        self._wrapped_token = wrapped_token
+        self.name = placeholder_name
+        self.symbol = placeholder_symbol
+
+    @classmethod
+    def get_native_token(cls) -> Token:
+        return HarmonyToken.get_native_token()
+
+    @property
+    def is_native_token(self) -> bool:
+        return self._wrapped_token.is_native_token

@@ -2,7 +2,7 @@ from typing import Iterable, Dict
 from decimal import Decimal
 from datetime import datetime
 from collections import defaultdict
-from txtool.harmony import WalletActivity, HarmonyToken
+from txtool.harmony import HarmonyToken, WalletActivity
 
 from ..fiat.dex.manager import DexPriceManager
 from ..fiat.coingecko.manager import CoinGeckoPriceManager
@@ -28,7 +28,11 @@ def get_token_prices_for_transactions(
     # also need to account for harmony bridge hack date
 
     # can only use DEX prices before the hack date
-    before = [x for x in txs if x.timestamp <= hack_ts]
+    before = [
+        x
+        for x in txs
+        if x.timestamp <= hack_ts and isinstance(x.coin_type, HarmonyToken)
+    ]
     price_data_before = DexPriceManager.get_price_data(before)
     for tx in before:
         tokens = tx.get_relevant_tokens()
@@ -38,7 +42,12 @@ def get_token_prices_for_transactions(
             )
 
     # after hack, must use coingecko
-    after = [x for x in txs if x.timestamp > hack_ts or is_coingecko_edge_case(x)]
+    after = [
+        x
+        for x in txs
+        if (x.timestamp > hack_ts and isinstance(x.coin_type, HarmonyToken))
+        or is_coingecko_edge_case(x)
+    ]
     price_data_after = CoinGeckoPriceManager.get_price_history_for_transactions(after)
     for tx in after:
         tokens = tx.get_relevant_tokens()

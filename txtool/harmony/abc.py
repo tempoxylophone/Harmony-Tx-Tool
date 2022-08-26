@@ -23,6 +23,10 @@ class Token(ABC):
         return hash("abstract token" + str(self.address.__hash__()))
 
     @property
+    def universal_symbol(self) -> str:  # pragma: no cover
+        raise NotImplementedError
+
+    @property
     def is_native_token(self) -> bool:  # pragma: no cover
         raise NotImplementedError
 
