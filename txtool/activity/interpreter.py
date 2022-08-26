@@ -198,9 +198,48 @@ class ViperSwapLiquidityEditor(Editor):
         super().__init__(self.CONTRACT_ADDRESSES)
 
     def interpret(self, transactions: List[WalletActivity]) -> List[WalletActivity]:
-        if len(transactions) > 4 or "addLiquidity" not in transactions[0].method:
+        if len(transactions) > 4:
             return transactions
 
+        initial_tx = transactions[0]
+        if initial_tx.method == "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)":
+            return self.interpret_remove_liquidity(transactions)
+        elif "addLiquidity" in initial_tx.method:
+            return self.interpret_add_liquidity(transactions)
+
+    def interpret_remove_liquidity(self, transactions: List[WalletActivity]) -> List[WalletActivity]:
+        # there is 1 send transaction that sends away VENOM-LP
+        # there are 2 get transactions that give you the original pair positions
+        # break up the send transaction into two even positions, so that we can 'trade'
+        # for the original pair
+        cost_tx = transactions[0]
+        send_tx_1 = next(x for x in transactions if x.is_sender and x.sent_currency_symbol == "VENOM-LP")
+        get_tx = [x for x in transactions if x.is_receiver]
+
+        lp_amount = send_tx_1.coin_amount / 2
+        send_tx_2 = deepcopy(send_tx_1)
+
+        send_tx_1.coin_amount = lp_amount
+        send_tx_1.sent_amount = lp_amount
+        send_tx_2.coin_amount = lp_amount
+        send_tx_2.sent_amount = lp_amount
+
+        get_tx_1, get_tx_2 = get_tx
+
+        in_order_txs = [
+            cost_tx,
+            get_tx_2,
+            send_tx_2,
+            get_tx_1,
+            send_tx_1
+        ]
+
+        for i, tx in enumerate(in_order_txs):
+            tx.log_idx = i
+
+        return in_order_txs
+
+    def interpret_add_liquidity(self, transactions: List[WalletActivity]) -> List[WalletActivity]:
         # there are 2 cases we must consider:
         # 1. you are adding Liquidity to a ONE/x LP and the first transaction
         # has a non-zero ONE amount - in this case, the tx signature
@@ -220,9 +259,9 @@ class ViperSwapLiquidityEditor(Editor):
         got_txs = [x for x in transactions if x.is_receiver]
 
         if (
-            len(got_txs) != 1
-            or len(send_txs) != 2
-            or got_txs[0].got_currency_symbol != "VENOM-LP"
+                len(got_txs) != 1
+                or len(send_txs) != 2
+                or got_txs[0].got_currency_symbol != "VENOM-LP"
         ):
             return transactions
 
@@ -253,6 +292,7 @@ class ViperSwapLiquidityEditor(Editor):
             t.log_idx = i
 
         return tx_log
+
 
 
 EDITORS = [
