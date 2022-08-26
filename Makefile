@@ -17,7 +17,7 @@ test:
 
 lint:
 	mypy .
-	black . --exclude '(venv|/dfk\.py/|/pyhmy\.py/)'
+	black . --exclude '(venv|/dfk\.py/)'
 	pylint txtool
 
 coverage:

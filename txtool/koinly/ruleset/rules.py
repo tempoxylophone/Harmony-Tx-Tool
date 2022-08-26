@@ -4,6 +4,28 @@ from .constants import *  # pylint: disable=W0401, W0614
 KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
     KoinlyLabel.NULL: [
         (
+            "Enter LP Position",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)",
+                ),
+                "sent_currency_symbol": ("!=", noop, "ONE"),
+                "got_currency_symbol": ("!=", noop, "ONE"),
+            },
+        ),
+        (
+            "Enter LP Position with Native Token Pair",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "addLiquidityETH(address,uint256,uint256,uint256,address,uint256)",
+                ),
+            },
+        ),
+        (
             "Stake TRANQ in Tranquil Finance",
             {
                 "sent_amount": (">", noop, 0),
@@ -103,6 +125,19 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
                 "method": ("==", noop, "claim_rewards(address)"),
+            },
+        ),
+        (
+            "Claim VIPER rewards",
+            {
+                "from_addr_str": (
+                    "==",
+                    noop,
+                    VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
+                ),
+                "is_receiver": ("==", noop, True),
+                "got_amount": (">", noop, 0),
+                "method": ("==", noop, "claimRewards(uint256[])"),
             },
         ),
     ],

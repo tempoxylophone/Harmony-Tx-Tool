@@ -1,6 +1,5 @@
 [MASTER]
-ignore-paths=^txtool/dfk/.*$,
-             ^txtool/pyhmy/.*$
+ignore-paths=^txtool/dfk/.*$
 
 [MESSAGES CONTROL]
 disable=C0116, C0114, C0103, C0115, C0209

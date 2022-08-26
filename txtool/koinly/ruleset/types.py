@@ -18,6 +18,7 @@ OPERATORS: Dict[str, Callable] = {
     "==": operator.eq,
     ">": operator.gt,
     "<": operator.lt,
+    "!=": operator.ne,
 }
 
 T_KOINLY_LABEL_RULESET = List[
