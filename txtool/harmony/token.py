@@ -16,19 +16,6 @@ from .constants import VIPERSWAP_GRAPH_CONFIG
 
 class HarmonyToken(Token):  # pylint: disable=R0902
     _TOKEN_DIRECTORY: Dict[HarmonyAddress, HarmonyToken] = {}
-    _CONV_BTC_ADDRS = {
-        "0x3095c7557bCb296ccc6e363DE01b760bA031F2d9",
-        "0xdc54046c0451f9269FEe1840aeC808D36015697d",
-    }
-    _CONV_DFK_GOLD_ADDRS = {
-        "0x3a4EDcf3312f44EF027acfd8c21382a5259936e7",
-        "0x576C260513204392F0eC0bc865450872025CB1cA",
-    }
-    _CONV_STABLE_COIN_ADDRS = {
-        "0x985458E523dB3d53125813eD68c274899e9DfAb4",
-        "0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f",
-        "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
-    }
     _VIPERSWAP = UniswapV2ForkGraph(*VIPERSWAP_GRAPH_CONFIG)
 
     def __init__(
@@ -45,8 +32,6 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         self.name = name
         self.symbol = symbol
         self.decimals = decimals
-
-        self._conversion_unit = self._get_conversion_unit()
 
         # DEX stuff
         self.is_lp_token = False
@@ -131,17 +116,8 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         # haven't seen this happen yet
         return False  # pragma: no cover
 
-    def _get_conversion_unit(self) -> str:
-        if self.address.eth in self._CONV_BTC_ADDRS:  # pragma: no cover
-            return "btc"
-        if self.address.eth in self._CONV_DFK_GOLD_ADDRS:  # pragma: no cover
-            return "kwei"
-        if self.address.eth in self._CONV_STABLE_COIN_ADDRS:
-            return "mwei"
-        return "ether"
-
     def get_value_from_wei(self, amount: int) -> Decimal:
-        return HarmonyAPI.get_value_from_wei(amount, self._conversion_unit)
+        return HarmonyAPI.get_value_from_wei(amount, self.decimals)
 
     @property
     def universal_symbol(self) -> str:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Tuple, Iterable, Union
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from functools import lru_cache
 
 import requests
@@ -238,14 +238,15 @@ class HarmonyAPI:
         return Web3.toChecksumAddress(eth_address_str)
 
     @staticmethod
-    def get_value_from_wei(amount: int, conversion_unit: str) -> Decimal:
-        # Simple way to determine conversion, maybe change to lookup on chain later
-        # w3.fromWei doesn't seem to have an 8 decimal option for BTC
-        return (
-            amount / Decimal(100000000)
-            if conversion_unit == "btc"
-            else Decimal(Web3.fromWei(amount, conversion_unit))
-        )
+    def get_value_from_wei(amount: int, num_decimals: int) -> Decimal:
+        # from web3.from_wei function
+        with localcontext() as ctx:
+            ctx.prec = 999
+
+            # do conversion
+            num = Decimal(value=amount, context=ctx)
+            val = num / Decimal("1" + "".join("0" for _ in range(num_decimals)))
+        return val
 
     @staticmethod
     def get_coin_amount_from_tx_data(result: Dict) -> Decimal:
