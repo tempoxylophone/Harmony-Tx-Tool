@@ -1,0 +1,95 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://www.4byte.directory/signatures/?bytes4_signature=0xecb586a5",
+                "body": null,
+                "headers": {
+                    "User-Agent": [
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_14_6) AppleWebKit/532.36 (KHTML, like Gecko) Chrome/99.0.414.84 Safari/517.36"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "sec-ch-ua": [
+                        "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\""
+                    ],
+                    "sec-ch-ua-mobile": [
+                        "?0"
+                    ],
+                    "sec-ch-ua-platform": [
+                        "\"macOS\""
+                    ],
+                    "DNT": [
+                        "1"
+                    ],
+                    "Upgrade-Insecure-Requests": [
+                        "1"
+                    ],
+                    "Sec-Fetch-Site": [
+                        "same-origin"
+                    ],
+                    "Sec-Fetch-Mode": [
+                        "navigate"
+                    ],
+                    "Sec-Fetch-User": [
+                        "?1"
+                    ],
+                    "Sec-Fetch-Dest": [
+                        "document"
+                    ],
+                    "Referer": [
+                        "https://www.4byte.directory/"
+                    ],
+                    "Accept-Language": [
+                        "en-US,en;q=0.9"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Server": [
+                        "nginx/1.14.2"
+                    ],
+                    "Content-Type": [
+                        "text/html; charset=utf-8"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Date": [],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "X-Frame-Options": [
+                        "SAMEORIGIN"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u0003\u00c5W\u00ddn\u00e4&\u0014\u00be\u00ce<\u0005\u00f5E\u00d5Je\u00c8\u007f\u00a2\u00adg\u00aaMw\u00b7\u00ca]\u00a4\u00f4\u00ae\u00aaV\u00d8>3\u00a6\u008b\u00c1\u0005\u009cd\u00fa&}\u0080\u00beX\u009f\u00a4\u0007l\u008c=\u009bFIw\u00b5\u00b54\u001e\u00c0\u0007\u00be\u008f\u00c3\u00f9#\u00af]#\u0089\u00e4j\u00bb\u00ca@e\u00eb\u0005!y\r\u00bc\u00f2\rl:\u00e1$\u00ac\u00df\u00ba\u001a\ft\r\u00b9\u0015[\u00c5]g\u0080\u00bc\u00e1\u008e\u0017\u00dcB\u00cez\u0091^\\\n\u00f5\u0081\u0018\u0090\u00ab\u00cc\u00d6\u00da\u00b8\u00b2sD\u0094Ze\u00a46\u00b0Ye\u00b5s\u00ad}\u00c5\u00d8i\u00b1s\u00b0\u00b4'\u00b4\u00b3\u00f4\u001e\u00ac\u00a3\u00c7K\u00de\u00f0?\u00b4\u00e2\u00f7vY\u00ea\u00e6\u00d5\u00e9\u00e9\t\u00b3\u008e;Q2\u00d1\u00f0-X\u00b6\u00e1w~\u00a5%\u00be2\u00e2v-\u00ac\u00b2\u00f0\u0085=\u00d0\u00800\u00f0M\u0004\u00fe/\\\u00ebv\u0012l\r\u00e0>e\u00d7\u00a5\u00b5\u00ac5\u00fa7(\u00dd\u0012\u00db\u00e1\\\u00f08\u00d2\u00f6>\u001fL\u00a1\u00b5\u00b3\u00ce\u00f0v\u00d9\b\u00f5\u00c5\u00c0(\u009aT\u00033\u00c8\u009cE\u00c3\u00cb\u000b]\u00ed\u0086\u0013U\u00fc\u008e\u0094\u0092[\u00bb\u00ca\u00b0YpC\u00fa?Z\u00c1\u0086w\u00d2\r\u00aaA\u00e5Tb\u0094DKq\\(0t#;Q\u008d2(\u00f5\u0015\u00a5\u00e4\u00capU\u0011\u00ffsz\u00bb\u0095@\u00b6\u00e0\u00c8\u00d6\u00e8\u00ae\u0085\u008al\u00b4!\u00058\u0007\u00864\u00ba\u0010\u00f8\u00b5\u0012\u00b6\u0095|G(\u00ed9\u0005\u00cf\u0098\u00a0\r\u0084<{0\u0013,D\u00e3s\u00ee\u00b4\u00f0\u00c8\u00d10X\u00f6\u00b4g\u00f1\t\u001cC\u00bcu \u00cf\u00963<\u00cf\u00ea x_\u00a4\u00b5^\u001c\u00f8'\u00ef\u00e4\u0004<j\r\u00e7\"\u00c3 p\u0080\u00e6\u00b4F\u0086\u00bdo2\u001b}\u00db\"\u00afw\u009d*\u009d\u00d0*y\u00bc\u00cd\u0019_\u00e7\f\u00a7<:\u001b\u00ee@9:[\u00e3\u00ad\u001fz\u00f6\u0002\u00b6+\u001a\u00e1\u0010\u00fa64\u009e=O4-F\u001a\u00ca\u000b\u0091\u00e6\u00be\u00be\u00ba~\u009a\u00ed0\u00c9j)*\u00e1vi\u00e6\u00ed0BnugJ \u00ef\u00f0\u00fc\u00f7\u0096\u00caY'\u009f>\u0018\u00ef\u00a5\u00f6_\u00ad\u00a5\u00ed\u00a4\u00a4\u000f\u0096\u001a\u00b1\u00ad\u00bd\u00f5\u00fe\u00a7\u00c3\u00aat\u00e9\u008f\u00e9\u00f5\u00cd5y\u0083\u00cd\u0017S\f\u00e0\u0013\u008a\u00f9\u00d4\u00be\u00f6\u00bcg\u0014\u00cb\u0019ZO\u00bf\u00f5\u00c1\u00e0\u001e\u00f5\u00b9\u0089\u0007L\u00bf\u001b}?\u00f9\u00b2\u00ef\u00af\u00926\u0015=:\u009eI\u00102\u00da5\u008a\u0007\u0086\u00e3\u00c0\u00ac;\u00e9\u0004\u0001|M\u0091\u00c7\u00fd\u0090\u0006\u0083\u0002\u00f5]\u00b4\u00cc\u0001jO6\u00b1\u009c\u00af\u00b0\u00cf/\u00c70\u00d1D\u00ff\u00f2m*\u0014\u009e;d\u0084\u0007\u00c7Ye3\u0087\"\r\u00b8ZW\u00ab\f#MF\u0094\u00be\u00e3hy\u00dc\u00c1\u00c4\u0090$/@\u00fa\u00e8\u00b3\u00ca|z\u00b4\u00a7\u00efGoB\u00a7\u0000n\u00caz\u00e6\u0014A>\u00cd_\u00e0F\u00c2\u00e6\u00a7\u00bc\u0003\u00b1\u0010\u00d8H\u00d8n/\u00d0#\rA\u00d5\u001a\u00aa\u0095\u00dc\u008d\u008a\u00bf\n\u00d8d\u00c4\u00ee\u00a7\u00b0\u0011\u00cd\u00e3\u00e4B\u00b5\u0098\u00da\u0015o0\r\u007fDv\u00a6\u0015\u00afl\u00a3e\u00cc\u00d9\u000e\u001ep\u00ff\u0018MK\u00a8\u00b5\u00c4p\u00b9\u00ca\u000e\u001f.\u000e\u00f9\u00e1\u00e5\u00f1\u00c9QFP-\u001d.y\u00f8\u0000eqvy\u00ce\u00cf\u0090\u00d6p\u00b8\b\u00bb\u00f0\u00d8\u00fd\u0093\u0017\u009ds\u0018\u009e\u00faJ\u00a0\u008f\u001dY\u0004.\u009c\"\u00f8K\u0019\u00a2\u00d7^\u00ce\u00faIQg9\u00f3\u00ea\u0089=\\|\u00aa9\u00acn$\u0004S\ty\u0004y,\u00f20\u0016A\u00faN/\u0086\u00e9S\u00f8\u00d4\u00d1\u00f7\nmpc\u0010\u00b3N\u00e0\u001c^9\u00e6\u00bcXY\u0085`\u00edLD\u009f\u0099\u00fa^\u0007\u00a7EPQ\u0091\u00b0\u00b8'\u0097\u00a5\u00d8\u00fd\u00c3\u00fe\u0019\u00ac\u0092\u0006\u00bf\u00e6M\u00fb\u00bd\u00c5\u0010\u00b9\u00f2y\u00f0\u00faM\u001f*\\\u009d\u0090=\u0095Q\u00b1cc6\u00da\u00b3\u001di\u008c\u001c\u0088?\u00cf\u00a9\u009d\u008e\u00e9\u00e4y\u0094\u00f6\u00a7\u00ff\u008c\u00cb%#\u00ff\u001cT\u0083f\u0012\u00c3OP\u00df\u00deJ\u00d9\u00fa\u00ca{\u00ca\u00cb\u00d9b\u00c5<\u001c;\u00b6\u0092A$3\u0019l%\u00d5@^\u00fb\u008f\u009cP\u00eeL\u00b4\u000b\u009f}G\u000f\u000e\u00e2I\u00be\u00ef\u00a2\u00d3\u00ba*\u008a{K8\u00ba\u00bc8;\u00bf@\nC\u00a9\u001f\u00c5f\u0006\u00e0\u0007'\u00f3\u00f6\u008f\u00cb@\u00a3\u00ef\u00e0\u00bd\u0014\u00bfc\u0091\u0085y\u00f4\u009bN(w|v\u00fe\u00dd\u00f0\u00ff\u00cb\u00c9\u00af\u00df\u00be\f\u00e1#%\u00e7\u00a5\u00ae`\u009d\u00cc9ga\u00e0\u0089U\u00f1\u00d3cn\u00d5k\u0095\u00b9\u00a4\u00d6=\u008dc\u00a0\t\u00fe\u008b\u009e\u001e\u001e\u00bf\u00f7Q\u0019i\u00c4\u00b7RHB\u00f5\u00c4\u00bc\u0094\u0006\u00d3\u00d0\u00a4H\f\u00a9g\u0083\u00b56\u00d6\u0095-W \u00e9\u00d0\u00f1J\u001d\u008b\u0001\\o,\u0019\u00fb\u00efT8hb\u00c5\u0018/P[\u00e1\u00ea\u00ae\u00f0W%\u00d6b\u00e41\r\u0018#x\u00c30\u00c9\u0084\u008b\u001a\u00dd\f\u00f5[\u00aa\u00c8\u00a8\u0081\u00ad\u00c0@\u00b5c\u00c2\u00da\u000eoT\n0\u001f\u00ff\u0014\u0016\"7\u00fdU\u0083\u00dc\u00e0]\u00cb{\u001d\u00ee\u00fb\u00cb\u00f2\u00f0u\u0016\u0016\u00e4$p\u008b\f,\u00ea)\u009a\u00ecT\u0019\u00eb{dM\u00fe\u00fe\u00f3/R\u00ec\u00c8\u00ad\u00e2\u001f\u0080\u00fcXs\u00af\u0004,\u0084\u00fc\u00a4i\u00d2\u00c0\u00a8\u001f.\u0013x\u00bb\u00c0\u009b\u00eez\u00f1\u000f\u00c9\u009a@_\u00f1\u000e\u0000\u0000"
+                }
+            }
+        }
+    ]
+}

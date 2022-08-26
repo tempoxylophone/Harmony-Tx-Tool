@@ -30,6 +30,12 @@ _HEADERS = {
 }
 
 
+class BadStatusException(Exception):
+    # throw to trigger retry anytime we get a non-200 HTTP status
+    # code from 4byte
+    pass
+
+
 @lru_cache(maxsize=256)
 def get_function_name_by_signature(function_signature: str) -> str:
     """
@@ -43,13 +49,19 @@ def get_function_name_by_signature(function_signature: str) -> str:
     return _do_request(function_signature)
 
 
-@api_retry()
+@api_retry(custom_exceptions=[BadStatusException])
 def _do_request(function_signature: str) -> str:
-    # get from the internet
+    # get from 4byte
+    url = _get_url(function_signature)
     r = requests.get(
-        _get_url(function_signature),
+        url,
         headers=_HEADERS,
     )
+
+    if r.status_code != 200:
+        raise BadStatusException(
+            f"Request to {url} raised non 200 HTTP status, got code: {r.status_code}"
+        )
 
     # find it in html
     k = re.search(_CAPTURE_METHOD_NAME_REGEX, r.text)

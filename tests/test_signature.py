@@ -34,3 +34,10 @@ def test_get_function_signature_bad_signature() -> None:
     func_name = get_function_name_by_signature("0123456789")
 
     assert func_name == ""
+
+
+@vcr.use_cassette()
+def test_get_function_signature() -> None:
+    signature = "0xecb586a5"
+    signature_name = get_function_name_by_signature(signature)
+    assert signature_name == "remove_liquidity(uint256,uint256[3])"
