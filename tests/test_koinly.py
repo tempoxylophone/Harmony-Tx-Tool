@@ -1,8 +1,5 @@
 from datetime import timezone
 from txtool.koinly import KoinlyReportCreator
-from .utils import get_vcr
-
-vcr = get_vcr(__file__)
 
 
 def test_koinly_tracked_currency() -> None:
@@ -10,12 +7,6 @@ def test_koinly_tracked_currency() -> None:
     assert KoinlyReportCreator.currency_is_tracked("USDC")
     assert KoinlyReportCreator.currency_is_tracked("ETH")
     assert not KoinlyReportCreator.currency_is_tracked("JENN")
-
-
-def test_timestamp_conversions() -> None:
-    assert "2022-07-30 14:05:28 UTC" == KoinlyReportCreator.format_utc_ts_as_str(
-        1659189928
-    )
 
 
 def test_create_koinly_report_creator() -> None:

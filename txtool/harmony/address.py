@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Union
+from typing import Dict, Union, Literal
 
 from pyhmy import util, account
 
@@ -14,8 +14,8 @@ class BadAddressException(Exception):
 
 
 class HarmonyAddress:
-    FORMAT_ETH = "eth"
-    FORMAT_ONE = "one"
+    FORMAT_ETH: Literal["eth"] = "eth"
+    FORMAT_ONE: Literal["one"] = "one"
     _HARMONY_BECH32_HRP = "one"
     _ADDRESS_DIRECTORY: Dict[str, HarmonyAddress] = {}
 
@@ -62,7 +62,7 @@ class HarmonyAddress:
     def clear_directory(cls) -> None:
         cls._ADDRESS_DIRECTORY = {}
 
-    def get_address_str(self, address_format: str) -> str:
+    def get_address_str(self, address_format: Literal["one", "eth"]) -> str:
         return self.addresses[address_format]
 
     def get_eth_address(self) -> str:

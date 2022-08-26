@@ -18,8 +18,6 @@ def test_export_full_tx_log_for_koinly() -> None:
     MAIN_LOGGER.setLevel(logging.INFO)
 
     report_creator = KoinlyReportCreator(
-        address_format=HarmonyAddress.FORMAT_ONE,
-        omit_tracked_fiat_prices=True,
         omit_cost=False,
         # there are lots of tx in this wallet
         date_lb_str="2022-07-28",

@@ -34,8 +34,6 @@ if __name__ == "__main__":
     wallet_address = args.wallet
 
     report = KoinlyReportCreator(
-        address_format=HarmonyAddress.FORMAT_ONE,
-        omit_tracked_fiat_prices=True,
         omit_cost=True,
         date_lb_str=args.start,
         date_ub_str=args.end,
