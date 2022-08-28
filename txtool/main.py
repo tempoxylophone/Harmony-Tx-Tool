@@ -2,8 +2,10 @@ from typing import Tuple, Sequence, List
 from datetime import datetime
 from eth_typing import HexStr
 
+from .harmony import HarmonyAPI, HarmonyAddress, WalletActivity
+from .activity.interpreter import get_interpreted_transactions
 from .koinly import KoinlyReportCreator
-from .harmony import HarmonyAPI, WalletActivity
+
 from .utils import MAIN_LOGGER
 
 
@@ -22,7 +24,8 @@ def get_harmony_tx_from_wallet_as_csv(
     )[: report.tx_limit]
 
     # --- GET + PARSE DATA FROM BLOCKCHAIN ---
-    tx_events = get_events(tx_hashes)
+    account = HarmonyAddress.get_harmony_address_by_string(wallet_address_eth_str)
+    tx_events = get_events(account, tx_hashes)
 
     MAIN_LOGGER.info("Done interpreting transactions.")
 
@@ -37,8 +40,10 @@ def get_harmony_tx_from_wallet_as_csv(
     return result_csv, _file_name
 
 
-def get_events(tx_hashes_strings: List[HexStr]) -> Sequence[WalletActivity]:
-    events = []
+def get_events(
+    account: HarmonyAddress, tx_hashes_strings: List[HexStr]
+) -> Sequence[WalletActivity]:
+    events: List[WalletActivity] = []
 
     total_tx = len(tx_hashes_strings)
     for i, tx_hash_string in enumerate(tx_hashes_strings):
@@ -57,11 +62,12 @@ def get_events(tx_hashes_strings: List[HexStr]) -> Sequence[WalletActivity]:
 
         # token transfers and fees associated with them
         try:
-            results = WalletActivity.extract_all_wallet_activity_from_transaction(
-                tx_hash_string
+            results = get_interpreted_transactions(
+                account,
+                tx_hash_string,
             )
             events += results
-        except Exception as e:  # pylint: disable=W0703
+        except Exception as e:  # pylint: disable=W0703; # pragma: no cover
             MAIN_LOGGER.warning(
                 "Transaction %s threw error: %s ...", tx_hash_string, str(e)
             )

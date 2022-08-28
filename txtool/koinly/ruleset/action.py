@@ -1,8 +1,10 @@
+from typing import Tuple
 from txtool.harmony import WalletActivity
-from .rules import *  # pylint: disable=W0614,W0401
+from .types import OPERATORS, KoinlyLabel
+from .rules import KOINLY_LABEL_RULES
 
 
-def get_label_for_tx_and_description(tx: WalletActivity) -> Tuple[str, str]:
+def get_label_for_tx_and_description(tx: WalletActivity) -> Tuple[KoinlyLabel, str]:
     for label, rules in KOINLY_LABEL_RULES.items():
         for rule in rules:
             is_match = True

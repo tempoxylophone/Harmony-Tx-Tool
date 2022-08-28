@@ -69,7 +69,9 @@ class TransactionReportCreator:
 
     def build_csv_from_events(self, events: List[TransactionCSVWrapper]) -> str:
         # build the csv
-        return self.get_csv_row_header() + "".join(self.to_csv_row(tx) for tx in events)
+        return self.get_csv_row_header() + "".join(
+            self.to_csv_row_str(tx) for tx in events
+        )
 
     def get_csv_from_transactions(self, events: Sequence[WalletActivity]) -> str:
         return self.build_csv_from_events(self.get_wrapped_transactions(events))
@@ -85,5 +87,5 @@ class TransactionReportCreator:
     def get_csv_row_header(self) -> str:
         return ",".join(self.HEADER)
 
-    def to_csv_row(self, tx: TransactionCSVWrapper) -> str:
+    def to_csv_row_str(self, tx: TransactionCSVWrapper) -> str:  # pragma: no cover
         raise NotImplementedError

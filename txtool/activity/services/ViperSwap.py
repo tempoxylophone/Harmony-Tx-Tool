@@ -20,19 +20,49 @@ class ViperSwapClaimRewardsEditor(Editor):
     def interpret(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        if (
-            0 < len(transactions) < 3
-            and transactions[0].method == "claimRewards(uint256[])"
-        ):
-            return InterpretedTransactionGroup(transactions)
+        root_method = transactions[0].method
 
+        if root_method == "deposit(uint256,uint256,address)":
+            # add liquidity TX, not much to do
+            if len(transactions) == 2:
+                # only cost + deposit
+                return InterpretedTransactionGroup(transactions)
+
+            # add liquidity and claim rewards
+            # everything after the first two is some kind of claim reward
+            # when you enter an LP position you had already entered, when
+            # you stake the position, you automatically claim rewards
+            deposit_txs = transactions[:2]
+            claim_txs = transactions[2:]
+            net_claim_tx = self._consolidate_claims(claim_txs)
+            return InterpretedTransactionGroup(
+                [
+                    *deposit_txs,
+                    net_claim_tx,
+                ]
+            )
+
+        if root_method in ("claimRewards(uint256[])", "claimReward(uint256)"):
+            # claim rewards only
+            cost_tx = transactions[0]
+            net_claim_tx = self._consolidate_claims(transactions[1:])
+            return InterpretedTransactionGroup([cost_tx, net_claim_tx])
+
+        # unknown pattern
+        return InterpretedTransactionGroup(transactions)
+
+    def _consolidate_claims(
+        self, claim_transactions: List[WalletActivity]
+    ) -> WalletActivity:
         plus_tx = [
             x
-            for x in transactions
+            for x in claim_transactions
             if x.is_receiver and x.got_currency_symbol == "VIPER"
         ]
         minus_tx = [
-            x for x in transactions if x.is_sender and x.got_currency_symbol == "VIPER"
+            x
+            for x in claim_transactions
+            if x.is_sender and x.got_currency_symbol == "VIPER"
         ]
 
         consolidated_tx = deepcopy(plus_tx[0])
@@ -42,16 +72,8 @@ class ViperSwapClaimRewardsEditor(Editor):
         )
         consolidated_tx.coin_amount = delta
         consolidated_tx.got_amount = delta
-        consolidated_tx.log_idx = 1
 
-        return InterpretedTransactionGroup(
-            [
-                # the cost transaction used to invoke contract
-                transactions[0],
-                # the consolidated VIPER reward TX
-                consolidated_tx,
-            ]
-        )
+        return consolidated_tx
 
 
 class ViperSwapXRewardsEditor(Editor):
@@ -137,9 +159,6 @@ class ViperSwapLiquidityEditor(Editor):
 
         in_order_txs = [cost_tx, get_tx_2, send_tx_2, get_tx_1, send_tx_1]
 
-        for i, tx in enumerate(in_order_txs):
-            tx.log_idx = i
-
         return InterpretedTransactionGroup(in_order_txs)
 
     def interpret_add_liquidity(
@@ -192,8 +211,5 @@ class ViperSwapLiquidityEditor(Editor):
         if cost_tx:
             # add back the cost TX if it was found
             tx_log.insert(0, cost_tx)
-
-        for i, t in enumerate(tx_log):
-            t.log_idx = i
 
         return InterpretedTransactionGroup(tx_log)

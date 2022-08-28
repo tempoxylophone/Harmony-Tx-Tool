@@ -63,7 +63,7 @@ class TransactionCSVWrapper:
 
     @property
     def got_amount(self) -> str:
-        return str(self.tx.sent_amount or "")
+        return str(self.tx.got_amount or "")
 
     @property
     def got_currency(self) -> str:

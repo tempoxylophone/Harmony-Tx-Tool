@@ -19,6 +19,7 @@ OPERATORS: Dict[str, Callable] = {
     ">": operator.gt,
     "<": operator.lt,
     "!=": operator.ne,
+    "in": lambda x, y: x in y,
 }
 
 T_KOINLY_LABEL_RULESET = List[

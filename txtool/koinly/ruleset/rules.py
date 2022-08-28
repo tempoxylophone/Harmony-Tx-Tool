@@ -1,5 +1,14 @@
-from .types import *  # pylint: disable=W0401, W0614
-from .constants import *  # pylint: disable=W0401, W0614
+from typing import Dict
+from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop
+from .constants import (
+    TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR,
+    TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
+    TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
+    TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
+    VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
+    CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
+    EUPHORIA_BOND_DEPOSITORY_CONTRACT_ADDRESS_STR,
+)
 
 KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
     KoinlyLabel.NULL: [
@@ -8,6 +17,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "method": ("==", noop, "redeem(address,bool)"),
                 "got_amount": (">", noop, 0),
+                "got_currency_symbol": ("in", noop, "sWAGMI|WAGMI"),
             },
         ),
         (
@@ -19,6 +29,11 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     "deposit(uint256,uint256,address)",
                 ),
                 "sent_amount": (">", noop, 0),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    EUPHORIA_BOND_DEPOSITORY_CONTRACT_ADDRESS_STR,
+                ),
             },
         ),
         (
@@ -63,6 +78,18 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     "unstake(uint256,bool)",
                 ),
                 "got_currency_symbol": ("==", noop, "WAGMI"),
+            },
+        ),
+        (
+            "Stake LP Position in ViperSwap",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "deposit(uint256,uint256,address)",
+                ),
+                "sent_currency_symbol": ("==", noop, "VENOM-LP"),
+                "to_addr_str": ("==", noop, VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR),
             },
         ),
         (
@@ -199,7 +226,11 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 ),
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
-                "method": ("==", noop, "claimRewards(uint256[])"),
+                "method": (
+                    "in",
+                    noop,
+                    "claimReward(uint256)|claimRewards(uint256[])|deposit(uint256,uint256,address)",
+                ),
             },
         ),
     ],

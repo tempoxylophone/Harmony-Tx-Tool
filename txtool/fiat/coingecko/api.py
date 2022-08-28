@@ -5,6 +5,7 @@ from functools import lru_cache
 import requests
 
 SECONDS_IN_DAY = 86_400
+_TIMEOUT = 300  # 5 minutes
 T_COINGECKO_DATAPOINT = Tuple[int, float]
 CoingeckoPriceTimeseries = NewType(
     "CoingeckoPriceTimeseries", List[T_COINGECKO_DATAPOINT]
@@ -38,7 +39,10 @@ def get_coingecko_search_directory() -> Dict:
     }
 
     response: Dict = requests.get(
-        "https://api.coingecko.com/api/v3/search", params=params, headers=headers
+        "https://api.coingecko.com/api/v3/search",
+        params=params,
+        headers=headers,
+        timeout=_TIMEOUT,
     ).json()
 
     return response
@@ -100,6 +104,7 @@ def get_coingecko_chart_data(
         f"https://www.coingecko.com/price_charts/{coin_internal_id}/usd/custom.json",
         params=params,
         headers=headers,
+        timeout=_TIMEOUT,
     )
 
     chart_data: Dict[str, List[List]] = response.json()

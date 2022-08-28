@@ -12,6 +12,8 @@ class DatabaseUnavailableError(Exception):
 
 class UniswapV2ForkGraph:
     _UNIX_TS_1_DAY_APPROX = 86400
+    # 5 minutes
+    _TIMEOUT = 300
 
     def __init__(
         self,
@@ -26,7 +28,10 @@ class UniswapV2ForkGraph:
     @api_retry(custom_exceptions=[DatabaseUnavailableError])
     def _graph_ql_request(self, payload: Dict[str, str]) -> Dict[str, Dict]:
         r = requests.post(
-            self.subgraph_url, headers=self._get_graph_ql_headers(), json=payload
+            self.subgraph_url,
+            headers=self._get_graph_ql_headers(),
+            json=payload,
+            timeout=self._TIMEOUT,
         ).json()
 
         try:
@@ -38,8 +43,9 @@ class UniswapV2ForkGraph:
                 raise DatabaseUnavailableError("Database unavailable") from e
 
             raise RuntimeError(
-                f"Could not get data for subgraph from URL: {self.subgraph_url} "
-                f"with payload: {payload}. Got response: {r}"
+                f"Could not get data for subgraph from URL: "
+                f"{self.subgraph_url} with payload: {payload}. "
+                f"Got response: {r}"
             ) from e
 
     def _get_graph_ql_headers(self) -> Dict[str, str]:
@@ -47,7 +53,8 @@ class UniswapV2ForkGraph:
             "authority": str(self.authority),
             "pragma": "no-cache",
             "cache-control": "no-cache",
-            "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+            "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", '
+            '"Google Chrome";v="99"',
             "accept": "*/*",
             "dnt": "1",
             "sec-ch-ua-mobile": "?0",
@@ -179,7 +186,7 @@ class UniswapV2ForkGraph:
         "The Bundle is used as a global store of derived ETH price in USD" - Uniswap Docs
         """
         return f"""
-        t{block_num}: 
+        t{block_num}:
             token(id: $token_id, block: {{number: {block_num}}}) {{
               __typename
               derivedETH

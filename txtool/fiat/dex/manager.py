@@ -39,7 +39,16 @@ class DexPriceManager:
     def get_price_of_token_at_block(
         cls, token: Token, block: int, price_data: T_DEX_PRICES
     ) -> Decimal:
-        return price_data[token]["fiat_prices_by_block"][block]
+        try:
+            return price_data[token]["fiat_prices_by_block"][block]
+        except KeyError:  # pragma: no cover
+            MAIN_LOGGER.info(
+                make_yellow("\tCouldn't find price of token: %s, %s at block = %s"),
+                str(token),
+                token.symbol,
+                str(block),
+            )
+            return Decimal(0)
 
     @classmethod
     def get_tx_fiat_value(
@@ -143,7 +152,7 @@ class DexPriceManager:
                         token_properties["blocks"],
                     )
 
-                    if failure:
+                    if failure:  # pragma: no cover
                         MAIN_LOGGER.info(
                             make_yellow(
                                 "\tNo prices found for token: %s from %s",

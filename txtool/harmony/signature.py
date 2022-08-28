@@ -6,6 +6,7 @@ import requests
 
 from txtool.utils import api_retry
 
+_TIMEOUT = 300  # 5 minutes
 _LOOKUP_BASE_URL = "https://www.4byte.directory/signatures/?bytes4_signature={0}"
 _CAPTURE_METHOD_NAME_REGEX = r"<td class=\"text_signature\">(.*)<\/td>"
 _HEADERS = {
@@ -56,9 +57,10 @@ def _do_request(function_signature: str) -> str:
     r = requests.get(
         url,
         headers=_HEADERS,
+        timeout=_TIMEOUT,
     )
 
-    if r.status_code != 200:
+    if r.status_code != 200:  # pragma: no cover
         raise BadStatusException(
             f"Request to {url} raised non 200 HTTP status, got code: {r.status_code}"
         )

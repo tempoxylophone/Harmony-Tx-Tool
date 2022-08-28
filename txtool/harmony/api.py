@@ -22,6 +22,7 @@ from txtool.utils import MAIN_LOGGER, api_retry, get_local_abi
 
 
 class HarmonyAPI:
+    _TIMEOUT = 300  # 5 minutes
     _CUSTOM_EXCEPTIONS: List = [
         RPCError,
         RequestsError,
@@ -123,15 +124,14 @@ class HarmonyAPI:
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def _get_code(cls, address: str) -> Dict:
         url = cls._get_code_request_url(address)
-        r: Dict = requests.get(url).json()
+        r: Dict = requests.get(url, timeout=cls._TIMEOUT).json()
         return r
 
     @classmethod
     def get_code(cls, address: str) -> Dict:
-        # this service appears to be taken offline permanently
         try:
             return cls._get_code(address)
-        except JSONDecodeError:
+        except JSONDecodeError:  # pragma: no cover
             # 502 bad gateway
             return {}
 

@@ -4,7 +4,10 @@ from collections import defaultdict
 from decimal import Decimal
 
 from ...harmony import WalletActivity, HarmonyToken
-from .api import get_coingecko_chart_data_by_symbol, CoingeckoPriceTimeseries
+from .api import (
+    get_coingecko_chart_data_by_symbol as _get_api_data,
+    CoingeckoPriceTimeseries,
+)
 
 
 class CoinGeckoPriceLookupBounds(TypedDict):
@@ -34,6 +37,10 @@ class CoinGeckoPriceManager:
 
             for token in t.get_relevant_tokens():
                 p = price_lookup[token]
+                if p["timestamps"] and p["timestamps"][-1] == timestamp:
+                    # already have this exact time
+                    continue
+
                 p["timestamps"].append(timestamp)
                 p["timestamp_max"] = max(p["timestamp_max"], timestamp)
                 p["timestamp_min"] = min(p["timestamp_min"], timestamp)
@@ -43,21 +50,19 @@ class CoinGeckoPriceManager:
             symbol = token_obj.universal_symbol
 
             # add price timeseries to lookup info
-            full_ts = get_coingecko_chart_data_by_symbol(
+            full_ts = _get_api_data(
                 symbol,
                 int(p["timestamp_min"]),
                 int(p["timestamp_max"]),
             )
-            p[
-                "fiat_prices_by_timestamp"
-            ] = cls.get_best_estimate_at_timestamp_from_coingecko_data(
+            p["fiat_prices_by_timestamp"] = cls._get_best_estimates_at_timestamps(
                 p["timestamps"], full_ts
             )
 
         return price_lookup
 
     @classmethod
-    def get_best_estimate_at_timestamp_from_coingecko_data(
+    def _get_best_estimates_at_timestamps(
         cls, timestamps: List[int], full_ts: CoingeckoPriceTimeseries
     ) -> Dict:
         # assuming full_ts is in order and is a list of timestamp pairs of

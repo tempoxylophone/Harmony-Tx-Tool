@@ -1,21 +1,31 @@
 from typing import Any
 from datetime import datetime
-from copy import deepcopy
+from copy import deepcopy, copy
+
 import pytest  # noqa
-from txtool.activity.interpreter import get_interpreted_transaction_from_hash
-from txtool.harmony import WalletActivity
+from txtool.activity.interpreter import get_interpreted_transactions
+from txtool.harmony import HarmonyAddress, WalletActivity
 from .utils import get_vcr
 
 vcr = get_vcr(__file__)
+
+TX_RANDOM_HASH = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
+TX_RANDOM_ACCOUNT = HarmonyAddress.get_harmony_address_by_string(
+    "0x974190a07FF72043BDEAa1f6BFe90BDd33172E51"
+)
+
+TX_RANDOM_HASH_2 = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
+TX_RANDOM_ACCOUNT_2 = HarmonyAddress.get_harmony_address_by_string(
+    "0x9bC54Db115f9a362B5E6b9eFfcaf9c7c2486Bf16"
+)
 
 
 @vcr.use_cassette()
 def test_token_tx_with_intermediate_transfers() -> None:
     # random TX from explorer
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
-    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        tx_hash, exclude_intermediate_tx=False
+        TX_RANDOM_ACCOUNT, TX_RANDOM_HASH, exclude_intermediate_tx=False
     )
 
     assert len(txs) == 6
@@ -28,6 +38,7 @@ def test_token_tx_with_intermediate_transfers() -> None:
     get = txs[5]
 
     assert root.coin_type.is_native_token
+    assert root.coin_type_symbol == "ONE"
     assert root.coin_amount == 0
     assert root.tx_fee_in_native_token > 0
     assert root.is_sender
@@ -102,9 +113,8 @@ def test_token_tx_with_intermediate_transfers() -> None:
 def test_token_tx_ignore_intermediate_transfers() -> None:
     # random TX from explorers
     # SWAP: 31.0385 ONE -> 7.3554 USDC (de-pegged)
-    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(
-        tx_hash, exclude_intermediate_tx=True
+        TX_RANDOM_ACCOUNT, TX_RANDOM_HASH, exclude_intermediate_tx=True
     )
 
     assert len(txs) == 3
@@ -138,8 +148,9 @@ def test_token_tx_ignore_intermediate_transfers() -> None:
 
 @vcr.use_cassette()
 def test_get_function_name_for_unknown_abi_in_transaction() -> None:
-    tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
-    txs = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+    txs = WalletActivity.extract_all_wallet_activity_from_transaction(
+        TX_RANDOM_ACCOUNT_2, TX_RANDOM_HASH_2
+    )
 
     # check that we can get the signature even if we don't know the contract ABI
     assert all(x.method == "claimReward(uint8,address)" for x in txs)
@@ -147,9 +158,12 @@ def test_get_function_name_for_unknown_abi_in_transaction() -> None:
 
 @vcr.use_cassette()
 def test_transaction_equality() -> None:
-    tx_hash = "0xaa5308615087d52a0fa17925792af3be8eb35de017fc727a0dce2854bd9b32c0"
-    txs_1 = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
-    txs_2 = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+    txs_1 = WalletActivity.extract_all_wallet_activity_from_transaction(
+        TX_RANDOM_ACCOUNT_2, TX_RANDOM_HASH_2
+    )
+    txs_2 = WalletActivity.extract_all_wallet_activity_from_transaction(
+        TX_RANDOM_ACCOUNT_2, TX_RANDOM_HASH_2
+    )
 
     for t1, t2 in zip(txs_1, txs_2):
         assert t1 == t2
@@ -165,8 +179,7 @@ def test_transaction_equality() -> None:
 
 @vcr.use_cassette()
 def test_wallet_deepcopy_transaction_activity() -> None:
-    tx_hash = "0x8afcd2fef1bad1f048e90902834486771c589b08c9040b5ab6789ad98775bb13"
-    txs = get_interpreted_transaction_from_hash(tx_hash)
+    txs = get_interpreted_transactions(TX_RANDOM_ACCOUNT, TX_RANDOM_HASH)
     copy_txs = [deepcopy(tx) for tx in txs]
 
     # alter the fields in tx2 unless they are objects in our package
@@ -203,3 +216,18 @@ def test_wallet_deepcopy_transaction_activity() -> None:
                 a = getattr(tx1, attr_name)
                 b = getattr(tx2, attr_name)
                 assert (a is None and b is None) or a != b
+
+
+@vcr.use_cassette()
+def test_wallet_shallow_copy_transaction_activity() -> None:
+    txs = get_interpreted_transactions(TX_RANDOM_ACCOUNT, TX_RANDOM_HASH)
+    copy_txs = [copy(x) for x in txs]
+
+    # can 'mutate' primitive types without affecting copy but not objects
+    for c in copy_txs:
+        c.log_idx = -1
+        c.tx_data["hello"] = "world"
+
+    for c in txs:
+        assert c.log_idx != -1
+        assert "hello" in c.tx_data

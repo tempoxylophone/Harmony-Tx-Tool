@@ -27,11 +27,12 @@ class WalletAction(str, Enum):
 class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def __init__(
         self,
+        account: HarmonyAddress,
         tx_hash: HexStr,
         harmony_token: Optional[Token] = None,
     ):
         # get information about this tx
-        super().__init__(tx_hash)
+        super().__init__(account, tx_hash)
 
         # set custom token if it is given
         self.coin_type = harmony_token or self.coin_type
@@ -39,11 +40,11 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
     @property
     def is_receiver(self) -> bool:
-        return self.to_addr == self.account
+        return bool(self.to_addr == self.account)
 
     @property
     def is_sender(self) -> bool:
-        return self.from_addr == self.account
+        return bool(self.from_addr == self.account)
 
     def _get_action(self) -> WalletAction:
         if self.is_receiver:
@@ -85,10 +86,11 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     @classmethod
     def extract_all_wallet_activity_from_transaction(
         cls,
+        account: HarmonyAddress,
         tx_hash: Union[HexStr, str],
         exclude_intermediate_tx: Optional[bool] = True,
     ) -> List[WalletActivity]:
-        root_tx = WalletActivity(HexStr(tx_hash))
+        root_tx = WalletActivity(account, HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx, exclude_intermediate_tx)
         return [root_tx, *leaf_tx]
 
@@ -269,6 +271,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             # create tx that is the contract sending you what you requested
             return_tx = WalletActivity(
                 # technically this is not the same hash, but we want it to show up
+                root_tx.account,
                 root_tx.tx_hash,
                 d.coin_type,
             )
@@ -301,7 +304,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         token = HarmonyToken.get_harmony_token_by_address(log["address"])
         value = token.get_value_from_wei(log["args"]["value"])
 
-        r = WalletActivity(root_tx.tx_hash, token)
+        r = WalletActivity(root_tx.account, root_tx.tx_hash, token)
         r.log_idx = log_idx
         r.coin_amount = value
         r.event = log["event"]
@@ -315,7 +318,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         return r
 
     def __copy__(self) -> WalletActivity:
-        new_tx = WalletActivity(self.tx_hash, self.coin_type)
+        new_tx = WalletActivity(self.account, self.tx_hash, self.coin_type)
         new_tx.__dict__.update(self.__dict__)
         return new_tx
 
@@ -323,7 +326,7 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         self_module: str = self.__class__.__module__.rsplit(".", 1)[0]
 
         # create a copy of this transaction, set all important fields
-        wallet_copy = WalletActivity(self.tx_hash, self.coin_type)
+        wallet_copy = WalletActivity(self.account, self.tx_hash, self.coin_type)
         memo[id(self)] = wallet_copy
 
         for attr_name, attr in self.__dict__.items():

@@ -58,6 +58,7 @@ black = "*"
 pylint = "*"
 vcrpy = "*"
 pytest-random-order = "*"
+flake8-bugbear = "*"
 
 [requires]
 python_version = "3.8"

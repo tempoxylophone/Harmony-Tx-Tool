@@ -1,0 +1,1091 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00e4Z\u00ebn,\u00b9\u008d\u00fe\u00bf\u008f\u00e1\u00df\u0083\u0005)\u008a\u00149o\u00a3\u00d2\u0005\u00d8E\u0090\u00043\t\u0010 \u00c8\u00bb\u0007\u0094T})\u00db\u00c7]v\u001f\u0007\u0098\u00b4\u00e7\f\u00baY%\u00deDR\u001fY\u00f5\u00cf\u0097\u00ff\u00ff\u00fd/\u007f\u00fe\u00ed\u00af\u00e5\u00e5\u00d7\u0097\u00f0\u00bf\u00f0\u00f2\u00cb\u00cb\u00ff\u00d5\u0097_\u0099\u007fy\u00f9\u00ad\u00fd\u00fe\u00f7?\u00fd\u00ed\u00e5\u00d7\u0017\u00f8\u0087\u0080\u0082@\u0004\u000e\u0014\u0015\u0090\u0005\u0001\u00108\t\u0000(\u00f4\u00ca\u001b\u0083\u0000D\u0012\u0004A@\u00d3y\u008dX\u00a0\u0001\u0016\u0005\u00a1\u0084\f\u00a8Y\u0010}u#NN\u00cd\u0091S\t5M\u00aa\u0096I\u00adUB\u00ab\u00d4&U\u00e4@\u008d\u0082\u00c0\u00d6'\u00b5\u0087^\u001b\u00e96\u00a95/\u00ea\u00d6sJ\u00a5\u000f\u00aa@\u00e5\u00b4\u00f4\u0012\u00de\u00ee\u00e4\u00fa\u00f5X\u0016\u00afl\u00c0V\u00b6\u00c5\u000bt\u00c9e\u00e0\\\u0016/\u008ex\u00e4\u00a55s\u00d9x\u009b\u00danu\u00ae\u00baP\u0087\u0004^T\u00e3\u00aa\u00b6E\u009cTmKn\b\u001bq\u0099\u0096E\u0093\u00a3\u0084\u008b\u00ef\u00fc:5\u009b\u00ab\u0092\u0095\"\u00c9`R;.j+mk0\u00a91\u00e4#/\u0092\u0018\u001b#\u000fm1\u00f2\\\u0015\u0083\u0089\u0014\u00d1I\u00c5~\u00a0\u000e\t\u00fb>\u0088b\u0002\u00c2i\u0019\u00e9\u00da\u00c9\u0004\u00194\u00d0\u00b4\u008c\u00b6W6\\\u00e4\u00fa\u00f5\u00d0\u00d6>\u00911\u0018\u00f1\\\u0015zXr\u00a1 t\u00b4\u00c9+lG^\u00816M\u00a1\u00d6\u00a9mZz]\u00a8\u0083\u0097.\u007f\u0010\u00e4\u00da\u0015\u00e7\u00ee\u0085\u0012\u0017\u0015\u00a94\u0096\u00b4\u00a8\u00e5(\u0001\u00a4\u00d7\u00da\u0080\u00c6u\u00b4\u00b5{`\u00dcr\u00da&5\u00e0\u00b2\u0001\u0015\u0005\u00ea.W\u0012'\u00de\u00ae\u0099\u00e1\u00eb3\u008f\u00c4`\u00e7\u00eey\u00a4\u00c0(\u0010@A\u0003\u0007%FE%\u00c0\u00f9\u00dd\u00d0\u0082\u0092\u0005\u0003\u00a7\u0019*\u0003\u009a\u00dfKJ\u00ce\u00977%E\u009cy\u0088\u00d5\u00f7\n\u00d5\u007f\u00a2\u0092\u0006\u00e7\u00e2\u00bca\u00f8\u00a6$\u0097\u00c90\u00ffl\u00fc\u00f3{\r\u0004\u00b0\u00a3\u00acl\u000e02O\u0003\u00d0\u00d4\r\u00d0e\u0005\u0000Oi\u0004\u0080\f\u0084\u0086\u00a2\u0017\u00ee\u0086\f\u00ce\u00d9\u00c2\u00e4=\u00ea\u0003*\u0018\u0002\u0019t\u001a\u0096\u0007v\u008d\u00a3\u0002\u0089\u00ff\u0017\u00e1\u00a2w\u00a0C\u00fdH\u00d4\u001f\u00fc(\u0012\u00a3\u00b8\u0005\u00ae\u0007\r\u00df\u0016\u00bb\u00f5\u00ad!2\u00b2\u00fb\u0096\u00ddshn\u00c7\u00d4\u00fa\u00a2\u0099t_W\u00fb\u00fd\u00ba\u001f\u00af\u00b9\u00b7Fn\u00ac\u00b1\u00f4\u0015k<\u00edlF\u0004\u00baE\u0006\u0086\u00d3\u00c2x\u00b1\u00b0\u00cd\u00e8\u00d95O\u00bc\u00ed\u00bf\u00ab\u00c7]J\u00fd>\u00baz7\u00b0\u0080\u00f2\u0080\u0017\u0092\u00ea\u00ce\u00eb\u00dd\u00fd\"\u00d0'\u00eeW\u00d2\u00b6$\u0092\u00c4\u00f7$\u008eJ\u00fb4\u0089\u0015]\u00a2g\u00cfk\u00a9\u00e1Fj*\u00f7R\u00c7j\u008d\u00fdm\u000f\u00dd\u00ae4;\u00ae|\\c\u0014\u0097\u00c2\u00e5f\u008f\u00df\u0091R^\u00e9wR\u008a1\u00dc\u00f8\u001e\u00c1\u0092~\u00b8\u0017\u0011\u00be\u0014\u00df\u0087\u00bd\u00c8\u00da?\u00b43F\u00f8\u00a2\u009d\u00d9lI\u00892\u00a4\u0096z\u009b!\u008fs{ \u008ff\u0085\u00cf\u00cd>\u00f6d.O\u00f4\u00e4&\u001fgnl\u00fcL\u0089[\u00fcP\"c{\u00a2\u00c4\u0082\u00f0\u00b6W\u00db\u008dD\u00fei\u00f5w\u00a7\u00ccz\u00bf\u007f\u00ef]\u00c6\u00e9\r\u0017}\u00f3\u00cd\u00d5r\u00d5\u00bd\u00be\u001d\u00e9\u00b7\u00de\u00da\u00be\u00b4?W\u00dd\u00a7.\u0082\u00d0\u0003\u00bd\u00ed\u00b1\u009b\u00fc\u00e2\u00fe\u00d5\u00fc\u00ea\u0097\u0013h\u00e4\u0017:\u009f\u0091_\u0003C\u00c4[\u009c\u00e3XC\u0000BzT\u00c0\u00bb\u009f\u0089F\u0006>Q\u0014d\b\u009e\u0085\u00e6{\u0010\r,B4\u00d2\b8\u00b24\u00aa\u00e3\u00c0\u00008\u0011\u008f9\u00d6\n\u0013\u00c1\b\u00189\u00c5w\u00daQ\u0096\u00fa\u0095\u00e9\u0019\u00d9&\u00fau|\u00e4\u00dd\u008cX\u009c\u00e8\u0010\u0006\u0006\u00e3\b\u0011\u001c\u00a7\u0085\u00dd\u00eb\u0086k\u0095cG\u00d7g\u00a0+\u0080\u0089\u0094\u00fc[p\u00e4\u00b5)rt\u00e9\u00e3\u00ea\u00c2`\u00be\u00de\u00b9\u000e$+\u00d9\u00f1o\u0098\u00f5e\u00a0\u00b3\u00c1\u00ed\u008a\u00dfv\u0004\u00b7\u00fc<\u00b4\u00abB\u00a4Q\u00a3 \"\u00daD{\u00ce\u00df\u00c2@h\u00fb\u00bd\u0081\u00e3\u00fd\u00ba\u001e|\u00d5X\u0017d\u00cf\u00b0\u00c4\u00a8\u0091\u001c\u00f3\u00a5X\u0094wL'\u0083\u00e3\u00ec\u0000\u00fdWP\u00bdA\u0099h\u0014\u009dfHv\"v3\u008a\u00eb\u00e2\u0015\u00d5y\u00c1\u00f0\u00e6\u00fe+\u000e_\u0007p\u00dbx\u00ec\u0092\u00ff?\u0000\u00c7\u00e1]\u00c4HK\u00e7\u0083\u00d5\u00b4\u00e3Q\u00a7\u00a5.-a\u00ab\u00b9a\u00d8p\u00b3\u00d4c\u00f5H\u00a4\u0004\u00bdu\u00dfR\u00ee9\u00f4\u009c\u001b`p\u00a6\u0019\u00c5\u008aD\u008d\\\u0005\u0083\u0014S\\>c\u008fh\u008f\u00fc\u008b\u0017\u00d3\u00d8M\u00e1\u008d\u0006*w\f\u00fe\u00be\u001d'\u00fc\u0092P\u00ae6+\u000e\u009ba\u00c6X\u0015\u00ef\u0006\u00dc~\u00df\u001f\u0003\u0015W\u00ba\u00ed:\u001a\u00c739L\u00b3\u008f\u00d1\u0089\u00b3|\u00a7S\u0007-\u0094,\u00c3g?\u00cb\u0007qD\u00f5\u001e\u00dfA\u00bdO\f#b\u00e8\u001a9\u00ea\u00fbh\\\u009c\u00ea\u00b13\u00d1\u00ee\u008c\u00daC71\u00fb(\u008d\u009b\u00e7\u00a9 \u00f2DJ\u0097\u00f8v\u00ecdD\u00e3\u009ah]\u00d7\u00ae\u00d1\u00ae\u00e2\u009eJutCgQ\u0099\u00e7\u00c8\u008e\u001e\u00ce\u00ac\u001d\u00de5\u0090\u00e9]}\u00a2\u007fGU\u0089\u00b3\u00b2\u00d9\u00ac3qv~\u00a9\u00c7\u009e\u00924A\tR\u0084)\u0007\u00ef\u00d8Q\u008a\u00ffJ!\u0080X\u00a2\u0000\u00d2\u00a4\u00a7\u0018 EQ\u00e1\u00002Wq\u00f2\u0098]\u00bc\fn\u00f1\u008e\u00c4\u0081w\u00f6Y\u008fy\u008d?\u0011\u00d5\u0084\u00f2~\u00f5\u007f\u00d4\u00fay.c2`\u001e\u00d9\u00ee\u00d6\u00c3\u00e9=\u00bd\u00a9:\u0001v\u000fFX\u00f5e\u008f(\u001b\u00f1\u00f9\u00b9\u00981k_\u0088\u0099\u001c\u00e0\u008f\u00163\u0002\u00a0\u0013\u0013\u008c\u00e9\u0002\u00d8\t\u00fc\u00ed57u\u00dd\u001a@\u00b2\u00c2\u0084\u00c2\u0086\u0011)\u00c6R\u00b1W\u00c8\u00d1\u00cf2\u00b4h\u00a9[\n!S\u00cd\u00b97\u00da\"\u00aat\u00d9$rj\u00be\u00e3d\u0090\u00bdV\u00eb\u0088\u00ddw\u00e5=\u00ea\u00d7q\u0016\u00ec]\u00f9\u00a56\u00ed\u0098\u00fc\f\u008a;\u009c\u0084\u00e2\u00bb\u00b5N\u000f\f0\")\u00d9\u008c\u00c6\u0081\u00b9\u000eg\u00bb\u009e\u00ab\u00fb\u0097\u0013,\u00fe\u00f7\u00e2\u00b4u.l\u00a6\u001a\u00deE9\u00f1\u001e\u00e5\u00a4\u00ee\u00b4qR\u00f9JT\u0019Hi\u00a1\u00ed{\\\u00e2u\u00c9\u00ef\u00ca\u00acD\u00a4t\u00c5)\u0083\u00dau\u00d2\u00aeg\u0015\u00f0\u001b\u00a8\u00eeC\u001c\u00c6w\u001af\u00a8Ns\r'&\u00f91\u00b6:\u0011\u00a1\u00f5\u0016\u0093\u00bc\u0089\u00c3^\u00a3\u00d1\u0085*\u0095b@\u001c;V\u00b4\u00fc\u00cc\u00ba\u00e6\u00bfPo\u00eb\u001a\u00c3\u00a8NU,\u00c5Q\u00d58i\u00f2j\u0016\u0084%\u0006\u0090\u00d1\u00b9H\u0094\"\u00e6\u0095\u00ec(\u00e1\u00e3\u00bav\u000e\u00d7\u00fd(\u00cb\u00bf\u008eU\r\u00f4\u00e6\u009f\u00fb\u00bb\u0085\u00db\u00aaq\u009c<\u0003Z2\u00b0\u00c4\u00e1\u00c4,\u0084UP\u00f6i\u00f5\u00c8\u00cd\u00e8v\tx6\u00bb5\u00ba\u00a6\u00d63VF_\u00bc\u00f6\u00a6,\u00a9\u00ae\u009dg8\u008f\u00ce\u00c7\u00f1\u009d!,\u00f4\u00dc\u00e6\u001d\u00e4\u00f1=<\u001e\u0001\u00c7\u000e'\u00af\u00d8hc\u0016\u00fd\u00e9\u00cf\u00aa\u000eSS\u00ff\u001e\u00a6\u001d\u00fe=\u0084\u00a9\u00b9\u00f7_k&\u00efw\u00dej\u0087\u0080q\u00acPPvl>&\u00c6\u00b2[;{=[\u001c\u00fcn\t:\u0091\u00b0\u00f8\u00dd\u00f3\u00d4]\u009d\u000f\u008eZ\u00c6\u00bb\u00f4<\u00ef\u00b4}e\u0099\u00bf\u00d5\u007f\u00db|&\u00c0\u00ecu\u0090fo\u00e7\u00f7\u00b4\u00b0v\u0091\u00beZ\u00af\u00db|&\u0010f|O\u008b\u00cdm\u00cc=#\u00afz\u00db\u00a0q\u00a2:g\u0006\u00d4\u00e6\u00b7\u0089\u0007w\u00bc\u00feu=`\u00f8\u00d49\u009e;?\u00a7\u0096#\u00ea\u009b\u001a'\u0006=\u00d1\u008bzD\u009fCi\u00a3\u008e\u00b7\u00da\u00be\u00b1s\u00c2c\u00e7\u0084\u00e4\u00d4\u008f;\u00a7/\u00f4\u00e475\u00ca\u00ab\u00be\u009fvPVM\u00d9g\u00b8\u001d\u0093f\u00ff\u00bb\u00ed\u00c5\u00df\u00f8;\u0085\u0089<\u008b\u001e\u0099\u000f\u00ec\u0015\u00c8}\u00b4\u00d7\u009c;\u0014\u00df\u001d\u00c9~\u0012\u00c5w\u0087.\u009fE\u00f1\b@\u007f4\u0014\u007f\u0012\u00d3\"\u0082\u00f4o\u00cc\u00109d\u0088fv\u00ea\u0003\u00b3\u0085\u009b\u00ee\u00e4\u0084\u008d\u00a0\u0011\u00c5\u00c2\u00b3\u00fa\u0093\u0019\u00ed\u00cf\u00edPNd\\\u0098\u00cf9f\u0016\u00cd\u001e\u00fbss%;\u0099\u00ebJ#VP\u00f9\u001bc%\u001e\u00abi\u00b3\u000b\u00ba\u007fV5\r\u00d3\u00ae\u00fe\u009d\u00f3\u00b5p\u00cc\u0081\u00b29\u00f5\u00a9v\u008d\u00b8\u00ffx\u00e6iq\u00cc2at\u000eqVh\u001d\u00dd\u0083\u00b2G\u0097\u00e3'\u001d\u001d\u008c\u00a1\u00fbF\u000bo\r\u001b\u00b7\u00ad\u0095Ty\u00ab\u0018{\u00c2\u0018R\u00c5\u00a6\u00b1S\u00ad@\u0018\u000b\u00f4\u00b4\u00b9A\u008d\u00b7\u0000\u0090\u008b\u0096Th\u00b3\u00c0G\u00fc\u0092\u00e93'\u00cf\u008a\u00c6\u00f9N\u00c8w\u00ed\u001a\u001f\u00a3\u00b1\u00c4\u00bd\u0093{r4\u0012\u00e9\u007fp\u00da\u00ab\u00de)<6\u00edE\u008a\u00a44\u00fbd\u00ef\u0098\u00d7\u00b4\u009f\u00b4*\u00be\u00db\u000f\u00cb]?\u00ac\u00ad\u00ee\u00f5\u00ff\u0084\u009f\u00e4\u00c3\t\u00e1]\u00e7{*o\u00f8}\u00de\u008e\u00e5\u0017\u009e!f\u001b9\u00a6\u000b\u00cd\u00b8\u00dd\u00a3\u00bf\u000b\u00d7y\u00ffW\u00f25\\\u00beE\u00d8sr\u00cee\u0098\u001d\u00ad\u00ac\u00ac\u001co\u00c4\u0018Y\u00f0<\u00b6\u0090z\u00ad=p\u00c8\u0015\u00b7\u0016\u008a\u00da&V\u00c2\u0006\u00a2\u00bdP\u00d2\u009a\u00b3q\u00d8r\u00ea(TbFo\u007f:s\u008e\u00b5s\u00a0\u008d\u009a\u009f18\u009fo\u001d\u00f3si\u00175\u00ceY\u0001\u00c6j\u00df\u0015\u00a7J\u00c3\u001bx\u00ffn\u00d3\u00ec?\u00f7\u00e7\u00fco\u00bf}\u0085\u00d1\u00da\u00fbo_aTy\u00e4\u00ed+\u008ce{\u00f2\u00dbWu\u0097:\u00eb\u00e1\u00c5\u00c3s\u00cav\u00d5\u009f\u0099\u007f\u00faDf\u00bb\u009b\u00c88\"\u0015\u00e1X\u0005\u001d\u0081\u000e\u0094\u008a\u0012%\u008a\u00a5(&]\u00da\u00c0\u00a42\u0010\u00a9Hq|z\u0095\u00f01F=<\u0001<[\u001fy\u00ef\u00e9~\u00a2G\u00fa\u001djg\u000e\u0091(\u0010\f_T1i\u000b\u009f\u00f7+JOy\u00f8\u00a3\u00ef\u00deJA8Q\u00a2G<\u00e2V5#8\u00d4\u00d2\u00f1L\u00d8\u00afu\u00b9\u00af,\u00e3\u00ca\u0089\u00b7\u0001\u008e\u009d\u00da\u00eb\u008a)^\u000b>_\u00bf\u00e8\u0081\u00ea\u00b5\u00ea\u00e6\u00a8^\u00f1\u00a6z\u0005\u0082\u00e7T\u00ae7\u00b1\u00c5g\"L\u00fa\u00b7U\u00b6\u00b7\u00a6\u0006\u00f9\u00c1\u00a9\u0081w\u00cd\u00c0\u001a\u0086\u00e7\u00ef\u00cf\u00e0\u0014\u00fb\u000f\u00ce\u00e0p\u007f\u0006\u008fJ\u0016N\u009e\u00c1?8'\u00bfx\u0006\u00d3\u0007\u009c\u00f9\u0092\u0017\u00e3M\u008c\u0011\u00b1\u00a9\u00e95/\u00f6\u00da0\u009fP\u00d8'\u009eg\u00b9u\u0086O\u0088I\u00bc\u007f\u0017\u00ed\u001a\u0093\u00b4j\u00fe>\u0007\u0099\u00cfy\u00e6;'\u0097\u00aen\u009c\u0006\u00eb\u00b4U\u00b6\u009f^\u00f5\u00daG\u00e7@\u00a2\u00c4\u0012\u0092\u00d76\u0014\u00fa\u00f1i\u00f0\u00c8S\u00ea\u00fd\u00ec\u00eb\u00ed\u00be\u00c6.\t-\u0091\u00c8\u009c\u008c<Vk\u000f\u0095:$\u00bf\u00ab\u008d\u00bb\u00aa\u00f4\u00c4\u00b3n\u000b'\u0015\u00f2\u0083_\u00e2\u0098\u00b7\u00841\u0083AiN}cF\u00d3\u0084S\u00ba\u009d\u00c3\u00ec\u0093\u009a\u0093\u00fa`\u0082\u0004~\u009f{\u00ebs6\u00bd\u00f6\u00cc\u0019\u00dbx\u00c9`J\u00c9\u00b59>}\u0089~\u00b2\u00c9Xa\u00e2'\u001c\u0089\u00c9\u00f0F\u008a\u00c3\u0097\u00fcEm\u00e6\u00ac\u00cb\u00fd\u00b8k$\u0082\u0089\u00a5\u00a4\u00b8\u00fc\u00ce\u0012\u001f\u009d\u008b\u00dd\u00ac\u00fd\u00dc\u00be\u00bf\u00d2\u00e6]>\u00e2^\u0093\u00fa\u0084\u00dd\u00fa$\u00a7c\u00ec|\u009aO\u0014\u0016\u001aO\u00d70\u00d1z\u00c6\u00f6\u00ca\u000f#nx\u00d2\u00ae\u009cs\u0018\u0018\u00d0e\u0013k\b\u00e8\u009d\u000f\u00e5T\u0085*\u0085\u00b0\u0015\u00e9\u00b9\u008f\u0087\u00aa\u0081:\u00a7XE\u00b0\u00e4\u00bc\u00a5\u009eS\u008a\"\u008ayk\u0085c3\u00d9b-\u00bd\u00b7\\}'\u00a4K\u0011\u008a\u0004\u0000\u001e\u0092@\u00f4\u00f2\u00af\u00ff\u00f9w\u0000\u0000\u0000\u00ff\u00ff\u0017\u00b9\u00f6\u00c6\u00f64\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00e4Z\u00ebn,\u00b9\u008d\u00fe\u00bf\u008f\u00e1\u00df\u0083\u0005)\u008a\u00149o\u00a3\u00d2\u0005\u00d8E\u0090\u00043\t\u0010 \u00c8\u00bb\u0007\u0094T})\u00db\u00c7]v\u001f\u0007\u0098\u00b4\u00e7\f\u00baY%\u00deDR\u001fY\u00f5\u00cf\u0097\u00ff\u00ff\u00fd/\u007f\u00fe\u00ed\u00af\u00e5\u00e5\u00d7\u0097\u00f0\u00bf\u00f0\u00f2\u00cb\u00cb\u00ff\u00d5\u0097_Y~y\u00f9\u00ad\u00fd\u00fe\u00f7?\u00fd\u00ed\u00e5\u00d7\u0017\u00f8\u0087\u0080\u0082@\u0004\u000e\u0014\u0015\u0090\u0005\u0001\u00108\t\u0000(\u00f4\u00ca\u001b\u0083\u0000D\u0012\u0004A@\u00d3y\u008dX\u00a0\u0001\u0016\u0005\u00a1\u0084\f\u00a8Y\u0010}u#NN\u00cd\u0091S\t5M\u00aa\u0096I\u00adUB\u00ab\u00d4&U\u00e4@\u008d\u0082\u00c0\u00d6'\u00b5\u0087^\u001b\u00e96\u00a95/\u00ea\u00d6sJ\u00a5\u000f\u00aa@\u00e5\u00b4\u00f4\u0012\u00de\u00ee\u00e4\u00fa\u00f5X\u0016\u00afl\u00c0V\u00b6\u00c5\u000bt\u00c9e\u00e0\\\u0016/\u008ex\u00e4\u00a55s\u00d9x\u009b\u00danu\u00ae\u00baP\u0087\u0004^T\u00e3\u00aa\u00b6E\u009cTmKn\b\u001bq\u0099\u0096E\u0093\u00a3\u0084\u008b\u00ef\u00fc:5\u009b\u00ab\u0092\u0095\"\u00c9`R;.j+mk0\u00a91\u00e4#/\u0092\u0018\u001b#\u000fm1\u00f2\\\u0015\u0083\u0089\u0014\u00d1I\u00c5~\u00a0\u000e\t\u00fb>\u0088b\u0002\u00c2i\u0019\u00e9\u00da\u00c9\u0004\u00194\u00d0\u00b4\u008c\u00b6W6\\\u00e4\u00fa\u00f5\u00d0\u00d6>\u00911\u0018\u00f1\\\u0015zXr\u00a1 t\u00b4\u00c9+lG^\u00816M\u00a1\u00d6\u00a9mZz]\u00a8\u0083\u0097.\u007f\u0010\u00e4\u00da\u0015\u00e7\u00ee\u0085\u0012\u0017\u0015\u00a94\u0096\u00b4\u00a8\u00e5(\u0001\u00a4\u00d7\u00da\u0080\u00c6u\u00b4\u00b5{`\u00dcr\u00da&5\u00e0\u00b2\u0001\u0015\u0005\u00ea.W\u0012'\u00de\u00ae\u0099\u00e1\u00eb3\u008f\u00c4`\u00e7\u00eey\u00a4\u00c0(\u0010@A\u0003\u0007%FE%\u00c0\u00f9\u00dd\u00d0\u0082\u0092\u0005\u0003\u00a7\u0019*\u0003\u009a\u00dfKJ\u00ce\u00977%E\u009cy\u0088\u00d5\u00f7\n\u00d5\u007f\u00a2\u0092\u0006\u00e7\u00e2\u00bca\u00f8\u00a6$\u0097\u00c90\u00ffl\u00fc\u00f3{\r\u0004\u00b0\u00a3\u00acl\u000e02O\u0003\u00d0\u00d4\r\u00d0e\u0005\u0000Oi\u0004\u0080\f\u0084\u0086\u00a2\u0017\u00ee\u0086\f\u00ce\u00d9\u00c2\u00e4=\u00ea\u0003*\u0018\u0002\u0019t\u001a\u0096\u0007v\u008d\u00a3\u0002\u0089\u00ff\u0017\u00e1\u00a2w\u00a0C\u00fdH\u00d4\u001f\u00fc(\u0012\u00a3\u00b8\u0005\u00ae\u0007\r\u00df\u0016\u00bb\u00f5\u00ad!2\u00b2\u00fb\u0096\u00ddshn\u00c7\u00d4\u00fa\u00a2\u0099t_W\u00fb\u00fd\u00ba\u001f\u00af\u00b9\u00b7Fn\u00ac\u00b1\u00f4\u0015k<\u00edlF\u0004\u00baE\u0006\u0086\u00d3\u00c2x\u00b1\u00b0\u00cd\u00e8\u00d95O\u00bc\u00ed\u00bf\u00ab\u00c7]J\u00fd>\u00baz7\u00b0\u0080\u00f2\u0080\u0017\u0092\u00ea\u00ce\u00eb\u00dd\u00fd\"\u00d0'\u00eeW\u00d2\u00b6$\u0092\u00c4\u00f7$\u008eJ\u00fb4\u0089\u0015]\u00a2g\u00cfk\u00a9\u00e1Fj*\u00f7R\u00c7j\u008d\u00fdm\u000f\u00dd\u00ae4;\u00ae|\\c\u0014\u0097\u00c2\u00e5f\u008f\u00df\u0091R^\u00e9wR\u008a1\u00dc\u00f8\u001e\u00c1\u0092~\u00b8\u0017\u0011\u00be\u0014\u00df\u0087\u00bd\u00c8\u00da?\u00b43F\u00f8\u00a2\u009d\u00d9lI\u00892\u00a4\u0096z\u009b!\u008fs{ \u008ff\u0085\u00cf\u00cd>\u00f6d.O\u00f4\u00e4&\u001fgnl\u00fcL\u0089[\u00fcP\"c{\u00a2\u00c4\u0082\u00f0\u00b6W\u00db\u008dD\u00fei\u00f5w\u00a7\u00ccz\u00bf\u007f\u00ef]\u00c6\u00e9\r\u0017}\u00f3\u00cd\u00d5r\u00d5\u00bd\u00be\u001d\u00e9\u00b7\u00de\u00da\u00be\u00b4?W\u00dd\u00a7.\u0082\u00d0\u0003\u00bd\u00ed\u00b1\u009b\u00fc\u00e2\u00fe\u00d5\u00fc\u00ea\u0097\u0013h\u00e4\u0017:\u009f\u0091_\u0003C\u00c4[\u009c\u00e3XC\u0000BzT\u00c0\u00bb\u009f\u0089F\u0006>Q\u0014d\b\u009e\u0085\u00e6{\u0010\r,B4\u00d2\b8\u00b24\u00aa\u00e3\u00c0\u00008\u0011\u008f9\u00d6\n\u0013\u00c1\b\u00189\u00c5w\u00daQ\u0096\u00fa\u0095\u00e9\u0019\u00d9&\u00fau|\u00e4\u00dd\u008cX\u009c\u00e8\u0010\u0006\u0006\u00e3\b\u0011\u001c\u00a7\u0085\u00dd\u00eb\u0086k\u0095cG\u00d7g\u00a0+\u0080\u0089\u0094\u00fc[p\u00e4\u00b5)rt\u00e9\u00e3\u00ea\u00c2`\u00be\u00de\u00b9\u000e$+\u00d9\u00f1o\u0098\u00f5e\u00a0\u00b3\u00c1\u00ed\u008a\u00dfv\u0004\u00b7\u00fc<\u00b4\u00abB\u00a4Q\u00a3 \"\u00daD{\u00ce\u00df\u00c2@h\u00fb\u00bd\u0081\u00e3\u00fd\u00ba\u001e|\u00d5X\u0017d\u00cf\u00b0\u00c4\u00a8\u0091\u001c\u00f3\u00a5X\u0094wL'\u0083\u00e3\u00ec\u0000\u00fdWP\u00bdA\u0099h\u0014\u009dfHv\"v3\u008a\u00eb\u00e2\u0015\u00d5y\u00c1\u00f0\u00e6\u00fe+\u000e_\u0007p\u00dbx\u00ec\u0092\u00ff?\u0000\u00c7\u00e1]\u00c4HK\u00e7\u0083\u00d5\u00b4\u00e3Q\u00a7\u00a5.-a\u00ab\u00b9a\u00d8p\u00b3\u00d4c\u00f5H\u00a4\u0004\u00bdu\u00dfR\u00ee9\u00f4\u009c\u001b`p\u00a6\u0019\u00c5\u008aD\u008d\\\u0005\u0083\u0014S\\>c\u008fh\u008f\u00fc\u008b\u0017\u00d3\u00d8M\u00e1\u008d\u0006*w\f\u00fe\u00be\u001d'\u00fc\u0092P\u00ae6+\u000e\u009ba\u00c6X\u0015\u00ef\u0006\u00dc~\u00df\u001f\u0003\u0015W\u00ba\u00ed:\u001a\u00c739L\u00b3\u008f\u00d1\u0089\u00b3|\u00a7S\u0007-\u0094,\u00c3g?\u00cb\u0007qD\u00f5\u001e\u00dfA\u00bdO\f#b\u00e8\u001a9\u00ea\u00fbh\\\u009c\u00ea\u00b13\u00d1\u00ee\u008c\u00daC71\u00fb(\u008d\u009b\u00e7\u00a9 \u00f2DJ\u0097\u00f8v\u00ecdD\u00e3\u009ah]\u00d7\u00ae\u00d1\u00ae\u00e2\u009eJutCgQ\u0099\u00e7\u00c8\u008e\u001e\u00ce\u00ac\u001d\u00de5\u0090\u00e9]}\u00a2\u007fGU\u0089\u00b3\u00b2\u00d9\u00ac3qv~\u00a9\u00c7\u009e\u00924A\tR\u0084)\u0007\u00ef\u00d8Q\u008a\u00ffJ!\u0080X\u00a2\u0000\u00d2\u00a4\u00a7\u0018 EQ\u00e1\u00002Wq\u00f2\u0098]\u00bc\fn\u00f1\u008e\u00c4\u0081w\u00f6Y\u008fy\u008d?\u0011\u00d5\u0084\u00f2~\u00f5\u007f\u00d4\u00fay.c2`\u001e\u00d9\u00ee\u00d6\u00c3\u00e9=\u00bd\u00a9:\u0001v\u000fFX\u00f5e\u008f(\u001b\u00f1\u00f9\u00b9\u00981k_\u0088\u0099\u001c\u00e0\u008f\u00163\u0002\u00a0\u0013\u0013\u008c\u00e9\u0002\u00d8\t\u00fc\u00ed57u\u00dd\u001a@\u00b2\u00c2\u0084\u00c2\u0086\u0011)\u00c6R\u00b1W\u00c8\u00d1\u00cf2\u00b4h\u00a9[\n!S\u00cd\u00b97\u00da\"\u00aat\u00d9$rj\u00be\u00e3d\u0090\u00bdV\u00eb\u0088\u00ddw\u00e5=\u00ea\u00d7q\u0016\u00ec]\u00f9\u00a56\u00ed\u0098\u00fc\f\u008a;\u009c\u0084\u00e2\u00bb\u00b5N\u000f\f0\")\u00d9\u008c\u00c6\u0081\u00b9\u000eg\u00bb\u009e\u00ab\u00fb\u0097\u0013,\u00fe\u00f7\u00e2\u00b4u.l\u00a6\u001a\u00deE9\u00f1\u001e\u00e5\u00a4\u00ee\u00b4qR\u00f9JT\u0019Hi\u00a1\u00ed{\\\u00e2u\u00c9\u00ef\u00ca\u00acD\u00a4t\u00c5)\u0083\u00dau\u00d2\u00aeg\u0015\u00f0\u001b\u00a8\u00eeC\u001c\u00c6w\u001af\u00a8Ns\r'&\u00f91\u00b6:\u0011\u00a1\u00f5\u0016\u0093\u00bc\u0089\u00c3^\u00a3\u00d1\u0085*\u0095b@\u001c;V\u00b4\u00fc\u00cc\u00ba\u00e6\u00bfPo\u00eb\u001a\u00c3\u00a8NU,\u00c5Q\u00d58i\u00f2j\u0016\u0084%\u0006\u0090\u00d1\u00b9H\u0094\"\u00e6\u0095\u00ec(\u00e1\u00e3\u00bav\u000e\u00d7\u00fd(\u00cb\u00bf\u008eU\r\u00f4\u00e6\u009f\u00fb\u00bb\u0085\u00db\u00aaq\u009c<\u0003Z2\u00b0\u00c4\u00e1\u00c4,\u0084UP\u00f6i\u00f5\u00c8\u00cd\u00e8v\tx6\u00bb5\u00ba\u00a6\u00d63VF_\u00bc\u00f6\u00a6,\u00a9\u00ae\u009dg8\u008f\u00ce\u00c7\u00f1\u009d!,\u00f4\u00dc\u00e6\u001d\u00e4\u00f1=<\u001e\u0001\u00c7\u000e'\u00af\u00d8hc\u0016\u00fd\u00e9\u00cf\u00aa\u000eSS\u00ff\u001e\u00a6\u001d\u00fe=\u0084\u00a9\u00b9\u00f7_k&\u00efw\u00dej\u0087\u0080q\u00acPPvl>&\u00c6\u00b2[;{=[\u001c\u00fcn\t:\u0091\u00b0\u00f8\u00dd\u00f3\u00d4]\u009d\u000f\u008eZ\u00c6\u00bb\u00f4<\u00ef\u00b4}e\u0099\u00bf\u00d5\u007f\u00db|&\u00c0\u00ecu\u0090fo\u00e7\u00f7\u00b4\u00b0v\u0091\u00beZ\u00af\u00db|&\u0010f|O\u008b\u00cdm\u00cc=#\u00afz\u00db\u00a0q\u00a2:g\u0006\u00d4\u00e6\u00b7\u0089\u0007w\u00bc\u00feu=`\u00f8\u00d49\u009e;?\u00a7\u0096#\u00ea\u009b\u001a'\u0006=\u00d1\u008bzD\u009fCi\u00a3\u008e\u00b7\u00da\u00be\u00b1s\u00c2c\u00e7\u0084\u00e4\u00d4\u008f;\u00a7/\u00f4\u00e475\u00ca\u00ab\u00be\u009fvPVM\u00d9g\u00b8\u001d\u0093f\u00ff\u00bb\u00ed\u00c5\u00df\u00f8;\u0085\u0089<\u008b\u001e\u0099\u000f\u00ec\u0015\u00c8}\u00b4\u00d7\u009c;\u0014\u00df\u001d\u00c9~\u0012\u00c5w\u0087.\u009fE\u00f1\b@\u007f4\u0014\u007f\u0012\u00d3\"\u0082\u00f4o\u00cc\u00109d\u0088fv\u00ea\u0003\u00b3\u0085\u009b\u00ee\u00e4\u0084\u008d\u00a0\u0011\u00c5\u00c2\u00b3\u00fa\u0093\u0019\u00ed\u00cf\u00edPNd\\\u0098\u00cf9f\u0016\u00cd\u001e\u00fbss%;\u0099\u00ebJ#VP\u00f9\u001bc%\u001e\u00abi\u00b3\u000b\u00ba\u007fV5\r\u00d3\u00ae\u00fe\u009d\u00f3\u00b5p\u00cc\u0081\u00b29\u00f5\u00a9v\u008d\u00b8\u00ffx\u00e6iq\u00cc2at\u000eqVh\u001d\u00dd\u0083\u00b2G\u0097\u00e3'\u001d\u001d\u008c\u00a1\u00fbF\u000bo\r\u001b\u00b7\u00ad\u0095Ty\u00ab\u0018{\u00c2\u0018R\u00c5\u00a6\u00b1S\u00ad@\u0018\u000b\u00f4\u00b4\u00b9A\u008d\u00b7\u0000\u0090\u008b\u0096Th\u00b3\u00c0G\u00fc\u0092\u00e93'\u00cf\u008a\u00c6\u00f9N\u00c8w\u00ed\u001a\u001f\u00a3\u00b1\u00c4\u00bd\u0093{r4\u0012\u00e9\u007fp\u00da\u00ab\u00de)<6\u00edE\u008a\u00a44\u00fbd\u00ef\u0098\u00d7\u00b4\u009f\u00b4*\u00be\u00db\u000f\u00cb]?\u00ac\u00ad\u00ee\u00f5\u00ff\u0084\u009f\u00e4\u00c3\t\u00e1]\u00e7{*o\u00f8}\u00de\u008e\u00e5\u0017\u009e!f\u001b9\u00a6\u000b\u00cd\u00b8\u00dd\u00a3\u00bf\u000b\u00d7y\u00ffW\u00f25\\\u00beE\u00d8sr\u00cee\u0098\u001d\u00ad\u00ac\u00ac\u001co\u00c4\u0018Y\u00f0<\u00b6\u0090z\u00ad=p\u00c8\u0015\u00b7\u0016\u008a\u00da&V\u00c2\u0006\u00a2\u00bdP\u00d2\u009a\u00b3q\u00d8r\u00ea(TbFo\u007f:s\u008e\u00b5s\u00a0\u008d\u009a\u009f18\u009fo\u001d\u00f3si\u00175\u00ceY\u0001\u00c6j\u00df\u0015\u00a7J\u00c3\u001bx\u00ffn\u00d3\u00ec?\u00f7\u00e7\u00fco\u00bf}\u0085\u00d1\u00da\u00fbo_aTy\u00e4\u00ed+\u008ce{\u00f2\u00dbWu\u0097:\u00eb\u00e1\u00c5\u00c3s\u00cav\u00d5\u009f\u0099\u007f\u00faDf\u00bb\u009b\u00c88\"\u0015\u00e1X\u0005\u001d\u0081\u000e\u0094\u008a\u0012%\u008a\u00a5(&]\u00da\u00c0\u00a42\u0010\u00a9Hq|z\u0095\u00f01F=<\u0001<[\u001fy\u00ef\u00e9~\u00a2G\u00fa\u001djg\u000e\u0091(\u0010\f_T1i\u000b\u009f\u00f7+JOy\u00f8\u00a3\u00ef\u00deJA8Q\u00a2G<\u00e2V5#8\u00d4\u00d2\u00f1L\u00d8\u00afu\u00b9\u00af,\u00e3\u00ca\u0089\u00b7\u0001\u008e\u009d\u00da\u00eb\u008a)^\u000b>_\u00bf\u00e8\u0081\u00ea\u00b5\u00ea\u00e6\u00a8^\u00f1\u00a6z\u0005\u0082\u00e7T\u00ae7\u00b1\u00c5g\"L\u00fa\u00b7U\u00b6\u00b7\u00a6\u0006\u00f9\u00c1\u00a9\u0081w\u00cd\u00c0\u001a\u0086\u00e7\u00ef\u00cf\u00e0\u0014\u00fb\u000f\u00ce\u00e0p\u007f\u0006\u008fJ\u0016N\u009e\u00c1?8'\u00bfx\u0006\u00d3\u0007\u009c\u00f9\u0092\u0017\u00e3M\u008c\u0011\u00b1\u00a9\u00e95/\u00f6\u00da0\u009fP\u00d8'\u009eg\u00b9u\u0086O\u0088I\u00bc\u007f\u0017\u00ed\u001a\u0093\u00b4j\u00fe>\u0007\u0099\u00cfy\u00e6;'\u0097\u00aen\u009c\u0006\u00eb\u00b4U\u00b6\u009f^\u00f5\u00daG\u00e7@\u00a2\u00c4\u0012\u0092\u00d76\u0014\u00fa\u00f1i\u00f0\u00c8S\u00ea\u00fd\u00ec\u00eb\u00ed\u00be\u00c6.\t-\u0091\u00c8\u009c\u008c<Vk\u000f\u0095:$\u00bf\u00ab\u008d\u00bb\u00aa\u00f4\u00c4\u00b3n\u000b'\u0015\u00f2\u0083_\u00e2\u0098\u00b7\u00841\u0083AiN}cF\u00d3\u0084S\u00ba\u009d\u00c3\u00ec\u0093\u009a\u0093\u00fa`\u0082\u0004~\u009f{\u00ebs6\u00bd\u00f6\u00cc\u0019\u00dbx\u00c9`J\u00c9\u00b59>}\u0089~\u00b2\u00c9Xa\u00e2'\u001c\u0089\u00c9\u00f0F\u008a\u00c3\u0097\u00fcEm\u00e6\u00ac\u00cb\u00fd\u00b8k$\u0082\u0089\u00a5\u00a4\u00b8\u00fc\u00ce\u0012\u001f\u009d\u008b\u00dd\u00ac\u00fd\u00dc\u00be\u00bf\u00d2\u00e6]>\u00e2^\u0093\u00fa\u0084\u00dd\u00fa$\u00a7c\u00ec|\u009aO\u0014\u0016\u001aO\u00d70\u00d1z\u00c6\u00f6\u00ca\u000f#nx\u00d2\u00ae\u009cs\u0018\u0018\u00d0e\u0013k\b\u00e8\u009d\u000f\u00e5T\u0085*\u0085\u00b0\u0015\u00e9\u00b9\u008f\u0087\u00aa\u0081:\u00a7XE\u00b0\u00e4\u00bc\u00a5\u009eS\u008a\"\u008ayk\u0085c3\u00d9b-\u00bd\u00b7\\}'\u00a4K\u0011\u008a\u0004\u0000\u001e\u0092@\u00f4\u00f2\u00af\u00ff\u00f9w\u0000\u0000\u0000\u00ff\u00ffq\u00c3\u0091\u007f\u00f64\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b225\u00d7Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ffX\u0087\u00a5\u00c20\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"data\": \"0x95d89b41\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "86"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b22\u00b5\u00d0Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\b\u0018Q\u00a6\u00dd\u00c0\u00c0\u00d4\u00d4\u00dc\u00c4\u00d0\u00c4\u00dc$\u00c5\u00c4\u0092<\u0003\u0094j\u00b9\u0000\u0001\u0000\u0000\u00ff\u00ff!\u00bf\u0093b\u00e8\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b22\u00b5\u00d4Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ffIxu\u00850\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"data\": \"0x313ce567\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "68"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b223\u00d0Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\fX*\u00d5r\u0001\u0002\u0000\u0000\u00ff\u00ff%\u00a2\u0097\u0013h\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b223\u00d4Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ff\u0006\u0006)[0\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"data\": \"0x06fdde03\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "92"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b223\u00d2Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\b\u0018Q\u00a6\u00dd\u00c0\u00c0\u00c2\u00c4\u00d4\u00dc\u00d4\u00dc\u00c0\u00cc\u00c2,\u00cd\u00dc\u00c8\u00cc\u00d2\u00cc\u0090T\u0003\u0094j\u00b9\u0000\u0001\u0000\u0000\u00ff\u00ff\u008a\u00cc\u008d\u00c4\u00e8\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0x0dc78c79B4eB080eaD5C1d16559225a46b580694\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00e4Z\u00ebn,\u00b9\u008d\u00fe\u00bf\u008f\u00e1\u00df\u0083\u0005)\u008a\u00149o\u00a3\u00d2\u0005\u00d8E\u0090\u00043\t\u0010 \u00c8\u00bb\u0007\u0094T})\u00db\u00c7]v\u001f\u0007\u0098\u00b4\u00e7\f\u00baY%\u00deDR\u001fY\u00f5\u00cf\u0097\u00ff\u00ff\u00fd/\u007f\u00fe\u00ed\u00af\u00e5\u00e5\u00d7\u0097\u00f0\u00bf\u00f0\u00f2\u00cb\u00cb\u00ff\u00d5\u0097_\u0085~y\u00f9\u00ad\u00fd\u00fe\u00f7?\u00fd\u00ed\u00e5\u00d7\u0017\u00f8\u0087\u0080\u0082@\u0004\u000e\u0014\u0015\u0090\u0005\u0001\u00108\t\u0000(\u00f4\u00ca\u001b\u0083\u0000D\u0012\u0004A@\u00d3y\u008dX\u00a0\u0001\u0016\u0005\u00a1\u0084\f\u00a8Y\u0010}u#NN\u00cd\u0091S\t5M\u00aa\u0096I\u00adUB\u00ab\u00d4&U\u00e4@\u008d\u0082\u00c0\u00d6'\u00b5\u0087^\u001b\u00e96\u00a95/\u00ea\u00d6sJ\u00a5\u000f\u00aa@\u00e5\u00b4\u00f4\u0012\u00de\u00ee\u00e4\u00fa\u00f5X\u0016\u00afl\u00c0V\u00b6\u00c5\u000bt\u00c9e\u00e0\\\u0016/\u008ex\u00e4\u00a55s\u00d9x\u009b\u00danu\u00ae\u00baP\u0087\u0004^T\u00e3\u00aa\u00b6E\u009cTmKn\b\u001bq\u0099\u0096E\u0093\u00a3\u0084\u008b\u00ef\u00fc:5\u009b\u00ab\u0092\u0095\"\u00c9`R;.j+mk0\u00a91\u00e4#/\u0092\u0018\u001b#\u000fm1\u00f2\\\u0015\u0083\u0089\u0014\u00d1I\u00c5~\u00a0\u000e\t\u00fb>\u0088b\u0002\u00c2i\u0019\u00e9\u00da\u00c9\u0004\u00194\u00d0\u00b4\u008c\u00b6W6\\\u00e4\u00fa\u00f5\u00d0\u00d6>\u00911\u0018\u00f1\\\u0015zXr\u00a1 t\u00b4\u00c9+lG^\u00816M\u00a1\u00d6\u00a9mZz]\u00a8\u0083\u0097.\u007f\u0010\u00e4\u00da\u0015\u00e7\u00ee\u0085\u0012\u0017\u0015\u00a94\u0096\u00b4\u00a8\u00e5(\u0001\u00a4\u00d7\u00da\u0080\u00c6u\u00b4\u00b5{`\u00dcr\u00da&5\u00e0\u00b2\u0001\u0015\u0005\u00ea.W\u0012'\u00de\u00ae\u0099\u00e1\u00eb3\u008f\u00c4`\u00e7\u00eey\u00a4\u00c0(\u0010@A\u0003\u0007%FE%\u00c0\u00f9\u00dd\u00d0\u0082\u0092\u0005\u0003\u00a7\u0019*\u0003\u009a\u00dfKJ\u00ce\u00977%E\u009cy\u0088\u00d5\u00f7\n\u00d5\u007f\u00a2\u0092\u0006\u00e7\u00e2\u00bca\u00f8\u00a6$\u0097\u00c90\u00ffl\u00fc\u00f3{\r\u0004\u00b0\u00a3\u00acl\u000e02O\u0003\u00d0\u00d4\r\u00d0e\u0005\u0000Oi\u0004\u0080\f\u0084\u0086\u00a2\u0017\u00ee\u0086\f\u00ce\u00d9\u00c2\u00e4=\u00ea\u0003*\u0018\u0002\u0019t\u001a\u0096\u0007v\u008d\u00a3\u0002\u0089\u00ff\u0017\u00e1\u00a2w\u00a0C\u00fdH\u00d4\u001f\u00fc(\u0012\u00a3\u00b8\u0005\u00ae\u0007\r\u00df\u0016\u00bb\u00f5\u00ad!2\u00b2\u00fb\u0096\u00ddshn\u00c7\u00d4\u00fa\u00a2\u0099t_W\u00fb\u00fd\u00ba\u001f\u00af\u00b9\u00b7Fn\u00ac\u00b1\u00f4\u0015k<\u00edlF\u0004\u00baE\u0006\u0086\u00d3\u00c2x\u00b1\u00b0\u00cd\u00e8\u00d95O\u00bc\u00ed\u00bf\u00ab\u00c7]J\u00fd>\u00baz7\u00b0\u0080\u00f2\u0080\u0017\u0092\u00ea\u00ce\u00eb\u00dd\u00fd\"\u00d0'\u00eeW\u00d2\u00b6$\u0092\u00c4\u00f7$\u008eJ\u00fb4\u0089\u0015]\u00a2g\u00cfk\u00a9\u00e1Fj*\u00f7R\u00c7j\u008d\u00fdm\u000f\u00dd\u00ae4;\u00ae|\\c\u0014\u0097\u00c2\u00e5f\u008f\u00df\u0091R^\u00e9wR\u008a1\u00dc\u00f8\u001e\u00c1\u0092~\u00b8\u0017\u0011\u00be\u0014\u00df\u0087\u00bd\u00c8\u00da?\u00b43F\u00f8\u00a2\u009d\u00d9lI\u00892\u00a4\u0096z\u009b!\u008fs{ \u008ff\u0085\u00cf\u00cd>\u00f6d.O\u00f4\u00e4&\u001fgnl\u00fcL\u0089[\u00fcP\"c{\u00a2\u00c4\u0082\u00f0\u00b6W\u00db\u008dD\u00fei\u00f5w\u00a7\u00ccz\u00bf\u007f\u00ef]\u00c6\u00e9\r\u0017}\u00f3\u00cd\u00d5r\u00d5\u00bd\u00be\u001d\u00e9\u00b7\u00de\u00da\u00be\u00b4?W\u00dd\u00a7.\u0082\u00d0\u0003\u00bd\u00ed\u00b1\u009b\u00fc\u00e2\u00fe\u00d5\u00fc\u00ea\u0097\u0013h\u00e4\u0017:\u009f\u0091_\u0003C\u00c4[\u009c\u00e3XC\u0000BzT\u00c0\u00bb\u009f\u0089F\u0006>Q\u0014d\b\u009e\u0085\u00e6{\u0010\r,B4\u00d2\b8\u00b24\u00aa\u00e3\u00c0\u00008\u0011\u008f9\u00d6\n\u0013\u00c1\b\u00189\u00c5w\u00daQ\u0096\u00fa\u0095\u00e9\u0019\u00d9&\u00fau|\u00e4\u00dd\u008cX\u009c\u00e8\u0010\u0006\u0006\u00e3\b\u0011\u001c\u00a7\u0085\u00dd\u00eb\u0086k\u0095cG\u00d7g\u00a0+\u0080\u0089\u0094\u00fc[p\u00e4\u00b5)rt\u00e9\u00e3\u00ea\u00c2`\u00be\u00de\u00b9\u000e$+\u00d9\u00f1o\u0098\u00f5e\u00a0\u00b3\u00c1\u00ed\u008a\u00dfv\u0004\u00b7\u00fc<\u00b4\u00abB\u00a4Q\u00a3 \"\u00daD{\u00ce\u00df\u00c2@h\u00fb\u00bd\u0081\u00e3\u00fd\u00ba\u001e|\u00d5X\u0017d\u00cf\u00b0\u00c4\u00a8\u0091\u001c\u00f3\u00a5X\u0094wL'\u0083\u00e3\u00ec\u0000\u00fdWP\u00bdA\u0099h\u0014\u009dfHv\"v3\u008a\u00eb\u00e2\u0015\u00d5y\u00c1\u00f0\u00e6\u00fe+\u000e_\u0007p\u00dbx\u00ec\u0092\u00ff?\u0000\u00c7\u00e1]\u00c4HK\u00e7\u0083\u00d5\u00b4\u00e3Q\u00a7\u00a5.-a\u00ab\u00b9a\u00d8p\u00b3\u00d4c\u00f5H\u00a4\u0004\u00bdu\u00dfR\u00ee9\u00f4\u009c\u001b`p\u00a6\u0019\u00c5\u008aD\u008d\\\u0005\u0083\u0014S\\>c\u008fh\u008f\u00fc\u008b\u0017\u00d3\u00d8M\u00e1\u008d\u0006*w\f\u00fe\u00be\u001d'\u00fc\u0092P\u00ae6+\u000e\u009ba\u00c6X\u0015\u00ef\u0006\u00dc~\u00df\u001f\u0003\u0015W\u00ba\u00ed:\u001a\u00c739L\u00b3\u008f\u00d1\u0089\u00b3|\u00a7S\u0007-\u0094,\u00c3g?\u00cb\u0007qD\u00f5\u001e\u00dfA\u00bdO\f#b\u00e8\u001a9\u00ea\u00fbh\\\u009c\u00ea\u00b13\u00d1\u00ee\u008c\u00daC71\u00fb(\u008d\u009b\u00e7\u00a9 \u00f2DJ\u0097\u00f8v\u00ecdD\u00e3\u009ah]\u00d7\u00ae\u00d1\u00ae\u00e2\u009eJutCgQ\u0099\u00e7\u00c8\u008e\u001e\u00ce\u00ac\u001d\u00de5\u0090\u00e9]}\u00a2\u007fGU\u0089\u00b3\u00b2\u00d9\u00ac3qv~\u00a9\u00c7\u009e\u00924A\tR\u0084)\u0007\u00ef\u00d8Q\u008a\u00ffJ!\u0080X\u00a2\u0000\u00d2\u00a4\u00a7\u0018 EQ\u00e1\u00002Wq\u00f2\u0098]\u00bc\fn\u00f1\u008e\u00c4\u0081w\u00f6Y\u008fy\u008d?\u0011\u00d5\u0084\u00f2~\u00f5\u007f\u00d4\u00fay.c2`\u001e\u00d9\u00ee\u00d6\u00c3\u00e9=\u00bd\u00a9:\u0001v\u000fFX\u00f5e\u008f(\u001b\u00f1\u00f9\u00b9\u00981k_\u0088\u0099\u001c\u00e0\u008f\u00163\u0002\u00a0\u0013\u0013\u008c\u00e9\u0002\u00d8\t\u00fc\u00ed57u\u00dd\u001a@\u00b2\u00c2\u0084\u00c2\u0086\u0011)\u00c6R\u00b1W\u00c8\u00d1\u00cf2\u00b4h\u00a9[\n!S\u00cd\u00b97\u00da\"\u00aat\u00d9$rj\u00be\u00e3d\u0090\u00bdV\u00eb\u0088\u00ddw\u00e5=\u00ea\u00d7q\u0016\u00ec]\u00f9\u00a56\u00ed\u0098\u00fc\f\u008a;\u009c\u0084\u00e2\u00bb\u00b5N\u000f\f0\")\u00d9\u008c\u00c6\u0081\u00b9\u000eg\u00bb\u009e\u00ab\u00fb\u0097\u0013,\u00fe\u00f7\u00e2\u00b4u.l\u00a6\u001a\u00deE9\u00f1\u001e\u00e5\u00a4\u00ee\u00b4qR\u00f9JT\u0019Hi\u00a1\u00ed{\\\u00e2u\u00c9\u00ef\u00ca\u00acD\u00a4t\u00c5)\u0083\u00dau\u00d2\u00aeg\u0015\u00f0\u001b\u00a8\u00eeC\u001c\u00c6w\u001af\u00a8Ns\r'&\u00f91\u00b6:\u0011\u00a1\u00f5\u0016\u0093\u00bc\u0089\u00c3^\u00a3\u00d1\u0085*\u0095b@\u001c;V\u00b4\u00fc\u00cc\u00ba\u00e6\u00bfPo\u00eb\u001a\u00c3\u00a8NU,\u00c5Q\u00d58i\u00f2j\u0016\u0084%\u0006\u0090\u00d1\u00b9H\u0094\"\u00e6\u0095\u00ec(\u00e1\u00e3\u00bav\u000e\u00d7\u00fd(\u00cb\u00bf\u008eU\r\u00f4\u00e6\u009f\u00fb\u00bb\u0085\u00db\u00aaq\u009c<\u0003Z2\u00b0\u00c4\u00e1\u00c4,\u0084UP\u00f6i\u00f5\u00c8\u00cd\u00e8v\tx6\u00bb5\u00ba\u00a6\u00d63VF_\u00bc\u00f6\u00a6,\u00a9\u00ae\u009dg8\u008f\u00ce\u00c7\u00f1\u009d!,\u00f4\u00dc\u00e6\u001d\u00e4\u00f1=<\u001e\u0001\u00c7\u000e'\u00af\u00d8hc\u0016\u00fd\u00e9\u00cf\u00aa\u000eSS\u00ff\u001e\u00a6\u001d\u00fe=\u0084\u00a9\u00b9\u00f7_k&\u00efw\u00dej\u0087\u0080q\u00acPPvl>&\u00c6\u00b2[;{=[\u001c\u00fcn\t:\u0091\u00b0\u00f8\u00dd\u00f3\u00d4]\u009d\u000f\u008eZ\u00c6\u00bb\u00f4<\u00ef\u00b4}e\u0099\u00bf\u00d5\u007f\u00db|&\u00c0\u00ecu\u0090fo\u00e7\u00f7\u00b4\u00b0v\u0091\u00beZ\u00af\u00db|&\u0010f|O\u008b\u00cdm\u00cc=#\u00afz\u00db\u00a0q\u00a2:g\u0006\u00d4\u00e6\u00b7\u0089\u0007w\u00bc\u00feu=`\u00f8\u00d49\u009e;?\u00a7\u0096#\u00ea\u009b\u001a'\u0006=\u00d1\u008bzD\u009fCi\u00a3\u008e\u00b7\u00da\u00be\u00b1s\u00c2c\u00e7\u0084\u00e4\u00d4\u008f;\u00a7/\u00f4\u00e475\u00ca\u00ab\u00be\u009fvPVM\u00d9g\u00b8\u001d\u0093f\u00ff\u00bb\u00ed\u00c5\u00df\u00f8;\u0085\u0089<\u008b\u001e\u0099\u000f\u00ec\u0015\u00c8}\u00b4\u00d7\u009c;\u0014\u00df\u001d\u00c9~\u0012\u00c5w\u0087.\u009fE\u00f1\b@\u007f4\u0014\u007f\u0012\u00d3\"\u0082\u00f4o\u00cc\u00109d\u0088fv\u00ea\u0003\u00b3\u0085\u009b\u00ee\u00e4\u0084\u008d\u00a0\u0011\u00c5\u00c2\u00b3\u00fa\u0093\u0019\u00ed\u00cf\u00edPNd\\\u0098\u00cf9f\u0016\u00cd\u001e\u00fbss%;\u0099\u00ebJ#VP\u00f9\u001bc%\u001e\u00abi\u00b3\u000b\u00ba\u007fV5\r\u00d3\u00ae\u00fe\u009d\u00f3\u00b5p\u00cc\u0081\u00b29\u00f5\u00a9v\u008d\u00b8\u00ffx\u00e6iq\u00cc2at\u000eqVh\u001d\u00dd\u0083\u00b2G\u0097\u00e3'\u001d\u001d\u008c\u00a1\u00fbF\u000bo\r\u001b\u00b7\u00ad\u0095Ty\u00ab\u0018{\u00c2\u0018R\u00c5\u00a6\u00b1S\u00ad@\u0018\u000b\u00f4\u00b4\u00b9A\u008d\u00b7\u0000\u0090\u008b\u0096Th\u00b3\u00c0G\u00fc\u0092\u00e93'\u00cf\u008a\u00c6\u00f9N\u00c8w\u00ed\u001a\u001f\u00a3\u00b1\u00c4\u00bd\u0093{r4\u0012\u00e9\u007fp\u00da\u00ab\u00de)<6\u00edE\u008a\u00a44\u00fbd\u00ef\u0098\u00d7\u00b4\u009f\u00b4*\u00be\u00db\u000f\u00cb]?\u00ac\u00ad\u00ee\u00f5\u00ff\u0084\u009f\u00e4\u00c3\t\u00e1]\u00e7{*o\u00f8}\u00de\u008e\u00e5\u0017\u009e!f\u001b9\u00a6\u000b\u00cd\u00b8\u00dd\u00a3\u00bf\u000b\u00d7y\u00ffW\u00f25\\\u00beE\u00d8sr\u00cee\u0098\u001d\u00ad\u00ac\u00ac\u001co\u00c4\u0018Y\u00f0<\u00b6\u0090z\u00ad=p\u00c8\u0015\u00b7\u0016\u008a\u00da&V\u00c2\u0006\u00a2\u00bdP\u00d2\u009a\u00b3q\u00d8r\u00ea(TbFo\u007f:s\u008e\u00b5s\u00a0\u008d\u009a\u009f18\u009fo\u001d\u00f3si\u00175\u00ceY\u0001\u00c6j\u00df\u0015\u00a7J\u00c3\u001bx\u00ffn\u00d3\u00ec?\u00f7\u00e7\u00fco\u00bf}\u0085\u00d1\u00da\u00fbo_aTy\u00e4\u00ed+\u008ce{\u00f2\u00dbWu\u0097:\u00eb\u00e1\u00c5\u00c3s\u00cav\u00d5\u009f\u0099\u007f\u00faDf\u00bb\u009b\u00c88\"\u0015\u00e1X\u0005\u001d\u0081\u000e\u0094\u008a\u0012%\u008a\u00a5(&]\u00da\u00c0\u00a42\u0010\u00a9Hq|z\u0095\u00f01F=<\u0001<[\u001fy\u00ef\u00e9~\u00a2G\u00fa\u001djg\u000e\u0091(\u0010\f_T1i\u000b\u009f\u00f7+JOy\u00f8\u00a3\u00ef\u00deJA8Q\u00a2G<\u00e2V5#8\u00d4\u00d2\u00f1L\u00d8\u00afu\u00b9\u00af,\u00e3\u00ca\u0089\u00b7\u0001\u008e\u009d\u00da\u00eb\u008a)^\u000b>_\u00bf\u00e8\u0081\u00ea\u00b5\u00ea\u00e6\u00a8^\u00f1\u00a6z\u0005\u0082\u00e7T\u00ae7\u00b1\u00c5g\"L\u00fa\u00b7U\u00b6\u00b7\u00a6\u0006\u00f9\u00c1\u00a9\u0081w\u00cd\u00c0\u001a\u0086\u00e7\u00ef\u00cf\u00e0\u0014\u00fb\u000f\u00ce\u00e0p\u007f\u0006\u008fJ\u0016N\u009e\u00c1?8'\u00bfx\u0006\u00d3\u0007\u009c\u00f9\u0092\u0017\u00e3M\u008c\u0011\u00b1\u00a9\u00e95/\u00f6\u00da0\u009fP\u00d8'\u009eg\u00b9u\u0086O\u0088I\u00bc\u007f\u0017\u00ed\u001a\u0093\u00b4j\u00fe>\u0007\u0099\u00cfy\u00e6;'\u0097\u00aen\u009c\u0006\u00eb\u00b4U\u00b6\u009f^\u00f5\u00daG\u00e7@\u00a2\u00c4\u0012\u0092\u00d76\u0014\u00fa\u00f1i\u00f0\u00c8S\u00ea\u00fd\u00ec\u00eb\u00ed\u00be\u00c6.\t-\u0091\u00c8\u009c\u008c<Vk\u000f\u0095:$\u00bf\u00ab\u008d\u00bb\u00aa\u00f4\u00c4\u00b3n\u000b'\u0015\u00f2\u0083_\u00e2\u0098\u00b7\u00841\u0083AiN}cF\u00d3\u0084S\u00ba\u009d\u00c3\u00ec\u0093\u009a\u0093\u00fa`\u0082\u0004~\u009f{\u00ebs6\u00bd\u00f6\u00cc\u0019\u00dbx\u00c9`J\u00c9\u00b59>}\u0089~\u00b2\u00c9Xa\u00e2'\u001c\u0089\u00c9\u00f0F\u008a\u00c3\u0097\u00fcEm\u00e6\u00ac\u00cb\u00fd\u00b8k$\u0082\u0089\u00a5\u00a4\u00b8\u00fc\u00ce\u0012\u001f\u009d\u008b\u00dd\u00ac\u00fd\u00dc\u00be\u00bf\u00d2\u00e6]>\u00e2^\u0093\u00fa\u0084\u00dd\u00fa$\u00a7c\u00ec|\u009aO\u0014\u0016\u001aO\u00d70\u00d1z\u00c6\u00f6\u00ca\u000f#nx\u00d2\u00ae\u009cs\u0018\u0018\u00d0e\u0013k\b\u00e8\u009d\u000f\u00e5T\u0085*\u0085\u00b0\u0015\u00e9\u00b9\u008f\u0087\u00aa\u0081:\u00a7XE\u00b0\u00e4\u00bc\u00a5\u009eS\u008a\"\u008ayk\u0085c3\u00d9b-\u00bd\u00b7\\}'\u00a4K\u0011\u008a\u0004\u0000\u001e\u0092@\u00f4\u00f2\u00af\u00ff\u00f9w\u0000\u0000\u0000\u00ff\u00ff\u008d\u00e8!\u00cb\u00f64\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://graph.viper.exchange/subgraphs/name/venomprotocol/venomswap-v2",
+                "body": "{\"operationName\": \"coininfo\", \"variables\": {\"token_address\": \"0x0dc78c79b4eb080ead5c1d16559225a46b580694\"}, \"query\": \"\\n        query coininfo($token_address: ID!)  {\\n            pair(id: $token_address) {\\n                id\\n                __typename\\n                token0 {\\n                  id\\n                  __typename\\n                  symbol\\n                  name\\n                  decimals\\n                  totalSupply\\n                  tradeVolumeUSD\\n                  txCount\\n                  totalLiquidity\\n                  derivedETH\\n                }\\n                token1 {\\n                  id\\n                  __typename\\n                  symbol\\n                  name\\n                  decimals\\n                  totalSupply\\n                  tradeVolumeUSD\\n                  txCount\\n                  totalLiquidity\\n                  derivedETH\\n                }\\n            }\\n            token(id: $token_address) {\\n                id\\n                __typename\\n                symbol\\n                name\\n                decimals\\n                totalSupply\\n                tradeVolumeUSD\\n                txCount\\n                totalLiquidity\\n                derivedETH\\n            }\\n        }\\n        \"}",
+                "headers": {
+                    "user-agent": [
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.81 Safari/537.38"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "authority": [
+                        "graph.viper.exchange"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "sec-ch-ua": [
+                        "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\""
+                    ],
+                    "dnt": [
+                        "1"
+                    ],
+                    "sec-ch-ua-mobile": [
+                        "?0"
+                    ],
+                    "sec-ch-ua-platform": [
+                        "\"macOS\""
+                    ],
+                    "origin": [
+                        "https://info.viper.exchange"
+                    ],
+                    "sec-fetch-site": [
+                        "same-site"
+                    ],
+                    "sec-fetch-mode": [
+                        "cors"
+                    ],
+                    "sec-fetch-dest": [
+                        "empty"
+                    ],
+                    "referer": [
+                        "https://info.viper.exchange"
+                    ],
+                    "accept-language": [
+                        "en-US,en;q=0.9"
+                    ],
+                    "Content-Length": [
+                        "1276"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Server": [
+                        "nginx/1.21.4"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=63072000; includeSubdomains; preload"
+                    ],
+                    "access-control-allow-headers": [
+                        "Content-Type, User-Agent"
+                    ],
+                    "X-Frame-Options": [
+                        "DENY"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "Content-Length": [
+                        "334"
+                    ],
+                    "Date": [],
+                    "Content-Security-Policy": [
+                        "upgrade-insecure-requests"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "graph-attestable": [
+                        "true"
+                    ],
+                    "access-control-allow-methods": [
+                        "GET, OPTIONS, POST"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "{\"data\":{\"pair\":null,\"token\":{\"__typename\":\"Token\",\"decimals\":\"9\",\"derivedETH\":\"3.077394859058469601432554377432671\",\"id\":\"0x0dc78c79b4eb080ead5c1d16559225a46b580694\",\"name\":\"Euphoria\",\"symbol\":\"WAGMI\",\"totalLiquidity\":\"2148.907755629\",\"totalSupply\":\"8900\",\"tradeVolumeUSD\":\"449057743.9476424669255099556689859\",\"txCount\":\"1106446\"}}}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "1256"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00dcV\u00dbn\u001cG\u000e}\u00df\u00cf\u0098gc\u00c1{\u0091\u00fe\u009b\u00ae\u001b\u00b0\u008b\u00c5\u00ee\u00c2N\u0080\u0000A\u00fe=`U\u008f43\u0092b)v^\"\u00d9P\u000f\u00a7\u009a<<$\u000f\u00eb\u00d7\u00cb\u00bf\u00bf\u00fe\u00ef\u00bf_\u00fe\u00df.\u009f/\u00f4O\u00b8|\u00ba\u00fc\u00ab_>\u009b|\u00ba|\u0019_\u007f\u00fe\u00cfO\u0097\u00cf\u0017\u00f8\u00c5\u00c0\u00c1@@\u00c9\u0000\u0084\r\u00c1\u0010\u00a0\u0081\u0016\u0003\u0000V\u0083\u0001\u00d8\u001c\u008c\u0019\u00b9\r\u00b5\u0082\u0098'\u008ahI\u00eb\u0011\u00a0\u00d1j\u00ddV\u0019\u000fV1\u0004\u00ea\u00b1\u00ad\u001d\u0006C\u00af\u00b0\u00ac\u008c\u00f3\u00b4v\u00a3\u00d1yl+\u0015-\u000b\u00c1T\u00d3z\u0017w\u00f9\u00d2\u00d3W\u0081\u0003\u009c\u0018\u00b7\u00d5O4\u00a1\u00dd\u00a3\u00caim\u00f2\u00e8\u000b\u001d\rz\u00ef\u001b\u00ed\u00a1\u00fb\u00ad'k\u00be\u0085\u00d5\u00b7\u0095\u00b8z\u00a1\u00ab\u00b5\u009fhi\u00e0Q\u00bal+\u00d1|\u008c\u00006{\u001f\u00c0\u00eb{\u00e8'.\b\u001dG\u00a9\u00db\u008a:n\u00dfb;\u009f\u00b7\u00ad'\u000b\u00b6\u00be\u0001\u00d0\u009aUp\u0098]+\u008b\u0003j\u009e\u0019gu\u00b6]W\u00c5F\u00e4{u\u00e4{YO\u0007E\u0003\u0002\u0007'%gEGg\u00c0\u00fd\u001c\u0018\u00e4\u001c\u0014\u0090\u00b6@W\u00c0\u00c8\u00b3\u00ec\u009c\u009e\u00b5:;\u00e2\u008e\u0087\u00c4Z\u001c=?\u00a2\u00b3SzI\u00df\u0090,\"\u00d4\u008c\u00a9\u00b0\u007fc\u00fd\u00cf\u00b3\u0001\u00068\u00d1N\u00d4\u00a8\u0090\\8\u0001ol\u0080\u0019\u008b\u0000xy\u00018\u00801\u00d0\u00fc\u00c9{\u00e4;U!h\u00fb^}\u008a\u000e\u0081\u00c0\u0001\u0093o8A;^p\u0082\u0087dO;\u00b0\u00e5?\u0081\u00e7\u008c\u001c\u00efO\u0017\u009e\u00ef\u00fcqdE\u00cb\u00dc\u0012!\u00a77\u00b1\u00e3\u0096\u00f5@T\u00d4d]\u0093S\u008c\u00ccp\u00e7\u00f3\u0080y\u00f5\u00e7\u0003\u00e6U\u007f\u00e9\u00fd\u00de\u00e3{\u00bc\u008d\u00fa-\u0006\u00ec\u0099\u0001\u0002\u00fa\u001e\u0006\u001c\u00d1b\u00f7\u0017&\u000b\u0001\u0081\u009b\u0015ybe\u00e0\u00ea\u00ee+>\u00e2\u0097\u00f8\u00b2\u00dbo\u00f0\u00d1\r>}\u00c0\u00b7|fo\u00dc\u00f94}\u00e1\u0093l\u0018BA\u00bb\u009f\u00849\u0003\u0082\u00d0\u00de\u00c1$\u00c5\u00cb\u00f9\u00c2\u00b7\u0091\u001e\u00e5\u0011\u00e9\u00fb\u00b9D[X\u00e7}V\u00fd\u00ad\u00f9.\u00fc\u0090\u00ffx\u0099\u00ff\u00db]O\u00b3\u00fd\u00c0\u00ae/G,\u0086\u001f4\u00eb\t\u001b3\u007f\u008b\u00c5\u001bl,\u00c7\u008f\u00e9GXH\u0013_]3\u00c4K\u00cfR\u00bd\u00d6\u0086[\u00b5\u00cb\u00ea\u00e7'\u0081\u009c\u00acX*\u00a9\u00c2r\u00d5\u00ad@\u00cd\u00f9\u00c5}.P\u00b1\u00cc\u0081s\u00ce\u00d6$\u0088;HU\u008d)\u009d\u00e2\u00f0:\u009b\u00b5~\u0080\u008c\u00aa\u0015:71(\u008a\u008d\u0004\u00a8i\u00d3\u00d6\u0002!Z\u00d0\u00ee\u00b8\u00f4\u009e1\u000e\u00da\u00fd\t+\u00f6\u00adb\u001b\u0000-uT\u00b4=\u00d9\u0000@\u00e5\u00bdt\u00bc\u00f9\u00b32\u0013\u00b4H\f\f\u0092\u00ea\u009c\u00f9\u00baD\u00d6D\u0080R\u00d9]\u00d6\u00b9\u00dc\u0019\u008b\u00b3\u00a0X{\u00c3\u00c9\u00e9\u00ac\u00ac\u0018\u00ad\u00ad\u0096\u00ea\u009eU\u0015\u00de;\u001bam\u0010\u0015H_\u009c\u00cc]u\u00fc|+w$\u00e5\u00e7\u00ec$\u0080\u00ad\u00f3\u00f9\u00945\u00d1\u00ea\u00a8\u00b2b\u00a6\u00ed\u00dc \u00f9~z]\u001b[$76\u00ed\u00c9]\u00bbey{\u00de>\n\u00a7B\u00dcW]\u00ee\u00ab\u009e\u00fe\u00e8#\u001dVr\u008b\u00b9\u00ea\u00da\u0097\u008b\u0019!p\u000bP\u00f5\u00dc\u0089v\u00ed\u0093\u00e0\u0090d7\u0019,\u00d3\u009b\u00d6\u0081CG\u001d\u00adt\u00ad\u001de\u0016\u0014*\u001d\u0087\u00cb\u00e4\u00de\u00f3\u009e\u00d0`\u0096J\u00148\u00b4\u0012\u00c0\u00d1\u00bc\u0095\u00c65H\u0083v\u00ae\u00ab_X\u0017+Y\u008f\u0095\u00a9i\u0095\u0012\u00eb\u00ef\u00072a\u00b4d\u00e6\u00ca\u00c5\u009e\u0087\u0093\u0015$PqB\\UV\u00bc\u009b\u00df\u000f\u00c4\u0010\u00ccK\u00db\u00d2\u0081\u00c8\u00feP\u000f-\u001f\u009ahy@\u00f9j\u00fd\u0098]\u00b2\"\u00b1:&\u00b1\u007f\u00ff\u008c\u00a0\u00a0j]\u00f9[\n\u00f9_\u008f\u00f9\u0099\u00efV\u00ff<\u00df\u001f\u008f\u009c\u00aa\u00e3\u00bc\u0015I\u00f5C\u00f1 \u0095\u00e9\u008fTuG\\\u0011\u00fc\u001a!\u00f8\u009c\u00a2\u00a5\u000b\u00a99\u00e7\u0089\u0092\u00dd\u00ad\u00ban\u00a8{\u008e\u00f6\u00fd\u0094\u00cb\u00ec}\u0092\u00d2\u00d1\u00b1\u000ej\u001e\u00d5\u00a2Q\u0005\u00f3\u00d9\u00b8x?\u008eP\u00aaG\u0099h\u00dc\u00e4@4\u00f2\u00a9zH\u009fJ\\y\u00ccu\u00bf\u00bdW\u00dd\u00eb\u0014\u00f1\u00f5N\u00f9\u00ac\u0016\u00af\u00cd\u00c4Y#<kd\u00d1ok\u00f4\u00danyb\u0080\u00ce\u00fc\u00f4\u0089ct^^|6\u00d8\u001c\u00ac\r\u00b3~\u00d5\u00dd}b\u00f0U\u00c7PO\u00b5\u00b5\u00de\u00b4p\u00dfQy\u00ec\u00a7s\u00a3\u009e[\u00c3i\u00ab\u00a6\"s`\u0099e\u00b6\u00a9L\ru\u00c2a\u00bdB\u00ed\u00d6a\u0000{\u001dG\u00c1\u00ce\u00d0\u001d\u00bc\u0095\u001e\u00de*\u00d7Y\u00c8\u00fc\b\u00ad3\u00e5\u00b3\u009a\u00c6\u008b\u00fb\u00d1A\u009b\u00a9\u00dcM\u00b9\u00ad\u00f2\u00e6\u00b2\u0095\u00f66o\u00b8\u00dd\u00ac's\u00e7\u0019|m\u00cb\u00b9\u00b8\u00fd\u001dw\\2\u00b1n \u0096S\u00e7\u00f2|\u001b\u00be\u00ef\u00bb\u00c7Y\u0005\u0088\u00e5\u00f3\u00ec \u00c9o\u00f6\u00bc\u00e6\u00ad\u00f5\u0099\u00d19\u000e2\u00b1(`VX\u009d\b\u0089 p\u008c2XE*\u0094>\u0084\u000b\u00d6\u00a9\u00cd\",|\u008e2e\u00c6\u00818Jk\u00c0\u00a3\u001c\u00c7P\u00ea,\u00a31U\u00b4\u0006&\u0085mZ3\u0016\u00ce\u0004\u00b2D\u00cc\u0097\u00df\u00fe\u00f1{\u0000\u0000\u0000\u00ff\u00ff\u0014\u0090\u00a8\u00bcH\u0010\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "1256"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00dcV\u00dbn\u001cG\u000e}\u00df\u00cf\u0098gc\u00c1{\u0091\u00fe\u009b\u00ae\u001b\u00b0\u008b\u00c5\u00ee\u00c2N\u0080\u0000A\u00fe=`U\u008f43\u0092b)v^\"\u00d9P\u000f\u00a7\u009a<<$\u000f\u00eb\u00d7\u00cb\u00bf\u00bf\u00fe\u00ef\u00bf_\u00fe\u00df.\u009f/\u00f4O\u00b8|\u00ba\u00fc\u00ab_>\u009b~\u00ba|\u0019_\u007f\u00fe\u00cfO\u0097\u00cf\u0017\u00f8\u00c5\u00c0\u00c1@@\u00c9\u0000\u0084\r\u00c1\u0010\u00a0\u0081\u0016\u0003\u0000V\u0083\u0001\u00d8\u001c\u008c\u0019\u00b9\r\u00b5\u0082\u0098'\u008ahI\u00eb\u0011\u00a0\u00d1j\u00ddV\u0019\u000fV1\u0004\u00ea\u00b1\u00ad\u001d\u0006C\u00af\u00b0\u00ac\u008c\u00f3\u00b4v\u00a3\u00d1yl+\u0015-\u000b\u00c1T\u00d3z\u0017w\u00f9\u00d2\u00d3W\u0081\u0003\u009c\u0018\u00b7\u00d5O4\u00a1\u00dd\u00a3\u00caim\u00f2\u00e8\u000b\u001d\rz\u00ef\u001b\u00ed\u00a1\u00fb\u00ad'k\u00be\u0085\u00d5\u00b7\u0095\u00b8z\u00a1\u00ab\u00b5\u009fhi\u00e0Q\u00bal+\u00d1|\u008c\u00006{\u001f\u00c0\u00eb{\u00e8'.\b\u001dG\u00a9\u00db\u008a:n\u00dfb;\u009f\u00b7\u00ad'\u000b\u00b6\u00be\u0001\u00d0\u009aUp\u0098]+\u008b\u0003j\u009e\u0019gu\u00b6]W\u00c5F\u00e4{u\u00e4{YO\u0007E\u0003\u0002\u0007'%gEGg\u00c0\u00fd\u001c\u0018\u00e4\u001c\u0014\u0090\u00b6@W\u00c0\u00c8\u00b3\u00ec\u009c\u009e\u00b5:;\u00e2\u008e\u0087\u00c4Z\u001c=?\u00a2\u00b3SzI\u00df\u0090,\"\u00d4\u008c\u00a9\u00b0\u007fc\u00fd\u00cf\u00b3\u0001\u00068\u00d1N\u00d4\u00a8\u0090\\8\u0001ol\u0080\u0019\u008b\u0000xy\u00018\u00801\u00d0\u00fc\u00c9{\u00e4;U!h\u00fb^}\u008a\u000e\u0081\u00c0\u0001\u0093o8A;^p\u0082\u0087dO;\u00b0\u00e5?\u0081\u00e7\u008c\u001c\u00efO\u0017\u009e\u00ef\u00fcqdE\u00cb\u00dc\u0012!\u00a77\u00b1\u00e3\u0096\u00f5@T\u00d4d]\u0093S\u008c\u00ccp\u00e7\u00f3\u0080y\u00f5\u00e7\u0003\u00e6U\u007f\u00e9\u00fd\u00de\u00e3{\u00bc\u008d\u00fa-\u0006\u00ec\u0099\u0001\u0002\u00fa\u001e\u0006\u001c\u00d1b\u00f7\u0017&\u000b\u0001\u0081\u009b\u0015ybe\u00e0\u00ea\u00ee+>\u00e2\u0097\u00f8\u00b2\u00dbo\u00f0\u00d1\r>}\u00c0\u00b7|fo\u00dc\u00f94}\u00e1\u0093l\u0018BA\u00bb\u009f\u00849\u0003\u0082\u00d0\u00de\u00c1$\u00c5\u00cb\u00f9\u00c2\u00b7\u0091\u001e\u00e5\u0011\u00e9\u00fb\u00b9D[X\u00e7}V\u00fd\u00ad\u00f9.\u00fc\u0090\u00ffx\u0099\u00ff\u00db]O\u00b3\u00fd\u00c0\u00ae/G,\u0086\u001f4\u00eb\t\u001b3\u007f\u008b\u00c5\u001bl,\u00c7\u008f\u00e9GXH\u0013_]3\u00c4K\u00cfR\u00bd\u00d6\u0086[\u00b5\u00cb\u00ea\u00e7'\u0081\u009c\u00acX*\u00a9\u00c2r\u00d5\u00ad@\u00cd\u00f9\u00c5}.P\u00b1\u00cc\u0081s\u00ce\u00d6$\u0088;HU\u008d)\u009d\u00e2\u00f0:\u009b\u00b5~\u0080\u008c\u00aa\u0015:71(\u008a\u008d\u0004\u00a8i\u00d3\u00d6\u0002!Z\u00d0\u00ee\u00b8\u00f4\u009e1\u000e\u00da\u00fd\t+\u00f6\u00adb\u001b\u0000-uT\u00b4=\u00d9\u0000@\u00e5\u00bdt\u00bc\u00f9\u00b32\u0013\u00b4H\f\f\u0092\u00ea\u009c\u00f9\u00baD\u00d6D\u0080R\u00d9]\u00d6\u00b9\u00dc\u0019\u008b\u00b3\u00a0X{\u00c3\u00c9\u00e9\u00ac\u00ac\u0018\u00ad\u00ad\u0096\u00ea\u009eU\u0015\u00de;\u001bam\u0010\u0015H_\u009c\u00cc]u\u00fc|+w$\u00e5\u00e7\u00ec$\u0080\u00ad\u00f3\u00f9\u00945\u00d1\u00ea\u00a8\u00b2b\u00a6\u00ed\u00dc \u00f9~z]\u001b[$76\u00ed\u00c9]\u00bbey{\u00de>\n\u00a7B\u00dcW]\u00ee\u00ab\u009e\u00fe\u00e8#\u001dVr\u008b\u00b9\u00ea\u00da\u0097\u008b\u0019!p\u000bP\u00f5\u00dc\u0089v\u00ed\u0093\u00e0\u0090d7\u0019,\u00d3\u009b\u00d6\u0081CG\u001d\u00adt\u00ad\u001de\u0016\u0014*\u001d\u0087\u00cb\u00e4\u00de\u00f3\u009e\u00d0`\u0096J\u00148\u00b4\u0012\u00c0\u00d1\u00bc\u0095\u00c65H\u0083v\u00ae\u00ab_X\u0017+Y\u008f\u0095\u00a9i\u0095\u0012\u00eb\u00ef\u00072a\u00b4d\u00e6\u00ca\u00c5\u009e\u0087\u0093\u0015$PqB\\UV\u00bc\u009b\u00df\u000f\u00c4\u0010\u00ccK\u00db\u00d2\u0081\u00c8\u00feP\u000f-\u001f\u009ahy@\u00f9j\u00fd\u0098]\u00b2\"\u00b1:&\u00b1\u007f\u00ff\u008c\u00a0\u00a0j]\u00f9[\n\u00f9_\u008f\u00f9\u0099\u00efV\u00ff<\u00df\u001f\u008f\u009c\u00aa\u00e3\u00bc\u0015I\u00f5C\u00f1 \u0095\u00e9\u008fTuG\\\u0011\u00fc\u001a!\u00f8\u009c\u00a2\u00a5\u000b\u00a99\u00e7\u0089\u0092\u00dd\u00ad\u00ban\u00a8{\u008e\u00f6\u00fd\u0094\u00cb\u00ec}\u0092\u00d2\u00d1\u00b1\u000ej\u001e\u00d5\u00a2Q\u0005\u00f3\u00d9\u00b8x?\u008eP\u00aaG\u0099h\u00dc\u00e4@4\u00f2\u00a9zH\u009fJ\\y\u00ccu\u00bf\u00bdW\u00dd\u00eb\u0014\u00f1\u00f5N\u00f9\u00ac\u0016\u00af\u00cd\u00c4Y#<kd\u00d1ok\u00f4\u00danyb\u0080\u00ce\u00fc\u00f4\u0089ct^^|6\u00d8\u001c\u00ac\r\u00b3~\u00d5\u00dd}b\u00f0U\u00c7PO\u00b5\u00b5\u00de\u00b4p\u00dfQy\u00ec\u00a7s\u00a3\u009e[\u00c3i\u00ab\u00a6\"s`\u0099e\u00b6\u00a9L\ru\u00c2a\u00bdB\u00ed\u00d6a\u0000{\u001dG\u00c1\u00ce\u00d0\u001d\u00bc\u0095\u001e\u00de*\u00d7Y\u00c8\u00fc\b\u00ad3\u00e5\u00b3\u009a\u00c6\u008b\u00fb\u00d1A\u009b\u00a9\u00dcM\u00b9\u00ad\u00f2\u00e6\u00b2\u0095\u00f66o\u00b8\u00dd\u00ac's\u00e7\u0019|m\u00cb\u00b9\u00b8\u00fd\u001dw\\2\u00b1n \u0096S\u00e7\u00f2|\u001b\u00be\u00ef\u00bb\u00c7Y\u0005\u0088\u00e5\u00f3\u00ec \u00c9o\u00f6\u00bc\u00e6\u00ad\u00f5\u0099\u00d19\u000e2\u00b1(`VX\u009d\b\u0089 p\u008c2XE*\u0094>\u0084\u000b\u00d6\u00a9\u00cd\",|\u008e2e\u00c6\u00818Jk\u00c0\u00a3\u001c\u00c7P\u00ea,\u00a31U\u00b4\u0006&\u0085mZ3\u0016\u00ce\u0004\u00b2D\u00cc\u0097\u00df\u00fe\u00f1{\u0000\u0000\u0000\u00ff\u00ffL$@*H\u0010\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b223\u00d3Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ff\u00ae\u00fay\u00950\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"data\": \"0x95d89b41\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "84"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b223\u00d7Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\b\u0018Q\u00a6\u00dd\u00c0\u00c0\u00c4\u00d4\u00dc$\u00cd$\u00d5\u00c4\u0094\\\u0003\u0094j\u00b9\u0000\u0001\u0000\u0000\u00ff\u00ff\u00ae\u0090/d\u00e8\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b22\u00b3\u00d0Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ff\u00bf\u0005\u00a9\u00d20\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"data\": \"0x313ce567\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "69"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b22\u00b3\u00d4Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\b\u0018\u001a)\u00d5r\u0001\u0002\u0000\u0000\u00ff\u00ff\u00fd\u00d8\u00dbLh\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": []}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "67"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "72"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b227\u00d0Q*J-.\u00cd)Q\u00b2R2\u00a803653I61P\u00aa\u00e5\u0002\u0004\u0000\u0000\u00ff\u00ff\u009f0\u00bf\u00190\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_call\", \"params\": [{\"to\": \"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"data\": \"0x06fdde03\"}, \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "148"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "98"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00aaV\u00ca*\u00ce\u00cf+*HV\u00b2R2\u00d23P\u00d2Q\u00caLQ\u00b227\u00d4Q*J-.\u00cd)Q\u00b2R2\u00a80\u00a0\b\u0018Q\u00a6\u00dd\u00c0 \u00c9\u00d4\u00dc\u00dc\u00c8\u00cc\u00d0\u00dc\u00c0\u00dc\u00c0\u00cc\u00d4\u00cc\u00c4\u00c8\u00c0$\u00cd$\u00d5\u00c4\u0094x\u0003\u0094j\u00b9\u0000\u0001\u0000\u0000\u00ff\u00ff!\u00b8\u00fc8\u00e8\u0000\u0000\u0000"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://a.api.s0.t.hmny.io/",
+                "body": "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getCode\", \"params\": [\"0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a\", \"latest\"]}",
+                "headers": {
+                    "User-Agent": [
+                        "Web3.py/5.30.0/<class 'web3.providers.rpc.HTTPProvider'>"
+                    ],
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "*/*"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "121"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "Content-Length": [
+                        "1256"
+                    ],
+                    "Date": [],
+                    "Vary": [
+                        "Origin"
+                    ],
+                    "Content-Type": [
+                        "application/json"
+                    ],
+                    "Content-Encoding": [
+                        "gzip"
+                    ],
+                    "Connection": [
+                        "keep-alive"
+                    ]
+                },
+                "body": {
+                    "string": "bytes_\u001f\u008b\b\u0000\u0000\u0000\u0000\u0000\u0000\u00ff\u00dcV\u00dbn\u001cG\u000e}\u00df\u00cf\u0098gc\u00c1{\u0091\u00fe\u009b\u00ae\u001b\u00b0\u008b\u00c5\u00ee\u00c2N\u0080\u0000A\u00fe=`U\u008f43\u0092b)v^\"\u00d9P\u000f\u00a7\u009a<<$\u000f\u00eb\u00d7\u00cb\u00bf\u00bf\u00fe\u00ef\u00bf_\u00fe\u00df.\u009f/\u00f4O\u00b8|\u00ba\u00fc\u00ab_>\u0017\u00fat\u00f92\u00be\u00fe\u00fc\u009f\u009f.\u009f/\u00f0\u008b\u0081\u0083\u0081\u0080\u0092\u0001\b\u001b\u0082!@\u0003-\u0006\u0000\u00ac\u0006\u0003\u00b09\u00183r\u001bj\u00051O\u0014\u00d1\u0092\u00d6#@\u00a3\u00d5\u00ba\u00ad2\u001e\u00acb\b\u00d4c[;\f\u0086^aY\u0019\u00e7i\u00edF\u00a3\u00f3\u00d8V*Z\u0016\u0082\u00a9\u00a6\u00f5.\u00ee\u00f2\u00a5\u00a7\u00af\u0002\u000781n\u00ab\u009fhB\u00bbG\u0095\u00d3\u00da\u00e4\u00d1\u0017:\u001a\u00f4\u00de7\u00daC\u00f7[O\u00d6|\u000b\u00abo+q\u00f5BWk?\u00d1\u00d2\u00c0\u00a3t\u00d9V\u00a2\u00f9\u0018\u0001l\u00f6>\u0080\u00d7\u00f7\u00d0O\\\u0010:\u008eR\u00b7\u0015u\u00dc\u00be\u00c5v>o[O\u0016l}\u0003\u00a05\u00ab\u00e00\u00bbV\u0016\u0007\u00d4<3\u00ce\u00eal\u00bb\u00ae\u008a\u008d\u00c8\u00f7\u00ea\u00c8\u00f7\u00b2\u009e\u000e\u008a\u0006\u0004\u000eNJ\u00ce\u008a\u008e\u00ce\u0080\u00fb90\u00c89( m\u0081\u00ae\u0080\u0091g\u00d99=kuv\u00c4\u001d\u000f\u0089\u00b58z~Dg\u00a7\u00f4\u0092\u00be!YD\u00a8\u0019Sa\u00ff\u00c6\u00fa\u009fg\u0003\fp\u00a2\u009d\u00a8Q!\u00b9p\u0002\u00de\u00d8\u00003\u0016\u0001\u00f0\u00f2\u0002p\u0000c\u00a0\u00f9\u0093\u00f7\u00c8w\u00aaB\u00d0\u00f6\u00bd\u00fa\u0014\u001d\u0002\u0081\u0003&\u00dfp\u0082v\u00bc\u00e0\u0004\u000f\u00c9\u009ev`\u00cb\u007f\u0002\u00cf\u00199\u00de\u009f.<\u00df\u00f9\u00e3\u00c8\u008a\u0096\u00b9%BNob\u00c7-\u00eb\u0081\u00a8\u00a8\u00c9\u00ba&\u00a7\u0018\u0099\u00e1\u00ce\u00e7\u0001\u00f3\u00ea\u00cf\u0007\u00cc\u00ab\u00fe\u00d2\u00fb\u00bd\u00c7\u00f7x\u001b\u00f5[\f\u00d83\u0003\u0004\u00f4=\f8\u00a2\u00c5\u00ee/L\u0016\u0002\u00027+\u00f2\u00c4\u00ca\u00c0\u00d5\u00ddW|\u00c4/\u00f1e\u00b7\u00df\u00e0\u00a3\u001b|\u00fa\u0080o\u00f9\u00cc\u00de\u00b8\u00f3i\u00fa\u00c2'\u00d90\u0084\u0082v?\ts\u0006\u0004\u00a1\u00bd\u0083I\u008a\u0097\u00f3\u0085o#=\u00ca#\u00d2\u00f7s\u0089\u00b6\u00b0\u00ce\u00fb\u00ac\u00fa[\u00f3]\u00f8!\u00ff\u00f12\u00ff\u00b7\u00bb\u009ef\u00fb\u0081]_\u008eX\f?h\u00d6\u00136f\u00fe\u0016\u008b7\u00d8X\u008e\u001f\u00d3\u008f\u00b0\u0090&\u00be\u00baf\u0088\u0097\u009e\u00a5z\u00ad\r\u00b7j\u0097\u00d5\u00cfO\u00029Y\u00b1TR\u0085\u00e5\u00aa[\u0081\u009a\u00f3\u008b\u00fb\\\u00a0b\u0099\u0003\u00e7\u009c\u00adI\u0010w\u0090\u00aa\u001aS:\u00c5\u00e1u6k\u00fd\u0000\u0019U+tnbP\u0014\u001b\tP\u00d3\u00a6\u00ad\u0005B\u00b4\u00a0\u00ddq\u00e9=c\u001c\u00b4\u00fb\u0013V\u00ec[\u00c56\u0000Z\u00ea\u00a8h{\u00b2\u0001\u0080\u00ca{\u00e9x\u00f3ge&h\u0091\u0018\u0018$\u00d59\u00f3u\u0089\u00ac\u0089\u0000\u00a5\u00b2\u00bb\u00acs\u00b93\u0016gA\u00b1\u00f6\u0086\u0093\u00d3YY1Z[-\u00d5=\u00ab*\u00bcw6\u00c2\u00da *\u0090\u00be8\u0099\u00bb\u00ea\u00f8\u00f9V\u00eeH\u00ca\u00cf\u00d9I\u0000[\u00e7\u00f3)k\u00a2\u00d5Qe\u00c5L\u00db\u00b9A\u00f2\u00fd\u00f4\u00ba6\u00b6Hnl\u00da\u0093\u00bbv\u00cb\u00f2\u00f6\u00bc}\u0014N\u0085\u00b8\u00af\u00ba\u00dcW=\u00fd\u00d1G:\u00ac\u00e4\u0016s\u00d5\u00b5/\u00173B\u00e0\u0016\u00a0\u00ea\u00b9\u0013\u00ed\u00da'\u00c1!\u00c9n2X\u00a67\u00ad\u0003\u0087\u008e:Z\u00e9Z;\u00ca,(T:\u000e\u0097\u00c9\u00bd\u00e7=\u00a1\u00c1,\u0095(ph%\u0080\u00a3y+\u008dk\u0090\u0006\u00ed\\W\u00bf\u00b0.V\u00b2\u001e+S\u00d3*%\u00d6\u00df\u000fd\u00c2h\u00c9\u00cc\u0095\u008b=\u000f'+H\u00a0\u00e2\u0084\u00b8\u00aa\u00acx7\u00bf\u001f\u0088!\u0098\u0097\u00b6\u00a5\u0003\u0091\u00fd\u00a1\u001eZ>4\u00d1\u00f2\u0080\u00f2\u00d5\u00fa1\u00bbdEbuLb\u00ff\u00fe\u0019AA\u00d5\u00ba\u00f2\u00b7\u0014\u00f2\u00bf\u001e\u00f33\u00df\u00ad\u00fey\u00be?\u001e9U\u00c7y+\u0092\u00ea\u0087\u00e2A*\u00d3\u001f\u00a9\u00ea\u008e\u00b8\"\u00f85B\u00f09EK\u0017Rs\u00ce\u0013%\u00bb[u\u00ddP\u00f7\u001c\u00ed\u00fb)\u0097\u00d9\u00fb$\u00a5\u00a3c\u001d\u00d4<\u00aaE\u00a3\n\u00e6\u00b3q\u00f1~\u001c\u00a1T\u008f2\u00d1\u00b8\u00c9\u0081h\u00e4S\u00f5\u0090>\u0095\u00b8\u00f2\u0098\u00eb~{\u00af\u00ba\u00d7)\u00e2\u00eb\u009d\u00f2Y-^\u009b\u0089\u00b3Fx\u00d6\u00c8\u00a2\u00df\u00d6\u00e8\u00b5\u00dd\u00f2\u00c4\u0000\u009d\u00f9\u00e9\u0013\u00c7\u00e8\u00bc\u00bc\u00f8l\u00b09X\u001bf\u00fd\u00aa\u00bb\u00fb\u00c4\u00e0\u00ab\u008e\u00a1\u009ejk\u00bdi\u00e1\u00be\u00a3\u00f2\u00d8O\u00e7F=\u00b7\u0086\u00d3VME\u00e6\u00c02\u00cblS\u0099\u001a\u00ea\u0084\u00c3z\u0085\u00da\u00ad\u00c3\u0000\u00f6:\u008e\u0082\u009d\u00a1;x+=\u00bcU\u00ae\u00b3\u0090\u00f9\u0011Zg\u00cag5\u008d\u0017\u00f7\u00a3\u00836S\u00b9\u009br[\u00e5\u00cde+\u00edm\u00dep\u00bbYO\u00e6\u00ce3\u00f8\u00da\u0096sq\u00fb;\u00ee\u00b8db\u00dd@,\u00a7\u00ce\u00e5\u00f96|\u00dfw\u008f\u00b3\n\u0010\u00cb\u00e7\u00d9A\u0092\u00df\u00ecy\u00cd[\u00eb3\u00a3s\u001cdbQ\u00c0\u00ac\u00b0:\u0011\u0012A\u00e0\u0018e\u00b0\u008aT(}\b\u0017\u00acS\u009bEX\u00f8\u001ce\u00ca\u008c\u0003q\u0094\u00d6\u0080G9\u008e\u00a1\u00d4YFc\u00aah\rL\n\u00db\u00b4f,\u009c\td\u0089\u0098/\u00bf\u00fd\u00e3\u00f7\u0000\u0000\u0000\u00ff\u00ff4\u0014\u001f\u0019H\u0010\u0000\u0000"
+                }
+            }
+        }
+    ]
+}

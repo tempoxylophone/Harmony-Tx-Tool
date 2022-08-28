@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List, Dict, NewType
 
 from txtool.harmony import (
@@ -29,6 +29,7 @@ class Editor(ABC):
         root_tx = transactions[0]
         return root_tx.to_addr in self.contracts
 
+    @abstractmethod
     def interpret(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:

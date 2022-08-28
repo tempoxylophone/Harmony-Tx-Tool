@@ -78,7 +78,10 @@ class KoinlyReportCreator(TransactionReportCreator):  # pylint: disable=R0902
             coin_symbol.upper() in KoinlyReportCreator._KOINLY_TRACKED_CURRENCY_SYMBOLS
         )
 
-    def to_csv_row(self, tx: TransactionCSVWrapper) -> str:
+    def to_csv_row_str(self, tx: TransactionCSVWrapper) -> str:
+        return ",".join(self.to_csv_row(tx))
+
+    def to_csv_row(self, tx: TransactionCSVWrapper) -> List[str]:
         blank_fiat = self.omit_tracked_fiat_prices and self.currency_is_tracked(
             tx.coin_symbol
         )
@@ -87,32 +90,30 @@ class KoinlyReportCreator(TransactionReportCreator):  # pylint: disable=R0902
         # koinly specific labels
         label, desc = get_label_for_tx_and_description(tx.tx)
 
-        return ",".join(
-            (
-                # time of transaction
-                tx.date,
-                # block chain info
-                tx.sent_amount,
-                self.format_coin_symbol(tx.sent_currency),
-                tx.got_amount,
-                self.format_coin_symbol(tx.got_currency),
-                tx.fee_amount,
-                tx.fee_currency,
-                # fiat info
-                fiat_val,
-                tx.net_worth_currency,
-                # human readable stuff
-                label,
-                desc,
-                # ID stuff
-                tx.tx_hash,
-                tx.method,
-                tx.to_addr,
-                tx.from_addr,
-                tx.explorer_url,
-                "\n",
-            )
-        )
+        return [
+            # time of transaction
+            tx.date,
+            # block chain info
+            tx.sent_amount,
+            self.format_coin_symbol(tx.sent_currency),
+            tx.got_amount,
+            self.format_coin_symbol(tx.got_currency),
+            tx.fee_amount,
+            tx.fee_currency,
+            # fiat info
+            fiat_val,
+            tx.net_worth_currency,
+            # human readable stuff
+            label.value,
+            desc,
+            # ID stuff
+            tx.tx_hash,
+            tx.method,
+            tx.to_addr,
+            tx.from_addr,
+            tx.explorer_url,
+            "\n",
+        ]
 
     @staticmethod
     def format_coin_symbol(coin_symbol: str) -> str:

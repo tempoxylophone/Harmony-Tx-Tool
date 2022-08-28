@@ -148,6 +148,9 @@ class HarmonyToken(Token):  # pylint: disable=R0902
             self.symbol, self.name, self.address.eth, self.is_lp_token
         )
 
+    def __repr__(self) -> str:  # pragma: no cover
+        return super().__repr__() + f" ({self.__str__()})"
+
     def __eq__(self, other: object) -> bool:
         return isinstance(other, HarmonyToken) and self.address == other.address
 
@@ -169,6 +172,10 @@ class HarmonyPlaceholderToken(Token):
         self._wrapped_token = wrapped_token
         self.name = placeholder_name
         self.symbol = placeholder_symbol
+
+    @property
+    def universal_symbol(self) -> str:
+        return self.symbol
 
     @classmethod
     def get_native_token(cls) -> Token:

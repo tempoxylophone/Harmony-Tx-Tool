@@ -15,8 +15,8 @@ from .signature import get_function_name_by_signature
 class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
     EXPLORER_TX_URL = "https://explorer.harmony.one/tx/{0}"
 
-    def __init__(self, tx_hash: HexStr):
-        super().__init__(tx_hash)
+    def __init__(self, account: HarmonyAddress, tx_hash: HexStr):
+        super().__init__(account, tx_hash)
 
         # get transaction data
         self.tx_data = HarmonyAPI.get_transaction(tx_hash)
@@ -30,7 +30,9 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
             ) from e
 
         self.from_addr = HarmonyAddress.get_harmony_address(self.tx_data["from"])
-        self.account = self.from_addr
+
+        # whether this is going IN or OUT depends on the perspective you take
+        self.account = account
 
         # temporal data
         self.block = self.tx_data["blockNumber"]

@@ -33,7 +33,7 @@ MAIN_LOGGER = logging.getLogger("main")
 
 
 def make_yellow(log_output: str) -> str:  # pragma: no cover
-    return "\x1b[33;20m" + log_output
+    return "\x1b[33;20m" + log_output + "\033[0m"
 
 
 def retry_on_exceptions(

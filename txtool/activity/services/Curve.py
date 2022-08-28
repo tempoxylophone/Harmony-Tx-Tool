@@ -56,8 +56,4 @@ class Curve3PoolLiquidityEditor(Editor):
 
             results += t_group
 
-        # write tx logs in order
-        for i, x in enumerate(results):
-            x.log_idx = i
-
         return InterpretedTransactionGroup(results)

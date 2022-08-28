@@ -19,6 +19,7 @@ lint:
 	mypy .
 	black . --exclude '(venv|/dfk\.py/)'
 	pylint txtool
+	flake8
 
 coverage:
 	coverage run -m pytest .

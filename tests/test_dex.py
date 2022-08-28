@@ -6,7 +6,7 @@ from web3 import Web3
 import pytest  # noqa
 
 from txtool.dex import DatabaseUnavailableError
-from txtool.harmony import HarmonyToken, WalletActivity
+from txtool.harmony import HarmonyToken, WalletActivity, HarmonyAddress
 from txtool.fiat import DexPriceManager
 
 from .utils import get_non_cost_transactions_from_txt_hash, get_vcr
@@ -40,9 +40,11 @@ def test_get_coin_info() -> None:
     assert not token_object.is_native_token
 
     # random tx from explorer
-    wallet_address = "0x60b206dFD4af82FaFdbA5Af3C619D0c48129b3a1"
     tx_hash = "0x7fd33525c96258963fcfb0bba74ada0f2b52b40d01a746e9d184dda66df6b52f"
-    txs = get_non_cost_transactions_from_txt_hash(tx_hash)
+    account = HarmonyAddress.get_harmony_address_by_string(
+        "0x60b206dFD4af82FaFdbA5Af3C619D0c48129b3a1"
+    )
+    txs = get_non_cost_transactions_from_txt_hash(account, tx_hash)
 
     assert len(txs) == 1
 
@@ -112,9 +114,7 @@ def test_lp_token_info() -> None:
     assert token_object.lp_token_1.universal_symbol == "ONE"
 
     # random tx from explorer
-    wallet_address = "0x6B11C4cA9a2540F05c90655BDA08B251B29fcC79"
     tx_hash = "0xd1501298d70e47ebb086fdbe04e4143e820da2d89509bcb9325b0463bd374151"
-
     lp_token_address = "0xf170016d63fb89e1d559e8f87a17bcc8b7cd9c00"
     tx_block_num = 28330799
 
@@ -145,7 +145,10 @@ def test_lp_token_info() -> None:
 
     assert lp_price_ts[price_block["block"]] == price_per_lp_token
 
-    txs = get_non_cost_transactions_from_txt_hash(tx_hash)
+    account = HarmonyAddress.get_harmony_address_by_string(
+        "0x6B11C4cA9a2540F05c90655BDA08B251B29fcC79"
+    )
+    txs = get_non_cost_transactions_from_txt_hash(account, tx_hash)
 
     assert len(txs) == 1
 

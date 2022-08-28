@@ -2,7 +2,6 @@ import logging
 import pytest  # noqa
 
 from txtool.koinly import KoinlyReportCreator
-from txtool.harmony import HarmonyAddress
 from txtool.main import get_harmony_tx_from_wallet_as_csv
 from txtool.utils import MAIN_LOGGER
 

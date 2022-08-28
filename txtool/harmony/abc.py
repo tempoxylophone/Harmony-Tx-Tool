@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Union
 from datetime import datetime
 from decimal import Decimal
@@ -23,21 +23,25 @@ class Token(ABC):
         return hash("abstract token" + str(self.address.__hash__()))
 
     @property
+    @abstractmethod
     def universal_symbol(self) -> str:  # pragma: no cover
         raise NotImplementedError
 
     @property
+    @abstractmethod
     def is_native_token(self) -> bool:  # pragma: no cover
         raise NotImplementedError
 
     @classmethod
+    @abstractmethod
     def get_native_token(cls) -> Token:  # pragma: no cover
         raise NotImplementedError
 
 
-class Transaction(ABC):  # pylint: disable=R0902,R0903
-    def __init__(self, tx_hash: Any):
+class Transaction:  # pylint: disable=R0902,R0903
+    def __init__(self, account: Any, tx_hash: Any):
         self.tx_hash = tx_hash
+        self.account = account
 
         self.block = 1
         self.timestamp = -1

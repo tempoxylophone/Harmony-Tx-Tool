@@ -1,6 +1,7 @@
 from typing import List
 
 from txtool.harmony import (
+    HarmonyAddress,
     WalletActivity,
 )
 from .services.common import InterpretedTransactionGroup
@@ -38,8 +39,9 @@ def interpret_multi_transaction(
     return InterpretedTransactionGroup(transactions)
 
 
-def get_interpreted_transaction_from_hash(
+def get_interpreted_transactions(
+    account: HarmonyAddress,
     tx_hash: str,
 ) -> InterpretedTransactionGroup:
-    txs = WalletActivity.extract_all_wallet_activity_from_transaction(tx_hash)
+    txs = WalletActivity.extract_all_wallet_activity_from_transaction(account, tx_hash)
     return InterpretedTransactionGroup(interpret_multi_transaction(txs))

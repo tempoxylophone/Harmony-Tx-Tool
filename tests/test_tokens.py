@@ -1,5 +1,5 @@
 import pytest  # noqa
-from txtool.harmony import HarmonyToken
+from txtool.harmony import HarmonyToken, HarmonyPlaceholderToken
 from txtool.harmony.constants import NATIVE_TOKEN_ETH_ADDRESS_STR
 
 from .utils import get_vcr
@@ -92,3 +92,21 @@ def test_get_harmony_token_by_address_for_vcr_2() -> None:
         "0x3a4EDcf3312f44EF027acfd8c21382a5259936e7"
     )
     assert token.symbol == "DFKGOLD"
+
+
+@vcr.use_cassette()
+def test_harmony_placeholder_token() -> None:
+    token = HarmonyToken.get_harmony_token_by_address(
+        "0x0dc78c79B4eB080eaD5C1d16559225a46b580694"
+    )
+    assert token.symbol == "WAGMI"
+
+    placeholder = HarmonyPlaceholderToken(
+        wrapped_token=token,
+        placeholder_name="bond WAGMI",
+        placeholder_symbol="bWAGMI",
+        address="0x",
+    )
+    assert placeholder.universal_symbol == "bWAGMI"
+    assert placeholder.get_native_token().is_native_token
+    assert not placeholder.is_native_token
