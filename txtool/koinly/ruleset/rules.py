@@ -163,6 +163,13 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "method": ("==", noop, "redeem(uint256)"),
             },
         ),
+        (
+            "Trade",
+            {
+                "sent_amount": (">", noop, 0),
+                "got_amount": (">", noop, 0),
+            },
+        ),
     ],
     KoinlyLabel.COST: [
         (

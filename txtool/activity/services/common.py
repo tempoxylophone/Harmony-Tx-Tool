@@ -34,3 +34,14 @@ class Editor(ABC):
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
         raise NotImplementedError  # pragma: no cover
+
+    def consolidate_trade(
+        self, give_tx: WalletActivity, get_tx: WalletActivity
+    ) -> WalletActivity:
+        # use get TX has source of truth for monetary value
+        # mutate get_tx
+        get_tx.sent_amount = give_tx.sent_amount
+        get_tx.sent_currency = give_tx.sent_currency
+        get_tx.to_addr = give_tx.to_addr
+        get_tx.from_addr = give_tx.from_addr
+        return get_tx

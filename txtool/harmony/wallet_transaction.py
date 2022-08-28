@@ -340,6 +340,19 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         return wallet_copy
 
     def __str__(self) -> str:  # pragma: no cover
+        if self.sent_currency and self.got_currency:
+            # this is a trade
+            return "tx: {0} -- [{1} {2}] trade for [{3} {4}] --> {5} ({6}) - log idx = {7}".format(
+                self.from_addr.eth,
+                self.sent_amount,
+                self.sent_currency_symbol,
+                self.got_amount,
+                self.got_currency_symbol,
+                self.to_addr.eth,
+                self.tx_hash,
+                self.log_idx,
+            )
+
         return "tx: {0} --[{1} {2}]--> {3} ({4}) - log idx = {5}".format(
             self.from_addr.eth,
             self.coin_amount,

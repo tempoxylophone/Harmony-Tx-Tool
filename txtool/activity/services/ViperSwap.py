@@ -107,6 +107,8 @@ class ViperSwapLiquidityEditor(Editor):
     CONTRACT_ADDRESSES = [
         # ViperSwap Uniswap Router v2 Contract
         "0xf012702a5f0e54015362cBCA26a26fc90AA832a3",
+        # HRC20 ViperPit (xVIPER)
+        "0xE064a68994e9380250CfEE3E8C0e2AC5C0924548",
     ]
 
     def __init__(self) -> None:
@@ -120,6 +122,7 @@ class ViperSwapLiquidityEditor(Editor):
             return InterpretedTransactionGroup(transactions)
 
         initial_tx = transactions[0]
+
         if "removeLiquidity" in initial_tx.method:
             # removal
             return self.interpret_remove_liquidity(transactions)
@@ -128,8 +131,36 @@ class ViperSwapLiquidityEditor(Editor):
             # add
             return self.interpret_add_liquidity(transactions)
 
+        if len(transactions) in (2, 3) and all(
+            self._should_treat_as_trade(x) for x in transactions
+        ):
+            cost_tx = transactions[0] if len(transactions) == 3 else None
+
+            # this is a trade
+            give_tx = next(x for x in transactions[int(bool(cost_tx)) :] if x.is_sender)
+            get_tx = next(
+                x for x in transactions[int(bool(cost_tx)) :] if x.is_receiver
+            )
+
+            return InterpretedTransactionGroup(
+                (cost_tx and [cost_tx] or [])
+                + [self.consolidate_trade(give_tx, get_tx)]
+            )
+
         # this editor is not relevant to this transaction group
         return InterpretedTransactionGroup(transactions)
+
+    def _should_treat_as_trade(self, x: WalletActivity) -> bool:
+        return (
+            # standard uniswap style tx
+            "swap" in x.method
+            or
+            # enter the viperpit (VIPER -> xVIPER)
+            x.method == "enter(uint256)"
+            or
+            # leave the viperpit (xVIPER -> VIPER)
+            x.method == "leave(uint256)"
+        )
 
     def interpret_remove_liquidity(
         self, transactions: List[WalletActivity]
@@ -157,7 +188,11 @@ class ViperSwapLiquidityEditor(Editor):
 
         get_tx_1, get_tx_2 = get_tx
 
-        in_order_txs = [cost_tx, get_tx_2, send_tx_2, get_tx_1, send_tx_1]
+        in_order_txs = [
+            cost_tx,
+            self.consolidate_trade(send_tx_2, get_tx_2),
+            self.consolidate_trade(send_tx_1, get_tx_1),
+        ]
 
         return InterpretedTransactionGroup(in_order_txs)
 
@@ -193,7 +228,6 @@ class ViperSwapLiquidityEditor(Editor):
         got_tx_2 = deepcopy(got_tx_1)
         amount = got_tx_1.coin_amount / 2
 
-        # easier for Koinly to detect as exchange
         got_tx_1.coin_amount = amount
         got_tx_1.got_amount = amount
         got_tx_2.coin_amount = amount
@@ -202,10 +236,8 @@ class ViperSwapLiquidityEditor(Editor):
         send_tx_1, send_tx_2 = send_txs
 
         tx_log = [
-            got_tx_1,
-            send_tx_1,
-            got_tx_2,
-            send_tx_2,
+            self.consolidate_trade(send_tx_2, got_tx_2),
+            self.consolidate_trade(send_tx_1, got_tx_1),
         ]
 
         if cost_tx:
