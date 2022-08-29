@@ -22,6 +22,10 @@ class EuphoriaBondEditor(Editor):
         # BondDepositories
         "0x202c598E93F69dbe3a5e5706DfB85bdc598bb16F",
         "0xF43911c859532E38c969ee1b59Eeca3De5630Fe3",
+        # Staking Helper
+        "0xEc6c0B83410c732Ac41Ee8391e35A4fcb0dcc799",
+        # Staking
+        "0x95066025af40F7f7832f61422802cD1e13C23753",
     ]
 
     def __init__(self) -> None:
@@ -30,23 +34,41 @@ class EuphoriaBondEditor(Editor):
     def interpret(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        root_tx = transactions[0]
+        root_method = transactions[0].method
 
-        if root_tx.method == "deposit(uint256,uint256,address)":
-            return self.interpret_bond(transactions)
-        if root_tx.method == "redeem(address,bool)":
-            return self.interpret_redeem(transactions)
+        if root_method == "deposit(uint256,uint256,address)":
+            return self.parse_deposit(transactions)
+        if root_method == "redeem(address,bool)":
+            return self.parse_redeem(transactions)
+        if root_method == "stake(uint256,address)":
+            return self.parse_stake(transactions)
+        if root_method == "unstake(uint256,bool)":
+            return self.parse_unstake(transactions)
 
         # can't interpret this
         return InterpretedTransactionGroup(transactions)
 
-    def interpret_bond(
+    def parse_stake(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        if len(transactions) != 3:
-            # don't interpret this
-            return InterpretedTransactionGroup(transactions)
+        give_tx = transactions[1]
+        get_tx = transactions[-1]
+        return InterpretedTransactionGroup(
+            [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+        )
 
+    def parse_unstake(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        give_tx = transactions[1]
+        get_tx = transactions[-1]
+        return InterpretedTransactionGroup(
+            [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+        )
+
+    def parse_deposit(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
         root_tx = transactions[0]
         send_tx = transactions[1]
 
@@ -68,34 +90,32 @@ class EuphoriaBondEditor(Editor):
         # for that amount in the future
         iou_tx.coin_type = self.bWAGMI_TOKEN
         iou_tx.got_currency = self.bWAGMI_TOKEN
-        iou_tx.got_amount = iou_tx.coin_amount
-
-        return InterpretedTransactionGroup([root_tx, iou_tx, send_tx])
-
-    def interpret_redeem(
-        self, transactions: List[WalletActivity]
-    ) -> InterpretedTransactionGroup:
-        if len(transactions) != 2 or transactions[1].got_currency_symbol not in (
-            "WAGMI",
-            "sWAGMI",
-        ):
-            # can't interpret this
-            return InterpretedTransactionGroup(transactions)
-
-        root_tx = transactions[0]
-        get_tx = transactions[1]
-
-        # create a send transaction as if you sent bWAGMI for WAGMI or sWAGMI
-        send_tx = deepcopy(root_tx)
-        send_tx.coin_type = self.bWAGMI_TOKEN
-        send_tx.sent_currency = self.bWAGMI_TOKEN
-        send_tx.coin_amount = get_tx.coin_amount
-        send_tx.sent_amount = get_tx.got_amount
 
         return InterpretedTransactionGroup(
             [
                 root_tx,
-                get_tx,
-                send_tx,
+                self.consolidate_trade(send_tx, iou_tx),
+            ]
+        )
+
+    def parse_redeem(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        root_tx = transactions[0]
+        args = self.get_root_tx_input(transactions)
+
+        stake = args["_stake"]
+        coin_type_got = "sWAGMI" if stake else "WAGMI"
+        get_tx = next(x for x in transactions if x.got_currency_symbol == coin_type_got)
+
+        # create a send transaction as if you sent bWAGMI for WAGMI or sWAGMI
+        send_tx = deepcopy(root_tx)
+        send_tx.coin_type = self.bWAGMI_TOKEN
+        send_tx.coin_amount = get_tx.coin_amount
+
+        return InterpretedTransactionGroup(
+            [
+                root_tx,
+                self.consolidate_trade(send_tx, get_tx),
             ]
         )

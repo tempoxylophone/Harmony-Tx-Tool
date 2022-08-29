@@ -11,4 +11,6 @@ KOINLY_UNSUPPORTED_COIN_NAMES = {
     "tq1ETH": "NULL74",  # ETH in tranquil finance
     # --- DEFI KINGDOMS ---
     "JEWEL-LP": "NULL80",
+    # --- EUPHORIA ---
+    "bWAGMI": "NULL90",
 }

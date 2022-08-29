@@ -1,5 +1,4 @@
 from typing import List
-from copy import deepcopy
 
 from txtool.harmony import (
     WalletActivity,
@@ -9,7 +8,10 @@ from .common import Editor, InterpretedTransactionGroup
 
 class Curve3PoolLiquidityEditor(Editor):
     CONTRACT_ADDRESSES = [
+        # Curve.fi DAI/USDC/USDT
         "0xC5cfaDA84E902aD92DD40194f0883ad49639b023",
+        # Curve.fi 3CRV RewardGauge Deposit
+        "0xbF7E49483881C76487b0989CD7d9A8239B20CA41"
     ]
 
     def __init__(self) -> None:
@@ -18,42 +20,56 @@ class Curve3PoolLiquidityEditor(Editor):
     def interpret(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        if len(transactions) != 5:
-            return InterpretedTransactionGroup(transactions)
+        root_method = transactions[0].method
 
-        # interpret 3 pool liquidity add
-        results = [transactions[0]]
+        if root_method == "claim_rewards(address)":
+            return self.parse_claim_rewards(transactions)
+        if root_method == "add_liquidity(uint256[3],uint256)":
+            return self.parse_add_liquidity(transactions)
+        if root_method == "remove_liquidity(uint256,uint256[3])":
+            return self.parse_remove_liquidity(transactions)
 
-        liquidity_received_tx = transactions[1]
+        return InterpretedTransactionGroup(transactions)
 
-        if liquidity_received_tx.method == "add_liquidity(uint256[3],uint256)":
-            # add liquidity
-            is_remove = False
-        elif liquidity_received_tx.method == "remove_liquidity(uint256,uint256[3])":
-            # remove liquidity
-            is_remove = True
-        else:
-            # unknown method signature - do nothing
-            return InterpretedTransactionGroup(transactions)
+    def parse_claim_rewards(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        return InterpretedTransactionGroup(transactions)
 
-        p_size_name = "sent_amount" if is_remove else "got_amount"
+    def parse_add_liquidity(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # USDC/DAI/USDT -> 3CRV
+        liquidity_received_tx = transactions[-1]
+        i_1, i_2, i_3 = self.split_copy(liquidity_received_tx, 3)
+        o_1, o_2, o_3 = transactions[1:4]
 
-        lp_position_size = getattr(liquidity_received_tx, p_size_name) / 3
+        return InterpretedTransactionGroup(
+            [
+                transactions[0],
+                self.consolidate_trade(o_1, i_1),
+                self.consolidate_trade(o_2, i_2),
+                self.consolidate_trade(o_3, i_3),
+            ]
+        )
 
-        for i in range(3):
-            # copy original token transfer tx, give 3 transfer tx
-            # where LP position is 1/3rd of full position
-            d = deepcopy(liquidity_received_tx)
+    def parse_remove_liquidity(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # 3CRV -> USDC/DAI/USDT
+        liquidity_give_tx = transactions[-1]
 
-            # edit amounts to add / remove
-            d.coin_amount = lp_position_size
-            setattr(d, p_size_name, lp_position_size)
+        # overwrite null address to CURVE contract
+        liquidity_give_tx.to_addr = transactions[0].to_addr
 
-            # order matters depending on add / remove
-            t_group = [d, transactions[i + 2]]
-            if is_remove:
-                t_group = list(reversed(t_group))
+        o_1, o_2, o_3 = self.split_copy(liquidity_give_tx, 3)
+        i_1, i_2, i_3 = transactions[1:4]
 
-            results += t_group
-
-        return InterpretedTransactionGroup(results)
+        return InterpretedTransactionGroup(
+            [
+                transactions[0],
+                self.consolidate_trade(o_1, i_1),
+                self.consolidate_trade(o_2, i_2),
+                self.consolidate_trade(o_3, i_3),
+            ]
+        )

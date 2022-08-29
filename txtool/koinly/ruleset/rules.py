@@ -37,17 +37,6 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
-            "Stake WAGMI for sWAGMI",
-            {
-                "method": (
-                    "==",
-                    noop,
-                    "stake(uint256,address)",
-                ),
-                "sent_currency_symbol": ("==", noop, "WAGMI"),
-            },
-        ),
-        (
             "Get sWAGMI for WAGMI staking",
             {
                 "method": (
@@ -67,17 +56,6 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     "unstake(uint256,bool)",
                 ),
                 "sent_currency_symbol": ("==", noop, "sWAGMI"),
-            },
-        ),
-        (
-            "Get WAGMI for sWAGMI unstaking",
-            {
-                "method": (
-                    "==",
-                    noop,
-                    "unstake(uint256,bool)",
-                ),
-                "got_currency_symbol": ("==", noop, "WAGMI"),
             },
         ),
         (
@@ -112,6 +90,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     noop,
                     "addLiquidityETH(address,uint256,uint256,uint256,address,uint256)",
                 ),
+                "sent_amount": (">", noop, 0),
             },
         ),
         (
@@ -151,11 +130,24 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
+            "Deposit collateral into Tranquil Finance",
+            {
+                "sent_amount": (">", noop, 0),
+                "got_amount": (">", noop, 0),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0xCa3e902eFdb2a410C952Fd3e4ac38d7DBDCB8E96",
+                ),
+                "method": ("==", noop, "mint(uint256)"),
+            },
+        ),
+        (
             "Remove collateral from Tranquil Finance",
             {
-                "sent_amount": ("==", noop, 0),
+                "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
-                "from_addr_str": (
+                "to_addr_str": (
                     "==",
                     noop,
                     TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
@@ -177,7 +169,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "sent_amount": ("==", noop, 0),
                 "got_amount": ("==", noop, 0),
-                "tx_fee_in_native_token": ("==", bool, True),
+                "tx_fee_in_native_token": (">", noop, 0),
             },
         )
     ],
