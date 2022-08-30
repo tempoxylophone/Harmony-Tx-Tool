@@ -93,12 +93,13 @@ class TransactionCSVWrapper:
             return ""
 
         token_usd_price = self._price_lookup[self.tx][self.tx.coin_type]
-        token_quantity = self.tx.coin_amount
+        token_quantity = (
+            self.tx.sent_amount if self.tx.is_sender else self.tx.got_amount
+        )
         return str(token_quantity * token_usd_price)
 
     @property
     def net_worth_currency(self) -> str:
-        # sorry other currencies, only USD for now
         return "usd"
 
     @property

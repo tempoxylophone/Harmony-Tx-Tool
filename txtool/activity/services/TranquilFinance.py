@@ -92,16 +92,14 @@ class TranquilFinanceONEDepositEditor(Editor):
             trade_tx = transactions[1]
 
             redeem_event = cost_tx.contract_pointer.get_tx_logs_by_event_name(
-                cost_tx.tx_hash,
-                "Redeem"
+                cost_tx.tx_hash, "Redeem"
             )[0]
 
-            args = redeem_event['args']
+            args = redeem_event["args"]
 
             one_token = cost_tx.coin_type.get_native_token()
             one_received_amount = HarmonyAPI.get_value_from_wei(
-                args['redeemAmount'],
-                one_token.decimals
+                args["redeemAmount"], one_token.decimals
             )
 
             # edit transaction
@@ -110,10 +108,9 @@ class TranquilFinanceONEDepositEditor(Editor):
             trade_tx.to_addr = cost_tx.to_addr
             trade_tx.from_addr = cost_tx.account
 
-            return InterpretedTransactionGroup(self.zero_non_root_cost([
-                cost_tx,
-                trade_tx
-            ]))
+            return InterpretedTransactionGroup(
+                self.zero_non_root_cost([cost_tx, trade_tx])
+            )
 
         # does not apply
         return InterpretedTransactionGroup(transactions)

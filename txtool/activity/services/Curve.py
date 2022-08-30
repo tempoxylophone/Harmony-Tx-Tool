@@ -15,6 +15,7 @@ class CurveUSDBTCETHLiquidityEditor(Editor):
         "deposit(uint256)": "parse_deposit",
         "withdraw(uint256)": "parse_withdraw",
         "add_liquidity(uint256[5],uint256)": "parse_add_liquidity",
+        "remove_liquidity_one_coin(uint256,uint256,uint256)": "parse_remove_liquidity_one_coin",
     }
     HRC_20_CRV_USD_BTC_ETH_ADDRESS = "0x99E8eD28B97c7F1878776eD94fFC77CABFB9B726"
     HRC_20_CRV_USD_BTC_ETH_GAUGE_ADDRESS = "0xF98450B5602fa59CC66e1379DFfB6FDDc724CfC4"
@@ -61,6 +62,19 @@ class CurveUSDBTCETHLiquidityEditor(Editor):
             self.zero_non_root_cost([cost_tx, self.consolidate_trade(give_tx, get_tx)])
         )
 
+    def parse_remove_liquidity_one_coin(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # remove all your LP position as 1 currency
+        cost_tx = transactions[0]
+        give_tx = next(x for x in transactions[1:] if x.is_sender)
+        give_tx.to_addr = cost_tx.to_addr
+
+        get_tx = next(x for x in transactions[1:] if x.is_receiver)
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([cost_tx, self.consolidate_trade(give_tx, get_tx)])
+        )
+
 
 class Curve3PoolLiquidityEditor(Editor):
     CONTRACT_ADDRESSES = [
@@ -79,6 +93,7 @@ class Curve3PoolLiquidityEditor(Editor):
         "exchange(int128,int128,uint256,uint256)": "parse_exchange",
         "deposit(uint256)": "parse_deposit",
         "withdraw(uint256)": "parse_withdraw",
+        "remove_liquidity_one_coin(uint256,int128,uint256)": "parse_remove_liquidity_one_coin",
     }
 
     def __init__(self) -> None:
@@ -159,6 +174,19 @@ class Curve3PoolLiquidityEditor(Editor):
                     self.consolidate_trade(o_3, i_3),
                 ]
             )
+        )
+
+    def parse_remove_liquidity_one_coin(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # remove all your LP position as 1 currency
+        cost_tx = transactions[0]
+        give_tx = next(x for x in transactions[1:] if x.is_sender)
+        give_tx.to_addr = cost_tx.to_addr
+
+        get_tx = next(x for x in transactions[1:] if x.is_receiver)
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([cost_tx, self.consolidate_trade(give_tx, get_tx)])
         )
 
     def parse_remove_liquidity_imbalance(

@@ -98,7 +98,7 @@ class KoinlyReportCreator(TransactionReportCreator):  # pylint: disable=R0902
             self.format_coin_symbol(tx.sent_currency),
             tx.got_amount,
             self.format_coin_symbol(tx.got_currency),
-            tx.fee_amount,
+            "" if self.omit_cost else tx.fee_amount or "",
             tx.fee_currency,
             # fiat info
             fiat_val,

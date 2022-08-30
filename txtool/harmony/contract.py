@@ -55,10 +55,7 @@ class HarmonyEVMSmartContract:
     def get_tx_logs_by_event_name(self, tx_hash: str, event_name: str) -> List[Dict]:
         tx_receipt = HarmonyAPI.get_tx_receipt(tx_hash)
         f = getattr(self.contract.events, event_name)
-        return [dict(x) for x in f().processReceipt(
-            tx_receipt,
-            errors=DISCARD
-        )]
+        return [dict(x) for x in f().processReceipt(tx_receipt, errors=DISCARD)]
 
     def decode_input(
         self, tx_input: HexStr

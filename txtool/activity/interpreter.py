@@ -58,4 +58,4 @@ def get_interpreted_transactions(
     tx_hash: str,
 ) -> InterpretedTransactionGroup:
     txs = WalletActivity.extract_all_wallet_activity_from_transaction(account, tx_hash)
-    return InterpretedTransactionGroup(interpret_multi_transaction(txs))
+    return interpret_multi_transaction(txs)
