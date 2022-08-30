@@ -133,7 +133,9 @@ class ViperSwapLiquidityEditor(UniswapDexEditor):
             transactions, self.VIPER_HRC20_ADDRESS, self.XVIPER_HRC20_ADDRESS
         )
 
-        return InterpretedTransactionGroup([root_tx, self.consolidate_trade(o, i)])
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
+        )
 
     def parse_leave(
         self, transactions: List[WalletActivity]
@@ -145,4 +147,6 @@ class ViperSwapLiquidityEditor(UniswapDexEditor):
             transactions, self.XVIPER_HRC20_ADDRESS, self.VIPER_HRC20_ADDRESS
         )
 
-        return InterpretedTransactionGroup([root_tx, self.consolidate_trade(o, i)])
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
+        )

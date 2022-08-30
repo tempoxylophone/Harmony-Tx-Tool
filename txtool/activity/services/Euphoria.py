@@ -115,7 +115,7 @@ class EuphoriaBondEditor(Editor):
         iou_tx = next(
             x
             for x in transactions
-            if x.to_addr_str == self.CONTRACT_ADDRESSES[0]
+            if x.to_addr_str in self.CONTRACT_ADDRESSES
             and x.coin_type == self.WAGMI_TOKEN
         )
 

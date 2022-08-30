@@ -6,7 +6,7 @@ from .harmony import HarmonyAPI, HarmonyAddress, WalletActivity
 from .activity.interpreter import get_interpreted_transactions
 from .koinly import KoinlyReportCreator
 
-from .utils import MAIN_LOGGER
+from .utils import MAIN_LOGGER, make_red
 
 
 def get_harmony_tx_from_wallet_as_csv(
@@ -69,7 +69,9 @@ def get_events(
             events += results
         except Exception as e:  # pylint: disable=W0703; # pragma: no cover
             MAIN_LOGGER.warning(
-                "Transaction %s threw error: %s ...", tx_hash_string, str(e)
+                make_red(
+                    "Transaction %s threw error: %s ..." % (tx_hash_string, str(e))
+                )
             )
 
     return events

@@ -109,21 +109,34 @@ class Curve3PoolLiquidityEditor(Editor):
     def parse_add_liquidity(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        # USDC/DAI/USDT -> 3CRV
-        liquidity_received_tx = transactions[-1]
-        i_1, i_2, i_3 = self.split_copy(liquidity_received_tx, 3)
-        o_1, o_2, o_3 = transactions[1:4]
-
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost(
-                [
-                    transactions[0],
-                    self.consolidate_trade(o_1, i_1),
-                    self.consolidate_trade(o_2, i_2),
-                    self.consolidate_trade(o_3, i_3),
-                ]
+        if len(transactions) == 3:
+            # (USDC/DAI/USDT) (one of these) -> 3CRV
+            cost_tx = transactions[0]
+            o = next(x for x in transactions[1:] if x.is_sender)
+            i = next(x for x in transactions[1:] if x.is_receiver)
+            return InterpretedTransactionGroup(
+                self.zero_non_root_cost([cost_tx, self.consolidate_trade(o, i)])
             )
-        )
+
+        if len(transactions) == 5:
+            # USDC/DAI/USDT -> 3CRV
+            liquidity_received_tx = transactions[-1]
+            i_1, i_2, i_3 = self.split_copy(liquidity_received_tx, 3)
+            o_1, o_2, o_3 = transactions[1:4]
+
+            return InterpretedTransactionGroup(
+                self.zero_non_root_cost(
+                    [
+                        transactions[0],
+                        self.consolidate_trade(o_1, i_1),
+                        self.consolidate_trade(o_2, i_2),
+                        self.consolidate_trade(o_3, i_3),
+                    ]
+                )
+            )
+
+        # doesn't apply here
+        return InterpretedTransactionGroup(transactions)
 
     def parse_remove_liquidity(
         self, transactions: List[WalletActivity]

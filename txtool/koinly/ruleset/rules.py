@@ -11,7 +11,6 @@ from .constants import (
     TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
     VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
     CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
-    EUPHORIA_BOND_DEPOSITORY_CONTRACT_ADDRESS_STR,
 )
 
 KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
@@ -33,11 +32,8 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     "deposit(uint256,uint256,address)",
                 ),
                 "sent_amount": (">", noop, 0),
-                "to_addr_str": (
-                    "==",
-                    noop,
-                    EUPHORIA_BOND_DEPOSITORY_CONTRACT_ADDRESS_STR,
-                ),
+                "got_amount": (">", noop, 0),
+                "got_currency_symbol": ("in", noop, "bWAGMI"),
             },
         ),
         (
