@@ -2,6 +2,7 @@ from typing import List
 from decimal import Decimal
 
 from txtool.harmony import (
+    HarmonyAPI,
     WalletActivity,
 )
 from .common import Editor, InterpretedTransactionGroup
@@ -74,13 +75,48 @@ class TranquilFinanceONEDepositEditor(Editor):
     def parse_redeem(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        get_tx = transactions[1]
-        give_tx = transactions[2]
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost(
-                [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+        if len(transactions) == 3:
+            get_tx = transactions[1]
+            give_tx = transactions[2]
+            return InterpretedTransactionGroup(
+                self.zero_non_root_cost(
+                    [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+                )
             )
-        )
+        if len(transactions) == 2:
+            # a bit different, the way the reimbursement of ONE tokens is
+            # handled is not in a transfer event, so we need to fetch parameters
+            # of that through a 'Redeem' event
+            cost_tx = transactions[0]
+
+            trade_tx = transactions[1]
+
+            redeem_event = cost_tx.contract_pointer.get_tx_logs_by_event_name(
+                cost_tx.tx_hash,
+                "Redeem"
+            )[0]
+
+            args = redeem_event['args']
+
+            one_token = cost_tx.coin_type.get_native_token()
+            one_received_amount = HarmonyAPI.get_value_from_wei(
+                args['redeemAmount'],
+                one_token.decimals
+            )
+
+            # edit transaction
+            trade_tx.got_amount = one_received_amount
+            trade_tx.got_currency = one_token
+            trade_tx.to_addr = cost_tx.to_addr
+            trade_tx.from_addr = cost_tx.account
+
+            return InterpretedTransactionGroup(self.zero_non_root_cost([
+                cost_tx,
+                trade_tx
+            ]))
+
+        # does not apply
+        return InterpretedTransactionGroup(transactions)
 
 
 class TranquilFinanceEditor(Editor):

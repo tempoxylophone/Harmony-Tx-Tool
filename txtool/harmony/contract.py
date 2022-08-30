@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Dict, Union, Tuple, Any
+from typing import Dict, Union, Tuple, Any, List
 from functools import lru_cache
 
 from web3.contract import ContractFunction
+from web3.logs import DISCARD
 from web3.types import HexStr
 from txtool.utils import get_local_abi
 
@@ -50,6 +51,14 @@ class HarmonyEVMSmartContract:
 
         # create contract object
         self.contract = HarmonyAPI.get_contract(self.address.eth, self.abi)
+
+    def get_tx_logs_by_event_name(self, tx_hash: str, event_name: str) -> List[Dict]:
+        tx_receipt = HarmonyAPI.get_tx_receipt(tx_hash)
+        f = getattr(self.contract.events, event_name)
+        return [dict(x) for x in f().processReceipt(
+            tx_receipt,
+            errors=DISCARD
+        )]
 
     def decode_input(
         self, tx_input: HexStr
