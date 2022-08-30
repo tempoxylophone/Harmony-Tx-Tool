@@ -11,6 +11,7 @@ from ..fiat.coingecko.manager import CoinGeckoPriceManager
 # source: https://medium.com/harmony-one/harmonys-horizon-bridge-hack-1e8d283b6d66
 # https://etherscan.io/tx/0x2f259dec682ccd6517c09b771d6edb439f1925e87b562a72649a708fdd0511e1
 HARMONY_HACK_DATE = datetime.fromisoformat("2022-06-23T13:30:00")
+HARMONY_HACK_TS = HARMONY_HACK_DATE.timestamp()
 KOINLY_TRANQ_PRICE_AVAILABLE_AFTER_DATE = datetime.fromisoformat("2021-11-28T00:00:00")
 
 T_PRICE_DATA_DICT = Dict[WalletActivity, Dict[HarmonyToken, Decimal]]
@@ -22,17 +23,8 @@ def get_token_prices_for_transactions(
     # create mapping from transaction to all relevant price data
     all_price_data: T_PRICE_DATA_DICT = defaultdict(dict)
 
-    hack_ts = HARMONY_HACK_DATE.timestamp()
-    # transactions do not have any notion of knowledge of their fiat values
-    # get price of token at block & get price of token at timestamp
-    # also need to account for harmony bridge hack date
-
     # can only use DEX prices before the hack date
-    before = [
-        x
-        for x in txs
-        if x.timestamp <= hack_ts and isinstance(x.coin_type, HarmonyToken)
-    ]
+    before = [x for x in txs if _should_get_from_dex(x)]
     price_data_before = DexPriceManager.get_price_data(before)
     for tx in before:
         tokens = tx.get_relevant_tokens()
@@ -42,12 +34,7 @@ def get_token_prices_for_transactions(
             )
 
     # after hack, must use coingecko
-    after = [
-        x
-        for x in txs
-        if (x.timestamp > hack_ts and isinstance(x.coin_type, HarmonyToken))
-        or is_coingecko_edge_case(x)
-    ]
+    after = [x for x in txs if _should_get_from_coingecko(x)]
     price_data_after = CoinGeckoPriceManager.get_price_history_for_transactions(after)
     for tx in after:
         tokens = tx.get_relevant_tokens()
@@ -63,7 +50,27 @@ def get_token_prices_for_transactions(
     return all_price_data
 
 
-def is_coingecko_edge_case(tx: WalletActivity) -> bool:
+def _should_get_from_dex(tx: WalletActivity) -> bool:
+    return (
+        # must be before de-peg
+        tx.timestamp <= HARMONY_HACK_TS
+        and
+        # must be a token instance, can't be placeholder
+        tx.coin_type.__class__ == HarmonyToken
+    )
+
+
+def _should_get_from_coingecko(tx: WalletActivity) -> bool:
+    return (
+        # must be before de-peg
+        (tx.timestamp > HARMONY_HACK_TS or _is_coingecko_edge_case(tx))
+        and
+        # must be token instance, can't be placeholder
+        tx.coin_type.__class__ == HarmonyToken
+    )
+
+
+def _is_coingecko_edge_case(tx: WalletActivity) -> bool:
     # some tokens don't exist in the dex, but also don't exist in Koinly.
     # in those cases, we will have to look them up on coingecko
     if (

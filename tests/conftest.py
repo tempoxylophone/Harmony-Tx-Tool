@@ -3,11 +3,7 @@ import gc
 import functools
 import pytest  # noqa
 
-
 from txtool.harmony import HarmonyAddress, HarmonyToken
-
-# file must be called "conftest" in order to be shared by all in this directory
-# see: https://docs.pytest.org/en/6.2.x/fixture.html#scope-sharing-fixtures-across-classes-modules-packages-or-session
 
 
 @pytest.fixture(autouse=True)

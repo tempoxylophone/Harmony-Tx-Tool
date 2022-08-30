@@ -85,13 +85,16 @@ class TransactionCSVWrapper:
 
     @property
     def net_worth_amount(self) -> str:
-        if isinstance(self.tx.coin_type, HarmonyToken):
-            token_usd_price = self._price_lookup[self.tx][self.tx.coin_type]
-            token_quantity = self.tx.coin_amount
-            return str(token_quantity * token_usd_price)
+        if self.tx.coin_type.__class__ != HarmonyToken:
+            # got placeholder token, don't look it up
+            return ""
 
-        # got placeholder token, don't look it up
-        return ""
+        if not isinstance(self.tx.coin_type, HarmonyToken):
+            return ""
+
+        token_usd_price = self._price_lookup[self.tx][self.tx.coin_type]
+        token_quantity = self.tx.coin_amount
+        return str(token_quantity * token_usd_price)
 
     @property
     def net_worth_currency(self) -> str:

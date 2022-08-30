@@ -5,26 +5,40 @@ from txtool.harmony import (
     WalletActivity,
 )
 from .services.common import InterpretedTransactionGroup
-from .services.Curve import Curve3PoolLiquidityEditor
-from .services.TranquilFinance import TranquilFinanceEditor
-from .services.Euphoria import EuphoriaBondEditor
+from .services.Curve import Curve3PoolLiquidityEditor, CurveUSDBTCETHLiquidityEditor
+from .services.TranquilFinance import (
+    TranquilFinanceEditor,
+    TranquilFinanceONEDepositEditor,
+    TranquilFinanceStakingEditor,
+)
+from .services.Euphoria import EuphoriaBondEditor, EuphoriaWrapEditor
 from .services.ViperSwap import (
     ViperSwapXRewardsEditor,
     ViperSwapLiquidityEditor,
     ViperSwapClaimRewardsEditor,
 )
+from .services.SushiSwap import SushiSwapLiquidityEditor
+from .services.DefiKingdoms import DefiKingdomsLiquidityEditor
 
 EDITORS = [
     # ViperSwap
     ViperSwapClaimRewardsEditor(),
     ViperSwapXRewardsEditor(),
     ViperSwapLiquidityEditor(),
+    # SushiSwap
+    SushiSwapLiquidityEditor(),
+    # Defi Kingdoms
+    DefiKingdomsLiquidityEditor(),
     # Euphoria
     EuphoriaBondEditor(),
+    EuphoriaWrapEditor(),
     # Tranquil
     TranquilFinanceEditor(),
+    TranquilFinanceONEDepositEditor(),
+    TranquilFinanceStakingEditor(),
     # Curve
     Curve3PoolLiquidityEditor(),
+    CurveUSDBTCETHLiquidityEditor(),
 ]
 
 

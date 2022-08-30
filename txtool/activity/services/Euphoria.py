@@ -9,6 +9,40 @@ from txtool.harmony import (
 from .common import Editor, InterpretedTransactionGroup
 
 
+class EuphoriaWrapEditor(Editor):
+    CONTRACT_ADDRESSES = [
+        # HRC20 - wsWAGMI
+        "0xBb948620Fa9cD554eF9A331B13eDeA9B181F9D45",
+    ]
+    HRC_20_WSWAGMI = "0xBb948620Fa9cD554eF9A331B13eDeA9B181F9D45"
+    HRC_20_SWAGMI = "0xF38593388079F7f5130d605E38aBF6090D981eC2"
+
+    def __init__(self) -> None:
+        super().__init__(self.CONTRACT_ADDRESSES)
+
+    def interpret(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        root_method = transactions[0].method
+
+        if root_method == "wrap(uint256)":
+            return self.parse_wrap(transactions)
+
+        return InterpretedTransactionGroup(transactions)
+
+    def parse_wrap(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        cost_tx = transactions[0]
+        o, i = self.get_pair_by_address(
+            transactions, self.HRC_20_SWAGMI, self.HRC_20_WSWAGMI
+        )
+
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([cost_tx, self.consolidate_trade(o, i)])
+        )
+
+
 class EuphoriaBondEditor(Editor):
     WAGMI_TOKEN = HarmonyToken.get_harmony_token_by_address(
         "0x0dc78c79B4eB080eaD5C1d16559225a46b580694"
@@ -54,7 +88,9 @@ class EuphoriaBondEditor(Editor):
         give_tx = transactions[1]
         get_tx = transactions[-1]
         return InterpretedTransactionGroup(
-            [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+            self.zero_non_root_cost(
+                [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+            )
         )
 
     def parse_unstake(
@@ -63,7 +99,9 @@ class EuphoriaBondEditor(Editor):
         give_tx = transactions[1]
         get_tx = transactions[-1]
         return InterpretedTransactionGroup(
-            [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+            self.zero_non_root_cost(
+                [transactions[0], self.consolidate_trade(give_tx, get_tx)]
+            )
         )
 
     def parse_deposit(
@@ -92,10 +130,12 @@ class EuphoriaBondEditor(Editor):
         iou_tx.got_currency = self.bWAGMI_TOKEN
 
         return InterpretedTransactionGroup(
-            [
-                root_tx,
-                self.consolidate_trade(send_tx, iou_tx),
-            ]
+            self.zero_non_root_cost(
+                [
+                    root_tx,
+                    self.consolidate_trade(send_tx, iou_tx),
+                ]
+            )
         )
 
     def parse_redeem(
@@ -114,8 +154,10 @@ class EuphoriaBondEditor(Editor):
         send_tx.coin_amount = get_tx.coin_amount
 
         return InterpretedTransactionGroup(
-            [
-                root_tx,
-                self.consolidate_trade(send_tx, get_tx),
-            ]
+            self.zero_non_root_cost(
+                [
+                    root_tx,
+                    self.consolidate_trade(send_tx, get_tx),
+                ]
+            )
         )

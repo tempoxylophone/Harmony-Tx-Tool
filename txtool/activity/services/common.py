@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing import List, Dict, NewType, Tuple
+from typing import List, Dict, NewType, Tuple, Callable
 from decimal import Decimal
 from copy import deepcopy
 
@@ -14,7 +13,9 @@ InterpretedTransactionGroup = NewType(
 )
 
 
-class Editor(ABC):
+class Editor:
+    _HANDLERS: Dict[str, str] = {}
+
     def __init__(self, contract_addresses: List[str]):
         self.contracts: Dict[HarmonyAddress, HarmonyEVMSmartContract] = {}
 
@@ -31,18 +32,26 @@ class Editor(ABC):
         root_tx = transactions[0]
         return root_tx.to_addr in self.contracts
 
-    @abstractmethod
     def interpret(
         self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
-        raise NotImplementedError  # pragma: no cover
+        root_method = transactions[0].method
+        f: Callable[[List[WalletActivity]], InterpretedTransactionGroup] = (
+            # give transactions to appropriate handler
+            getattr(self, self._HANDLERS[root_method])
+            if root_method in self._HANDLERS
+            else
+            # do nothing, just cast
+            InterpretedTransactionGroup
+        )
+        return f(transactions)
 
     def consolidate_trade(
         self, give_tx: WalletActivity, get_tx: WalletActivity
     ) -> WalletActivity:
+        # get coins moved to / from
         give_tx.sent_amount = give_tx.coin_amount
         give_tx.sent_currency = give_tx.coin_type
-
         get_tx.got_amount = get_tx.coin_amount
         get_tx.got_currency = get_tx.coin_type
 
@@ -52,7 +61,17 @@ class Editor(ABC):
         get_tx.sent_currency = give_tx.sent_currency
         get_tx.to_addr = give_tx.to_addr
         get_tx.from_addr = give_tx.from_addr
+
         return get_tx
+
+    def zero_non_root_cost(
+        self, transactions: List[WalletActivity]
+    ) -> List[WalletActivity]:
+        # mutate costs
+        for tx in transactions[1:]:
+            tx.tx_fee_in_native_token = Decimal(0)
+
+        return transactions
 
     def get_root_tx_input(self, transactions: List[WalletActivity]) -> Dict:
         root_tx = transactions[0]

@@ -100,6 +100,7 @@ def test_harmony_placeholder_token() -> None:
         "0x0dc78c79B4eB080eaD5C1d16559225a46b580694"
     )
     assert token.symbol == "WAGMI"
+    assert token.__class__ == HarmonyToken
 
     placeholder = HarmonyPlaceholderToken(
         wrapped_token=token,
@@ -110,3 +111,4 @@ def test_harmony_placeholder_token() -> None:
     assert placeholder.universal_symbol == "bWAGMI"
     assert placeholder.get_native_token().is_native_token
     assert not placeholder.is_native_token
+    assert placeholder.__class__ != HarmonyToken

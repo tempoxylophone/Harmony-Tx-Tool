@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
-from typing import Sequence, Optional
+from typing import Optional, List
 
 from web3.types import TxReceipt, HexStr
 
@@ -67,14 +67,19 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         # position of transaction in logs
         self.log_idx = 0
 
-    def get_relevant_tokens(self) -> Sequence[HarmonyToken]:
+    def get_relevant_tokens(self) -> List[HarmonyToken]:
         coins = {
             self.coin_type,
             self.got_currency,
             self.sent_currency,
             HarmonyToken.get_native_token(),
         } - {None}
-        return list(coins)  # type: ignore
+        coins = list(coins)  # type: ignore
+        return [
+            x
+            for x in coins
+            if x and isinstance(x, HarmonyToken) and x.__class__ == HarmonyToken
+        ]
 
     @property
     def receipt(self) -> TxReceipt:

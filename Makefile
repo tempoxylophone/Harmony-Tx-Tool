@@ -13,7 +13,7 @@ requirements:
 	pipenv lock -r --dev > requirements-dev.txt
 
 test:
-	pytest -v -s -rx --random-order -m "not slow"
+	pytest -v -s --random-order -m "not slow"
 
 lint:
 	mypy .

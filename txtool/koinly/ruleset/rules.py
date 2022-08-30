@@ -1,8 +1,12 @@
 from typing import Dict
+
+from txtool.activity.services.TranquilFinance import (
+    TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES,
+)
+
 from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop
 from .constants import (
     TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR,
-    TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
     TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
     TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
     VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
@@ -59,6 +63,73 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
+            "Stake LP Position in Curve USD-BTC-ETH Pool",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "deposit(uint256)",
+                ),
+                "sent_currency_symbol": ("==", noop, "crvUSDBTCETH"),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0xF98450B5602fa59CC66e1379DFfB6FDDc724CfC4",
+                ),
+            },
+        ),
+        (
+            "Unstake LP Position in Curve USD-BTC-ETH Pool",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "withdraw(uint256)",
+                ),
+                "sent_currency_symbol": ("==", noop, "crvUSDBTCETH-gauge"),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0xF98450B5602fa59CC66e1379DFfB6FDDc724CfC4",
+                ),
+            },
+        ),
+        (
+            "Stake LP Position in Curve 3 Pool",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "deposit(uint256)",
+                ),
+                "sent_currency_symbol": ("==", noop, "3CRV"),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0xbF7E49483881C76487b0989CD7d9A8239B20CA41",
+                ),
+            },
+        ),
+        (
+            "Unstake LP Position in Curve 3 Pool",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "withdraw(uint256)",
+                ),
+                "got_currency_symbol": ("==", noop, "3CRV"),
+                "sent_currency_symbol": ("==", noop, "3CRV-gauge"),
+                "got_amount": (">", noop, 0),
+                "sent_amount": (">", noop, 0),
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0xbF7E49483881C76487b0989CD7d9A8239B20CA41",
+                ),
+            },
+        ),
+        (
             "Stake LP Position in ViperSwap",
             {
                 "method": (
@@ -104,15 +175,25 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
-            "Borrow from Tranquil Finance",
+            "Unstake TRANQ from Tranquil Finance",
             {
                 "sent_amount": ("==", noop, 0),
                 "got_amount": (">", noop, 0),
                 "from_addr_str": (
                     "==",
                     noop,
-                    TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
+                    TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR,
                 ),
+                "got_currency_symbol": ("==", noop, "TRANQ"),
+                "method": ("==", noop, "redeem(uint256)"),
+            },
+        ),
+        (
+            "Borrow from Tranquil Finance",
+            {
+                "sent_amount": ("==", noop, 0),
+                "got_amount": (">", noop, 0),
+                "from_addr_str": ("in", noop, TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES),
                 "method": ("==", noop, "borrow(uint256)"),
             },
         ),
@@ -122,9 +203,9 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_amount": (">", noop, 0),
                 "got_amount": ("==", noop, 0),
                 "to_addr_str": (
-                    "==",
+                    "in",
                     noop,
-                    TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
+                    TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES,
                 ),
                 "method": ("==", noop, "repayBorrow(uint256)"),
             },
@@ -134,12 +215,13 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
+                "got_currency_symbol": ("==", lambda x: str(x)[:2], "tq"),
+                "method": ("in", lambda x: str(x).split("(", maxsplit=1)[0], "mint"),
                 "to_addr_str": (
-                    "==",
+                    "in",
                     noop,
-                    "0xCa3e902eFdb2a410C952Fd3e4ac38d7DBDCB8E96",
+                    TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES,
                 ),
-                "method": ("==", noop, "mint(uint256)"),
             },
         ),
         (
@@ -147,11 +229,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
-                "to_addr_str": (
-                    "==",
-                    noop,
-                    TRANQUIL_FINANCE_TQ_ERC20_DELEGATOR_ADDRESS_STR,
-                ),
+                "sent_currency_symbol": ("==", lambda x: str(x)[:2], "tq"),
                 "method": ("==", noop, "redeem(uint256)"),
             },
         ),
@@ -160,6 +238,14 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
+            },
+        ),
+        (
+            "Wallet to Wallet HRC20 Token Transfer",
+            {
+                "sent_amount": (">", noop, 0),
+                "got_amount": ("==", noop, 0),
+                "method": ("==", noop, "transfer(address,uint256)"),
             },
         ),
     ],
@@ -189,6 +275,20 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         )
     ],
     KoinlyLabel.REWARD: [
+        (
+            "Claim TRANQ reward",
+            {
+                "from_addr_str": (
+                    "==",
+                    noop,
+                    "0xA7Fe71bC92d3A48aC59403b9be86f73e49bfCd46",
+                ),
+                "is_receiver": ("==", noop, True),
+                "got_amount": (">", noop, 0),
+                "got_currency_symbol": ("==", noop, "TRANQ"),
+                "method": ("==", noop, "claimRewards()"),
+            },
+        ),
         (
             "Claim TRANQ reward",
             {
