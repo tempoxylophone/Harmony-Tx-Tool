@@ -44,11 +44,14 @@ class TranquilFinanceStakingEditor(Editor):
 
 class TranquilFinanceONEDepositEditor(Editor):
     HRC20_TQ_ONE_ADDR_STR = "0x34B9aa82D89AE04f0f546Ca5eC9C93eFE1288940"
+    HRC20_STONE_ADDR_STR = "0x22D62b19b7039333ad773b7185BB61294F3AdC19"
     CONTRACT_ADDRESSES = [
         # TRANQ HRC20 (tqONE)
         HRC20_TQ_ONE_ADDR_STR,
         # Unknown ABI
         "0x0ff9a77212609FE8fF8B1C85E60FCa66aDDaC045",
+        # Unknown ABI
+        "0xDE010f117000Ed4037de1c199b3F371FEd5B12C7",
     ]
 
     def __init__(self) -> None:
@@ -80,6 +83,8 @@ class TranquilFinanceONEDepositEditor(Editor):
             return self.parse_redeem(transactions)
         if root_method == "mint()":
             return self.parse_mint(transactions)
+        if root_method == "deposit(uint256)":
+            return self.parse_deposit(transactions)
 
         return InterpretedTransactionGroup(transactions)
 
@@ -134,6 +139,18 @@ class TranquilFinanceONEDepositEditor(Editor):
             )
 
         # does not apply
+        return InterpretedTransactionGroup(transactions)
+
+    def parse_deposit(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        if len(transactions) == 3:
+            # ONE -> stONE
+            o = transactions[0]
+            i = next(x for x in transactions if x.is_receiver)
+            return InterpretedTransactionGroup([self.consolidate_trade(o, i)])
+
+        # doesn't apply here
         return InterpretedTransactionGroup(transactions)
 
 
