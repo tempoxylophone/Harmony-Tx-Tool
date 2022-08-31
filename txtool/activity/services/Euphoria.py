@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from copy import deepcopy
 
 from txtool.harmony import (
@@ -44,14 +44,7 @@ class EuphoriaWrapEditor(Editor):
 
 
 class EuphoriaBondEditor(Editor):
-    WAGMI_TOKEN = HarmonyToken.get_harmony_token_by_address(
-        "0x0dc78c79B4eB080eaD5C1d16559225a46b580694"
-    )
-
-    # not a real currency, used for book-keeping purposes
-    bWAGMI_TOKEN = HarmonyPlaceholderToken(
-        WAGMI_TOKEN, "bondIOUWAGMI", "bWAGMI", "0xbWAGMIAddress"
-    )
+    WAGMI_TOKEN_ADDR_STR = "0x0dc78c79B4eB080eaD5C1d16559225a46b580694"
     CONTRACT_ADDRESSES = [
         # BondDepositories
         "0x202c598E93F69dbe3a5e5706DfB85bdc598bb16F",
@@ -64,6 +57,36 @@ class EuphoriaBondEditor(Editor):
 
     def __init__(self) -> None:
         super().__init__(self.CONTRACT_ADDRESSES)
+        self._wagmi_token: Optional[HarmonyToken] = None
+        self._bwagmi_token: Optional[HarmonyPlaceholderToken] = None
+
+    @property
+    def WAGMI_TOKEN(self) -> HarmonyToken:
+        if self._wagmi_token is None:
+            self._wagmi_token = HarmonyToken.get_harmony_token_by_address(
+                self.WAGMI_TOKEN_ADDR_STR
+            )
+
+        if not isinstance(self._wagmi_token, HarmonyToken):
+            raise RuntimeError(
+                f"Could not load WAGMI Token (address: {self.WAGMI_TOKEN_ADDR_STR})"
+            )
+
+        return self._wagmi_token
+
+    @property
+    def bWAGMI_TOKEN(self) -> HarmonyPlaceholderToken:
+        if self._bwagmi_token is None:
+            self._bwagmi_token = HarmonyPlaceholderToken(
+                self.WAGMI_TOKEN, "bondIOUWAGMI", "bWAGMI", "0xbWAGMIAddress"
+            )
+
+        if not isinstance(self._bwagmi_token, HarmonyPlaceholderToken):
+            raise RuntimeError(
+                f"Could not load bWAGMI Token (address: {self.WAGMI_TOKEN_ADDR_STR})"
+            )
+
+        return self._bwagmi_token
 
     def interpret(
         self, transactions: List[WalletActivity]

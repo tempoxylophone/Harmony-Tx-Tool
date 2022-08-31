@@ -6,7 +6,6 @@ from pyhmy import util, account
 
 from txtool.utils import MAIN_LOGGER
 from .api import HarmonyAPI
-from .abc import Token
 
 
 class BadAddressException(Exception):
@@ -46,18 +45,6 @@ class HarmonyAddress:
         # add to directory
         HarmonyAddress._ADDRESS_DIRECTORY[self.eth] = self
 
-        self.belongs_to_smart_contract = HarmonyAPI.address_belongs_to_smart_contract(
-            self.eth
-        )
-
-        # this will be set if the address is called in the constructor of token
-        self.belongs_to_token = (
-            self.belongs_to_smart_contract
-            and HarmonyAPI.address_belongs_to_erc_20_token(self.eth)
-        )
-
-        self.token: Union[Token, None] = None
-
     @classmethod
     def clear_directory(cls) -> None:
         cls._ADDRESS_DIRECTORY = {}
@@ -78,10 +65,6 @@ class HarmonyAddress:
     @property
     def one(self) -> str:
         return self.get_one_address()
-
-    @property
-    def belongs_to_non_token_smart_contract(self) -> bool:
-        return self.belongs_to_smart_contract and not self.belongs_to_token
 
     @classmethod
     def get_address_string_format(cls, address_string: str) -> str:

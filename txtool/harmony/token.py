@@ -25,8 +25,6 @@ class HarmonyToken(Token):  # pylint: disable=R0902
     ):
         super().__init__(address)
         self.address = HarmonyAddress.get_harmony_address(address)
-        self.address.belongs_to_token = True
-        self.address.token = self
 
         symbol, decimals, name = HarmonyAPI.get_token_info(self.address.eth)
         self.name = name
@@ -68,9 +66,12 @@ class HarmonyToken(Token):  # pylint: disable=R0902
     @classmethod
     def get_address_and_set_token(cls, eth_address_str: str) -> HarmonyAddress:
         addr_obj = HarmonyAddress.get_harmony_address(eth_address_str)
-        if addr_obj.belongs_to_token:
-            token = HarmonyToken.get_harmony_token_by_address(addr_obj)
-            addr_obj.token = token
+        try:
+            # create token object
+            HarmonyToken.get_harmony_token_by_address(addr_obj)
+        except ValueError:
+            # address does not belong to token
+            pass
 
         return addr_obj
 

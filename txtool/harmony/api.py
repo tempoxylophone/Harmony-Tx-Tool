@@ -51,7 +51,6 @@ class HarmonyAPI:
     )
 
     @classmethod
-    @lru_cache(maxsize=128)
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_transaction(cls, tx_hash: HexStr) -> Dict:
         return dict(cls._w3.eth.get_transaction(tx_hash))
@@ -72,7 +71,6 @@ class HarmonyAPI:
             ) from err
 
     @classmethod
-    @lru_cache(maxsize=256)
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_tx_receipt(cls, tx_hash: HexStr) -> TxReceipt:
         try:
@@ -120,7 +118,6 @@ class HarmonyAPI:
         return cls._w3.eth.get_code(eth_address)
 
     @classmethod
-    @lru_cache(maxsize=256)
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def _get_code(cls, address: str) -> Dict:
         url = cls._get_code_request_url(address)
@@ -136,6 +133,7 @@ class HarmonyAPI:
             return {}
 
     @classmethod
+    @lru_cache(maxsize=256)
     def get_abi(cls, address: str) -> Union[Dict, None]:
         if address in cls.INCORRECT_CONTRACT_ABI_ADDRESSES:
             # hacky handler for incorrect ABIs uploaded to Harmony API
@@ -148,12 +146,14 @@ class HarmonyAPI:
         return cls.ABI_API_ENDPOINT.format(address)
 
     @staticmethod
+    @lru_cache(maxsize=256)
     def address_belongs_to_smart_contract(eth_address: str) -> bool:
         # null byte if address belongs to a wallet
         # this will return True if this is the address of ERC20 token
         return bool(HarmonyAPI.get_smart_contract_byte_code(eth_address))
 
     @staticmethod
+    @lru_cache(maxsize=256)
     def address_belongs_to_erc_20_token(eth_address: str) -> bool:
         return HarmonyAPI.address_belongs_to_smart_contract(
             eth_address

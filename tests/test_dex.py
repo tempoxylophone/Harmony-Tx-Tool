@@ -34,9 +34,6 @@ def test_get_coin_info() -> None:
     token_object = HarmonyToken(token_address)
 
     assert not token_object.is_lp_token
-    assert token_object.address.belongs_to_token
-    assert token_object.address.belongs_to_smart_contract
-    assert not token_object.address.belongs_to_non_token_smart_contract
     assert not token_object.is_native_token
 
     # random tx from explorer
@@ -92,9 +89,6 @@ def test_lp_token_info() -> None:
     assert token_object.name == "Venom LP Token"
 
     assert token_object.is_lp_token
-    assert token_object.address.belongs_to_token
-    assert token_object.address.belongs_to_smart_contract
-    assert not token_object.address.belongs_to_non_token_smart_contract
     assert not token_object.is_native_token
     assert isinstance(token_object.lp_token_0, HarmonyToken)
     assert isinstance(token_object.lp_token_1, HarmonyToken)

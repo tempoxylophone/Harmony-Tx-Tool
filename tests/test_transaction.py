@@ -51,9 +51,7 @@ def test_token_tx_with_intermediate_transfers() -> None:
     assert not tx.is_receiver
     assert not tx.is_sender
     assert tx.from_addr.eth == "0xF170016d63fb89e1d559e8F87a17BCC8B7CD9c00"
-    assert tx.from_addr.token and tx.from_addr.token.symbol == "VENOM-LP"
     assert tx.to_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
-    assert tx.to_addr.belongs_to_non_token_smart_contract
     assert tx.log_idx == 21
 
     tx = txs[2]
@@ -65,8 +63,6 @@ def test_token_tx_with_intermediate_transfers() -> None:
     assert not tx.is_sender
     assert not tx.is_receiver
     assert tx.from_addr.eth == "0x060B9A5c8e9E84b9b8034362f982dCaC289F3bFb"
-    assert tx.from_addr.belongs_to_non_token_smart_contract
-    assert tx.to_addr.token and tx.to_addr.token.name == "FarmersOnly LP Token"
     assert tx.to_addr.eth == "0xe83eE2547613327300732D9B35238A6bCf168B21"
     assert tx.log_idx == 22
 
@@ -77,9 +73,7 @@ def test_token_tx_with_intermediate_transfers() -> None:
     assert not tx.is_receiver
     assert not tx.is_sender
     assert tx.from_addr.eth == "0xe83eE2547613327300732D9B35238A6bCf168B21"
-    assert tx.from_addr.token and tx.from_addr.token.name == "FarmersOnly LP Token"
     assert tx.to_addr.eth == "0x670240Cd8f514EBaD7e375EcBa7e9e6b761e893A"
-    assert tx.to_addr.token and tx.to_addr.token.name == "FarmersOnly LP Token"
     assert tx.log_idx == 23
 
     tx = txs[4]
@@ -89,9 +83,7 @@ def test_token_tx_with_intermediate_transfers() -> None:
     assert not tx.is_receiver
     assert not tx.is_sender
     assert tx.from_addr.eth == "0x670240Cd8f514EBaD7e375EcBa7e9e6b761e893A"
-    assert tx.from_addr.token and tx.from_addr.token.symbol == "FOX-LP"
     assert tx.to_addr.eth == "0xF170016d63fb89e1d559e8F87a17BCC8B7CD9c00"
-    assert tx.to_addr.token and tx.to_addr.token.symbol == "VENOM-LP"
     assert tx.log_idx == 26
 
 

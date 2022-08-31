@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import Dict, Union, Tuple, Any, List
+from typing import Dict, Union, Tuple, Any, List, Optional
 from functools import lru_cache
 
-from web3.contract import ContractFunction
+from web3.contract import ContractFunction, Contract
 from web3.logs import DISCARD
 from web3.types import HexStr
 from txtool.utils import get_local_abi
@@ -35,6 +35,17 @@ class HarmonyEVMSmartContract:
 
     def __init__(self, address: HarmonyAddress):
         self.address: HarmonyAddress = address
+        self._has_loaded = False
+
+        # loaded lazily
+        self.abi: Dict = {}
+        self.contract: Optional[Contract] = None
+        self.has_code = False
+        self.abi_attempt_idx = 0
+
+    def _load_contract_data(self) -> None:
+        if self._has_loaded:
+            return
 
         # contract function requires us to know interface of source
         self.has_code = HarmonyAPI.address_belongs_to_smart_contract(self.address.eth)
@@ -52,14 +63,30 @@ class HarmonyEVMSmartContract:
         # create contract object
         self.contract = HarmonyAPI.get_contract(self.address.eth, self.abi)
 
+        self._has_loaded = True
+
     def get_tx_logs_by_event_name(self, tx_hash: str, event_name: str) -> List[Dict]:
-        tx_receipt = HarmonyAPI.get_tx_receipt(tx_hash)
+        self._load_contract_data()
+
+        if not isinstance(self.contract, Contract):
+            raise RuntimeError(
+                f"Contract at address: {self.address.eth} could not be loaded."
+            )
+
+        tx_receipt = HarmonyAPI.get_tx_receipt(HexStr(tx_hash))
         f = getattr(self.contract.events, event_name)
         return [dict(x) for x in f().processReceipt(tx_receipt, errors=DISCARD)]
 
     def decode_input(
         self, tx_input: HexStr
     ) -> Tuple[bool, Union[T_DECODED_ETH_SIG, None]]:
+        self._load_contract_data()
+
+        if not isinstance(self.contract, Contract):
+            raise RuntimeError(
+                f"Contract at address: {self.address.eth} could not be loaded."
+            )
+
         if self.abi_attempt_idx > len(self.POSSIBLE_ABIS) - 1:
             # can't decode this, even after trying a few generic ABIs
             return False, None

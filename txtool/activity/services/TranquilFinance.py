@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Optional
 from decimal import Decimal
 
 from txtool.harmony import (
+    HarmonyEVMSmartContract,
     HarmonyAPI,
     WalletActivity,
 )
@@ -42,13 +43,33 @@ class TranquilFinanceStakingEditor(Editor):
 
 
 class TranquilFinanceONEDepositEditor(Editor):
+    HRC20_TQ_ONE_ADDR_STR = "0x34B9aa82D89AE04f0f546Ca5eC9C93eFE1288940"
     CONTRACT_ADDRESSES = [
         # TRANQ HRC20 (tqONE)
-        "0x34B9aa82D89AE04f0f546Ca5eC9C93eFE1288940",
+        HRC20_TQ_ONE_ADDR_STR,
+        # Unknown ABI
+        "0x0ff9a77212609FE8fF8B1C85E60FCa66aDDaC045",
     ]
 
     def __init__(self) -> None:
         super().__init__(self.CONTRACT_ADDRESSES)
+        self._redeem_contract: Optional[HarmonyEVMSmartContract] = None
+
+    @property
+    def redeem_decoding_contract(self) -> HarmonyEVMSmartContract:
+        if self._redeem_contract is None:
+            self._redeem_contract = (
+                HarmonyEVMSmartContract.lookup_harmony_smart_contract_by_address(
+                    self.HRC20_TQ_ONE_ADDR_STR
+                )
+            )
+
+        if not isinstance(self._redeem_contract, HarmonyEVMSmartContract):
+            raise RuntimeError(
+                f"Could not decode contract at address: {self.HRC20_TQ_ONE_ADDR_STR}"
+            )
+
+        return self._redeem_contract
 
     def interpret(
         self, transactions: List[WalletActivity]
@@ -91,7 +112,7 @@ class TranquilFinanceONEDepositEditor(Editor):
 
             trade_tx = transactions[1]
 
-            redeem_event = cost_tx.contract_pointer.get_tx_logs_by_event_name(
+            redeem_event = self.redeem_decoding_contract.get_tx_logs_by_event_name(
                 cost_tx.tx_hash, "Redeem"
             )[0]
 
@@ -126,6 +147,8 @@ class TranquilFinanceEditor(Editor):
         "0xCa3e902eFdb2a410C952Fd3e4ac38d7DBDCB8E96",
         # TqErc20Delegator (3)
         "0xc63AB8c72e636C9961c5e9288b697eC5F0B8E1F7",
+        # TqErc20Delegator (4)
+        "0x973f22036A0fF3A93654e7829444ec64CB37BD78",
     ]
 
     def __init__(self) -> None:
