@@ -14,6 +14,56 @@ from .constants import (
 )
 
 KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
+    KoinlyLabel.SWAP: [
+        (
+            "unwrap wsWAGMI to become sWAGMI",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "unwrap(uint256)"
+                ),
+                "sent_currency_symbol": ("==", noop, "wsWAGMI"),
+                "got_currency_symbol": ("==", noop, "sWAGMI"),
+            },
+        ),
+        (
+            "wrap sWAGMI to become wsWAGMI",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "wrap(uint256)"
+                ),
+                "got_currency_symbol": ("==", noop, "wsWAGMI"),
+                "sent_currency_symbol": ("==", noop, "sWAGMI"),
+            },
+        ),
+        (
+            "Get sWAGMI for WAGMI staking",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "stake(uint256,address)",
+                ),
+                "got_currency_symbol": ("==", noop, "sWAGMI"),
+                "sent_currency_symbol": ("==", noop, "WAGMI"),
+            },
+        ),
+        (
+            "Unstake sWAGMI for WAGMI",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "unstake(uint256,bool)",
+                ),
+                "got_currency_symbol": ("==", noop, "WAGMI"),
+                "sent_currency_symbol": ("==", noop, "sWAGMI"),
+            },
+        ),
+    ],
     KoinlyLabel.NULL: [
         (
             "Redeem WAGMI Bond",
@@ -34,28 +84,6 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
                 "got_currency_symbol": ("in", noop, "bWAGMI"),
-            },
-        ),
-        (
-            "Get sWAGMI for WAGMI staking",
-            {
-                "method": (
-                    "==",
-                    noop,
-                    "stake(uint256,address)",
-                ),
-                "got_currency_symbol": ("==", noop, "sWAGMI"),
-            },
-        ),
-        (
-            "Unstake sWAGMI for WAGMI",
-            {
-                "method": (
-                    "==",
-                    noop,
-                    "unstake(uint256,bool)",
-                ),
-                "sent_currency_symbol": ("==", noop, "sWAGMI"),
             },
         ),
         (

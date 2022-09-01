@@ -11,6 +11,7 @@ class KoinlyLabel(str, Enum):
     COST = "cost"
     INCOME = "income"
     REWARD = "reward"
+    SWAP = "swap"
     NULL = ""
 
 

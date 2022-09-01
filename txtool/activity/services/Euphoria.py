@@ -27,6 +27,8 @@ class EuphoriaWrapEditor(Editor):
 
         if root_method == "wrap(uint256)":
             return self.parse_wrap(transactions)
+        if root_method == "unwrap(uint256)":
+            return self.parse_unwrap(transactions)
 
         return InterpretedTransactionGroup(transactions)
 
@@ -37,6 +39,21 @@ class EuphoriaWrapEditor(Editor):
         o, i = self.get_pair_by_address(
             transactions, self.HRC_20_SWAGMI, self.HRC_20_WSWAGMI
         )
+
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost([cost_tx, self.consolidate_trade(o, i)])
+        )
+
+    def parse_unwrap(
+            self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        cost_tx = transactions[0]
+        o, i = self.get_pair_by_address(
+            transactions, self.HRC_20_WSWAGMI, self.HRC_20_SWAGMI
+        )
+
+        # overwrite null address
+        o.to_addr = cost_tx.to_addr
 
         return InterpretedTransactionGroup(
             self.zero_non_root_cost([cost_tx, self.consolidate_trade(o, i)])
