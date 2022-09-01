@@ -46,6 +46,14 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     def is_sender(self) -> bool:
         return bool(self.from_addr == self.account)
 
+    @property
+    def is_trade(self) -> bool:
+        return bool(
+                self.got_amount > 0 and self.sent_amount > 0 and
+                self.got_currency and self.sent_currency and
+                self.got_currency != self.sent_currency
+        )
+
     def _get_action(self) -> WalletAction:
         if self.is_receiver:
             return WalletAction.PAYMENT if self._is_payment() else WalletAction.DEPOSIT

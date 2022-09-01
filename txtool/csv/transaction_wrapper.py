@@ -6,19 +6,20 @@ from txtool.harmony import WalletActivity, HarmonyToken
 from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
 
 from txtool.fiat.get_prices import T_PRICE_DATA_DICT
+from txtool.koinly.ruleset.fixes import KOINLY_UNSUPPORTED_COIN_NAMES
 
 
 class TransactionCSVWrapper:
     DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S %Z"
 
     def __init__(  # pylint: disable=R0913
-        self,
-        transaction: WalletActivity,
-        price_lookup: T_PRICE_DATA_DICT,
-        use_universal_symbol: bool = True,
-        use_one_address_style: bool = True,
-        omit_cost: bool = False,
-        date_format: str = DEFAULT_DATE_FORMAT,
+            self,
+            transaction: WalletActivity,
+            price_lookup: T_PRICE_DATA_DICT,
+            use_universal_symbol: bool = True,
+            use_one_address_style: bool = True,
+            omit_cost: bool = False,
+            date_format: str = DEFAULT_DATE_FORMAT,
     ) -> None:
         self.tx = transaction
         self._price_lookup = price_lookup
@@ -85,18 +86,50 @@ class TransactionCSVWrapper:
 
     @property
     def net_worth_amount(self) -> str:
-        if self.tx.coin_type.__class__ != HarmonyToken:
+        if (
+                not isinstance(self.tx.coin_type, HarmonyToken) or
+                self.tx.coin_type.__class__ != HarmonyToken
+        ):
             # got placeholder token, don't look it up
             return ""
 
-        if not isinstance(self.tx.coin_type, HarmonyToken):
-            return ""
+        if self.tx.is_trade:
+            # use the token received to determine the networth amount of
+            # the trade
+            coins = [
+                (
+                    self.tx.got_currency,
+                    self.tx.got_amount,
+                    self._price_lookup[self.tx].get(self.tx.got_currency)
+                ),
+                (
+                    self.tx.sent_currency,
+                    self.tx.sent_amount,
+                    self._price_lookup[self.tx].get(self.tx.sent_currency)
+                )
+            ]
+            coin_choice = next(
+                (
+                    x for x in coins if
+                    (x[0] and x[0].symbol not in KOINLY_UNSUPPORTED_COIN_NAMES) and
+                    bool(x[2])
+                ),
+                None
+            )
 
-        token_usd_price = self._price_lookup[self.tx][self.tx.coin_type]
-        token_quantity = (
-            self.tx.sent_amount if self.tx.is_sender else self.tx.got_amount
-        )
-        return str(token_quantity * token_usd_price)
+            if not coin_choice:
+                # neither coin is supported by Koinly
+                return ""
+
+            coin, coin_amount, usd_price = coin_choice
+            return str(coin_amount * usd_price)
+        else:
+            token_quantity = (
+                self.tx.got_amount if self.tx.is_receiver else self.tx.sent_amount
+            )
+            coin_type = self.tx.got_currency if self.tx.is_receiver else self.tx.sent_currency
+            token_usd_price = self._price_lookup[self.tx][coin_type]
+            return str(token_quantity * token_usd_price)
 
     @property
     def net_worth_currency(self) -> str:
