@@ -45,7 +45,7 @@ class EuphoriaWrapEditor(Editor):
         )
 
     def parse_unwrap(
-            self, transactions: List[WalletActivity]
+        self, transactions: List[WalletActivity]
     ) -> InterpretedTransactionGroup:
         cost_tx = transactions[0]
         o, i = self.get_pair_by_address(

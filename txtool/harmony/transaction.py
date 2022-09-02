@@ -104,8 +104,16 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         return self.got_currency.symbol if self.got_currency else ""
 
     @property
+    def got_currency_is_lp_token(self) -> bool:
+        return self.got_currency.is_lp_token if self.got_currency else False
+
+    @property
     def sent_currency_symbol(self) -> str:
         return self.sent_currency.symbol if self.sent_currency else ""
+
+    @property
+    def sent_currency_is_lp_token(self) -> bool:
+        return self.sent_currency.is_lp_token if self.sent_currency else False
 
     @property
     def coin_type_symbol(self) -> str:

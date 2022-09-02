@@ -1,15 +1,15 @@
 from typing import Dict
 
 from txtool.activity.services.TranquilFinance import (
+    TranquilFinanceStakingEditor,
     TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES,
+    TRANQUIL_COLLECT_REWARD_ADDRESSES,
 )
+from txtool.activity.services.ViperSwap import ViperSwapClaimRewardsEditor
 
 from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop
 from .constants import (
-    TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR,
-    TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
     TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
-    VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
     CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
 )
 
@@ -18,11 +18,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         (
             "unwrap wsWAGMI to become sWAGMI",
             {
-                "method": (
-                    "==",
-                    noop,
-                    "unwrap(uint256)"
-                ),
+                "method": ("==", noop, "unwrap(uint256)"),
                 "sent_currency_symbol": ("==", noop, "wsWAGMI"),
                 "got_currency_symbol": ("==", noop, "sWAGMI"),
             },
@@ -30,11 +26,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         (
             "wrap sWAGMI to become wsWAGMI",
             {
-                "method": (
-                    "==",
-                    noop,
-                    "wrap(uint256)"
-                ),
+                "method": ("==", noop, "wrap(uint256)"),
                 "got_currency_symbol": ("==", noop, "wsWAGMI"),
                 "sent_currency_symbol": ("==", noop, "sWAGMI"),
             },
@@ -162,7 +154,27 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     "deposit(uint256,uint256,address)",
                 ),
                 "sent_currency_symbol": ("==", noop, "VENOM-LP"),
-                "to_addr_str": ("==", noop, VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR),
+                "to_addr_str": (
+                    "in",
+                    noop,
+                    ViperSwapClaimRewardsEditor.CONTRACT_ADDRESSES,
+                ),
+            },
+        ),
+        (
+            "Exit LP Position",
+            {
+                "method": (
+                    "in",
+                    lambda x: x.split("(", maxsplit=1)[0],
+                    ("removeLiquidity", "withdraw"),
+                ),
+                "got_amount": (">", noop, 0),
+                "got_currency_is_lp_token": (
+                    "==",
+                    noop,
+                    True,
+                ),
             },
         ),
         (
@@ -193,7 +205,11 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             {
                 "sent_amount": (">", noop, 0),
                 "got_amount": ("==", noop, 0),
-                "to_addr_str": ("==", noop, TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR),
+                "to_addr_str": (
+                    "in",
+                    noop,
+                    TranquilFinanceStakingEditor.CONTRACT_ADDRESSES,
+                ),
                 "sent_currency_symbol": ("==", noop, "TRANQ"),
                 "method": ("==", noop, "deposit(uint256)"),
             },
@@ -204,9 +220,9 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_amount": ("==", noop, 0),
                 "got_amount": (">", noop, 0),
                 "from_addr_str": (
-                    "==",
+                    "in",
                     noop,
-                    TRANQUIL_FINANCE_STAKING_PROXY_ADDRESS_STR,
+                    TranquilFinanceStakingEditor.CONTRACT_ADDRESSES,
                 ),
                 "got_currency_symbol": ("==", noop, "TRANQ"),
                 "method": ("==", noop, "redeem(uint256)"),
@@ -303,23 +319,9 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             "Claim TRANQ reward",
             {
                 "from_addr_str": (
-                    "==",
+                    "in",
                     noop,
-                    "0xA7Fe71bC92d3A48aC59403b9be86f73e49bfCd46",
-                ),
-                "is_receiver": ("==", noop, True),
-                "got_amount": (">", noop, 0),
-                "got_currency_symbol": ("==", noop, "TRANQ"),
-                "method": ("==", noop, "claimRewards()"),
-            },
-        ),
-        (
-            "Claim TRANQ reward",
-            {
-                "from_addr_str": (
-                    "==",
-                    noop,
-                    TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
+                    TRANQUIL_COLLECT_REWARD_ADDRESSES,
                 ),
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
@@ -343,16 +345,21 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             "Claim VIPER rewards",
             {
                 "from_addr_str": (
-                    "==",
+                    "in",
                     noop,
-                    VIPERSWAP_CLAIM_VIPER_CONTRACT_ADDRESS_STR,
+                    ViperSwapClaimRewardsEditor.CONTRACT_ADDRESSES,
                 ),
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
                 "method": (
                     "in",
                     noop,
-                    "claimReward(uint256)|claimRewards(uint256[])|deposit(uint256,uint256,address)",
+                    (
+                        "claimReward(uint256)",
+                        "claimRewards(uint256[])",
+                        "deposit(uint256,uint256,address)",
+                        "withdraw(uint256,uint256,address)",
+                    ),
                 ),
             },
         ),

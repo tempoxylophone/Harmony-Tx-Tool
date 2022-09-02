@@ -29,7 +29,25 @@ class ViperSwapClaimRewardsEditor(Editor):
         if root_method in ("claimRewards(uint256[])", "claimReward(uint256)"):
             return self.parse_claim_reward(transactions)
 
+        if root_method == "withdraw(uint256,uint256,address)":
+            return self.parse_withdraw(transactions)
+
         return InterpretedTransactionGroup(transactions)
+
+    def parse_withdraw(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        relevant_txs = [x for x in transactions if x.is_sender or x.is_receiver]
+
+        cost_tx = relevant_txs[0]
+        claims_tx = [x for x in relevant_txs if x.coin_type.symbol == "VIPER"]
+        lp_get = next(x for x in relevant_txs if x.got_currency_symbol == "VENOM-LP")
+
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost(
+                [cost_tx, self._consolidate_claims(claims_tx), lp_get]
+            )
+        )
 
     def parse_deposit(
         self, transactions: List[WalletActivity]

@@ -18,7 +18,7 @@ T_PRICE_DATA_DICT = Dict[WalletActivity, Dict[HarmonyToken, Decimal]]
 
 
 def get_token_prices_for_transactions(
-        txs: Iterable[WalletActivity],
+    txs: Iterable[WalletActivity],
 ) -> T_PRICE_DATA_DICT:
     # create mapping from transaction to all relevant price data
     all_price_data: T_PRICE_DATA_DICT = defaultdict(dict)
@@ -53,20 +53,20 @@ def get_token_prices_for_transactions(
 def _should_get_from_dex(tx: WalletActivity) -> bool:
     return (
         # must be before de-peg
-            tx.timestamp <= HARMONY_HACK_TS
-            and
-            # must be a token instance, can't be placeholder
-            tx.coin_type.__class__ == HarmonyToken
+        tx.timestamp <= HARMONY_HACK_TS
+        and
+        # must be a token instance, can't be placeholder
+        tx.coin_type.__class__ == HarmonyToken
     )
 
 
 def _should_get_from_coingecko(tx: WalletActivity) -> bool:
     return (
         # must be before de-peg
-            (tx.timestamp > HARMONY_HACK_TS or _is_coingecko_edge_case(tx))
-            and
-            # must be token instance, can't be placeholder
-            tx.coin_type.__class__ == HarmonyToken
+        (tx.timestamp > HARMONY_HACK_TS or _is_coingecko_edge_case(tx))
+        and
+        # must be token instance, can't be placeholder
+        tx.coin_type.__class__ == HarmonyToken
     )
 
 

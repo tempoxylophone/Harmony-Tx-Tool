@@ -49,9 +49,11 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     @property
     def is_trade(self) -> bool:
         return bool(
-                self.got_amount > 0 and self.sent_amount > 0 and
-                self.got_currency and self.sent_currency and
-                self.got_currency != self.sent_currency
+            self.got_amount > 0
+            and self.sent_amount > 0
+            and self.got_currency
+            and self.sent_currency
+            and self.got_currency != self.sent_currency
         )
 
     def _get_action(self) -> WalletAction:

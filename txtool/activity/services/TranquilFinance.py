@@ -237,3 +237,9 @@ TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES = [
     *TranquilFinanceEditor.CONTRACT_ADDRESSES,
     *TranquilFinanceONEDepositEditor.CONTRACT_ADDRESSES,
 ]
+TRANQUIL_COLLECT_REWARD_ADDRESSES = [
+    # unitroller address
+    TranquilFinanceEditor.CONTRACT_ADDRESSES[0],
+    # staking contract addresses
+    *TranquilFinanceStakingEditor.CONTRACT_ADDRESSES,
+]
