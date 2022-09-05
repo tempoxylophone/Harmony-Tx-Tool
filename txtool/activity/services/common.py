@@ -49,6 +49,8 @@ class Editor:
     def consolidate_trade(
         self, give_tx: WalletActivity, get_tx: WalletActivity
     ) -> WalletActivity:
+        fee = max(give_tx.tx_fee_in_native_token, get_tx.tx_fee_in_native_token)
+
         # get coins moved to / from
         give_tx.sent_amount = give_tx.coin_amount
         give_tx.sent_currency = give_tx.coin_type
@@ -61,6 +63,9 @@ class Editor:
         get_tx.sent_currency = give_tx.sent_currency
         get_tx.to_addr = give_tx.to_addr
         get_tx.from_addr = give_tx.from_addr
+
+        # set the fee
+        get_tx.tx_fee_in_native_token = fee
 
         return get_tx
 

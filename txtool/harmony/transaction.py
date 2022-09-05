@@ -8,7 +8,7 @@ from .api import HarmonyAPI
 from .abc import Transaction
 from .contract import HarmonyEVMSmartContract
 from .address import HarmonyAddress, BadAddressException
-from .token import Token, HarmonyToken
+from .token import Token, HarmonyToken, HarmonyNFT
 from .signature import get_function_name_by_signature
 
 
@@ -104,6 +104,10 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
         return self.got_currency.symbol if self.got_currency else ""
 
     @property
+    def got_currency_is_nft(self) -> bool:
+        return isinstance(self.got_currency, HarmonyNFT)
+
+    @property
     def got_currency_is_lp_token(self) -> bool:
         return self.got_currency.is_lp_token if self.got_currency else False
 
@@ -114,6 +118,10 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
     @property
     def sent_currency_is_lp_token(self) -> bool:
         return self.sent_currency.is_lp_token if self.sent_currency else False
+
+    @property
+    def sent_currency_is_nft(self) -> bool:
+        return isinstance(self.sent_currency, HarmonyNFT)
 
     @property
     def coin_type_symbol(self) -> str:

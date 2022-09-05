@@ -189,3 +189,112 @@ class HarmonyPlaceholderToken(Token):
     @property
     def is_native_token(self) -> bool:
         return self._wrapped_token.is_native_token
+
+
+class HarmonyNFTCollection:
+    _NFT_COLLECTION_DIRECTORY: Dict[str, HarmonyNFTCollection] = {}
+
+    def __init__(
+        self,
+        address: Union[str, HarmonyAddress],
+    ) -> None:
+        # koinly has 5000 unique placeholders for NFTs
+        # e.g. NFT1, NFT2, NFT3, ...,
+        # each unique NFT has to have its own placeholder.
+        # source:
+        # https://help.koinly.io/en/articles/5742771-how-to-add-nft-trades-manually-using-placeholders
+        self.address = HarmonyAddress.get_harmony_address(address)
+
+        symbol, name, total_supply = HarmonyAPI.get_nft_info(self.address.eth)
+        self.symbol = symbol
+        self.name = name
+        self.total_supply = total_supply
+
+    @classmethod
+    def clear_directory(cls) -> None:
+        cls._NFT_COLLECTION_DIRECTORY = {}
+
+    @classmethod
+    def create_nft_collection(cls, address_eth_str: str) -> HarmonyNFTCollection:
+        if address_eth_str in cls._NFT_COLLECTION_DIRECTORY:
+            return cls._NFT_COLLECTION_DIRECTORY[address_eth_str]
+
+        return HarmonyNFTCollection(address_eth_str)
+
+
+class HarmonyNFT(Token):
+    # global ID for Koinly
+    _GLOBAL_ID_START_AT = 1
+    _GLOBAL_ID = _GLOBAL_ID_START_AT
+    _NFT_DIRECTORY: Dict[str, HarmonyNFT] = {}
+
+    @property
+    def is_native_token(self) -> bool:
+        return False
+
+    @classmethod
+    def get_native_token(cls) -> HarmonyToken:
+        return HarmonyToken.get_native_token()
+
+    @property
+    def universal_symbol(self) -> str:
+        # do not change anything
+        return f"NFT{self.koinly_nft_id}"
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.collection.name} {self.token_id}/{self.collection.total_supply}"
+
+    def __init__(
+        self,
+        token_id: int,
+        global_id: int,
+        collection: HarmonyNFTCollection,
+    ) -> None:
+        super().__init__(collection.address)
+
+        self.collection = collection
+        self.token_id = token_id
+        self.koinly_nft_id = global_id
+        self.symbol = collection.symbol + " #" + str(self.token_id)
+        self.history: Dict[str, Decimal] = {}
+
+    @staticmethod
+    def create_nft_lookup_hash(collection_eth_address: str, token_id: int) -> str:
+        return f"nft-{collection_eth_address}-{token_id}"
+
+    @classmethod
+    def create_nft(cls, token_id: int, collection: HarmonyNFTCollection) -> HarmonyNFT:
+        lookup = cls.create_nft_lookup_hash(collection.address.eth, token_id)
+
+        if lookup in cls._NFT_DIRECTORY:
+            return cls._NFT_DIRECTORY[lookup]
+
+        nft = HarmonyNFT(token_id, cls._GLOBAL_ID, collection)
+        cls._GLOBAL_ID += 1
+        return nft
+
+    @classmethod
+    def clear_directory(cls) -> None:
+        cls._NFT_DIRECTORY = {}
+        cls._GLOBAL_ID = cls._GLOBAL_ID_START_AT
+
+    def add_event(self, tx_hash: str, cost_in_one: Decimal) -> None:
+        self.history[tx_hash] = cost_in_one
+
+    @property
+    def latest_price_in_one(self) -> Decimal:
+        if not self.history:
+            return Decimal(0)
+
+        # dicts are ordered in python3
+        txs = list(self.history)[-1]
+        return self.history[txs]
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, HarmonyNFT) and (
+            other.address == self.address and other.token_id == self.token_id
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.create_nft_lookup_hash(self.address.eth, self.token_id))

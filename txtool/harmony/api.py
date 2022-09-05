@@ -21,7 +21,7 @@ from pyhmy import account
 from txtool.utils import MAIN_LOGGER, api_retry, get_local_abi
 
 
-class HarmonyAPI:
+class HarmonyAPI:  # pylint: disable=R0904
     _TIMEOUT = 300  # 5 minutes
     _CUSTOM_EXCEPTIONS: List = [
         RPCError,
@@ -33,10 +33,15 @@ class HarmonyAPI:
 
     _w3 = Web3(Web3.HTTPProvider(_NET_HMY_WEB3))
     _ERC20_ABI = get_local_abi("ERC20")
+    _ERC721_ABI = get_local_abi("ERC721")
 
     _JEWEL_CONTRACT = _w3.eth.contract(  # noqa
         address="0x72Cb10C6bfA5624dD07Ef608027E366bd690048F",  # type: ignore
         abi=get_local_abi("JewelToken"),
+    )
+    _NFT_CONTRACT = _w3.eth.contract(
+        address="0xcDFFD2d1CE72aA4140eb3345941CE8D26e38c464",  # type: ignore
+        abi=_ERC721_ABI,
     )
 
     API_NOT_FOUND_MESSAGES = {"Not found", "contract not found"}
@@ -92,6 +97,16 @@ class HarmonyAPI:
         return events
 
     @classmethod
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def get_tx_transfer_logs_nft(cls, tx_receipt: TxReceipt) -> Iterable[EventData]:
+        events: Iterable[
+            EventData
+        ] = cls._NFT_CONTRACT.events.Transfer().processReceipt(
+            tx_receipt, errors=DISCARD
+        )
+        return events
+
+    @classmethod
     @lru_cache(maxsize=256)
     @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
     def get_token_info(cls, token_eth_address: str) -> Tuple[str, int, str]:
@@ -102,6 +117,18 @@ class HarmonyAPI:
         decimals = contract.functions.decimals().call()
         name = contract.functions.name().call()
         return symbol, decimals, name
+
+    @classmethod
+    @lru_cache(maxsize=256)
+    @api_retry(custom_exceptions=_CUSTOM_EXCEPTIONS)
+    def get_nft_info(cls, nft_eth_address: str) -> Tuple[str, int, int]:
+        contract = cls._w3.eth.contract(  # noqa
+            address=Web3.toChecksumAddress(nft_eth_address), abi=cls._ERC721_ABI
+        )
+        symbol = contract.functions.symbol().call()
+        name = contract.functions.name().call()
+        total_supply = contract.functions.totalSupply().call()
+        return symbol, name, total_supply
 
     @staticmethod
     def has_token_info(eth_address: str) -> bool:

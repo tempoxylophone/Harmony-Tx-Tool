@@ -89,6 +89,7 @@ class KoinlyReportCreator(TransactionReportCreator):  # pylint: disable=R0902
 
         # koinly specific labels
         label, desc = get_label_for_tx_and_description(tx.tx)
+        desc += tx.nft_description
 
         return [
             # time of transaction

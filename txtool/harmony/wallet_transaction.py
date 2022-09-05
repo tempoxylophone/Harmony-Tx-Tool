@@ -10,7 +10,7 @@ from web3.types import EventData
 from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 from txtool.utils import MAIN_LOGGER
 
-from .token import HarmonyToken, Token
+from .token import HarmonyToken, Token, HarmonyNFT, HarmonyNFTCollection
 from .api import HarmonyAPI
 from .address import HarmonyAddress
 from .transaction import HarmonyEVMTransaction
@@ -33,6 +33,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     ):
         # get information about this tx
         super().__init__(account, tx_hash)
+
+        self.is_nft_transfer = False
 
         # set custom token if it is given
         self.coin_type = harmony_token or self.coin_type
@@ -101,7 +103,8 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
     ) -> List[WalletActivity]:
         root_tx = WalletActivity(account, HexStr(tx_hash))
         leaf_tx = WalletActivity._get_token_transfers(root_tx)
-        return [root_tx, *leaf_tx]
+        nft_tx = WalletActivity._get_nft_transfers(root_tx)
+        return [root_tx, *leaf_tx, *nft_tx]
 
     @staticmethod
     def _get_token_transfers(root_tx: WalletActivity) -> List[WalletActivity]:
@@ -118,6 +121,36 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         return transfers
 
     @staticmethod
+    def _get_nft_transfers(root_tx: WalletActivity) -> List[WalletActivity]:
+        receipt = root_tx.receipt
+
+        nft_transfer_logs = list(HarmonyAPI.get_tx_transfer_logs_nft(receipt))
+
+        results = []
+        if nft_transfer_logs:
+            nft_collection_address = root_tx.to_addr.eth
+            nft_collection = HarmonyNFTCollection(nft_collection_address)
+
+            spent_per_mint = root_tx.coin_amount / len(nft_transfer_logs)
+
+            for i, log in enumerate(nft_transfer_logs, start=1):
+                MAIN_LOGGER.info(
+                    "\tExtracting NFT tx %s/%s...", i, len(nft_transfer_logs)
+                )
+                results.append(
+                    WalletActivity._create_nft_tx_from_log(
+                        root_tx, log, nft_collection, spent_per_mint
+                    )
+                )
+
+            # erase sent amount
+            root_tx.sent_amount = Decimal(0)
+            root_tx.coin_amount = Decimal(0)
+            root_tx.got_amount = Decimal(0)
+
+        return results
+
+    @staticmethod
     def _create_token_tx_from_log(
         root_tx: WalletActivity, log: EventData
     ) -> WalletActivity:
@@ -129,11 +162,48 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         r.coin_amount = value
         r.event = log["event"]
         r.is_token_transfer = r.event == "Transfer"
+        r.is_nft_transfer = False
+        r.tx_fee_in_native_token = Decimal(0)
 
         # logs can be different from root transaction - must set them here
         r.to_addr = HarmonyToken.get_address_and_set_token(log["args"]["to"])
         r.from_addr = HarmonyToken.get_address_and_set_token(log["args"]["from"])
         r.reinterpret_action()
+
+        return r
+
+    @staticmethod
+    def _create_nft_tx_from_log(
+        root_tx: WalletActivity,
+        log: EventData,
+        collection: HarmonyNFTCollection,
+        initial_price_in_one: Decimal,
+    ) -> WalletActivity:
+        # create NFT instance
+        token_id = log["args"]["tokenId"]
+        token = HarmonyNFT.create_nft(token_id, collection)
+        token.add_event(root_tx.tx_hash, initial_price_in_one)
+
+        r = WalletActivity(root_tx.account, root_tx.tx_hash, token)
+        r.log_idx = log["logIndex"]
+
+        # x ONE -> 1 NFT
+        r.got_amount = Decimal(1)
+        r.got_currency = token
+        r.sent_amount = initial_price_in_one
+        r.sent_currency = token.get_native_token()
+        r.tx_fee_in_native_token = Decimal(0)
+
+        r.event = log["event"]
+        r.is_token_transfer = False
+        r.is_nft_transfer = True
+
+        # logs can be different from root transaction - must set them here
+        r.to_addr = HarmonyToken.get_address_and_set_token(log["args"]["to"])
+
+        # usually this will be from 0x, but for book-keeping purposes, set it
+        # to the ERC721 contract
+        r.from_addr = root_tx.to_addr
 
         return r
 
@@ -180,7 +250,14 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
         else:
             sign = ""
 
-        return "tx: {0} --[{1}{2} {3}]--> {4} ({5}) - log idx = {6}".format(
+        nft_indicator = ""
+        nft_price = ""
+
+        if isinstance(self.coin_type, HarmonyNFT):
+            nft_indicator = " [NFT Transfer]"
+            nft_price = f" - latest price = {self.coin_type.latest_price_in_one} ONE"
+
+        return "tx: {0} --[{1}{2} {3}]--> {4} ({5}) - log idx = {6}{7}{8}".format(
             self.from_addr.eth,
             sign,
             self.coin_amount,
@@ -188,4 +265,6 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             self.to_addr.eth,
             self.tx_hash,
             self.log_idx,
+            nft_indicator,
+            nft_price,
         )

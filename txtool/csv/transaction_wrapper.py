@@ -1,7 +1,7 @@
 from typing import Literal
 from datetime import timezone, datetime
 
-from txtool.harmony import WalletActivity, HarmonyToken
+from txtool.harmony import WalletActivity, HarmonyToken, HarmonyNFT
 
 from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
 
@@ -179,3 +179,18 @@ class TransactionCSVWrapper:
     @property
     def explorer_url(self) -> str:
         return self.tx.explorer_url
+
+    @property
+    def nft_description(self) -> str:
+        if self.tx.got_currency_is_nft:
+            if not isinstance(self.tx.got_currency, HarmonyNFT):
+                return ""
+
+            return f" (got {self.tx.got_currency.full_name})"
+        if self.tx.sent_currency_is_nft:
+            if not isinstance(self.tx.sent_currency, HarmonyNFT):
+                return ""
+
+            return f" (sent {self.tx.sent_currency.full_name})"
+
+        return ""

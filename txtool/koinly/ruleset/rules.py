@@ -274,6 +274,22 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
+            "Got NFT in Trade",
+            {
+                "sent_amount": (">", noop, 0),
+                "got_amount": (">", noop, 0),
+                "got_currency_is_nft": ("==", noop, True),
+            },
+        ),
+        (
+            "Sent NFT in Trade",
+            {
+                "sent_amount": (">", noop, 0),
+                "got_amount": (">", noop, 0),
+                "sent_currency_is_nft": ("==", noop, True),
+            },
+        ),
+        (
             "Trade",
             {
                 "sent_amount": (">", noop, 0),
