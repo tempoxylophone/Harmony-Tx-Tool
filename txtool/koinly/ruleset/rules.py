@@ -313,6 +313,14 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "got_amount": ("==", noop, 0),
                 "tx_fee_in_native_token": (">", noop, 0),
             },
+        ),
+            (
+            "Horizon Bridge fee",
+            {
+                "sent_amount": (">", noop, 0),
+                "to_addr_str": ("==", noop, "0x8139d578f11638C78E16685EB2804c2a34482E41"),
+                "method": ("==", noop, "deposit(uint256)")
+            },
         )
     ],
     KoinlyLabel.INCOME: [
@@ -331,6 +339,20 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         )
     ],
     KoinlyLabel.REWARD: [
+        (
+            "Unlock locked VIPER",
+            {
+                "from_addr_str": (
+                    "==",
+                    noop,
+                    "0xEa589E93Ff18b1a1F1e9BaC7EF3E86Ab62addc79",
+                ),
+                "is_receiver": ("==", noop, True),
+                "got_amount": (">", noop, 0),
+                "got_currency_symbol": ("==", noop, "VIPER"),
+                "method": ("==", noop, "unlock()")
+            },
+        ),
         (
             "Claim TRANQ reward",
             {

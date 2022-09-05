@@ -126,8 +126,14 @@ class HarmonyToken(Token):  # pylint: disable=R0902
 
     @property
     def universal_symbol(self) -> str:
-        # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
-        return self.symbol[1:] if self.symbol.startswith("1") else self.symbol
+        if self.symbol.startswith("1"):
+            # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
+            return self.symbol[1:]
+        if self.symbol.startswith("bsc"):
+            # e.g. bscBUSD
+            return self.symbol[3:]
+
+        return self.symbol
 
     @classmethod
     def get_harmony_token_by_address(

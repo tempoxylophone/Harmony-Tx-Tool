@@ -66,6 +66,7 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
 
         # position of transaction in logs
         self.log_idx = 0
+        self.status = self.receipt['status']
 
     def get_relevant_tokens(self) -> List[HarmonyToken]:
         coins = {
@@ -80,6 +81,10 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
             for x in coins
             if x and isinstance(x, HarmonyToken) and x.__class__ == HarmonyToken
         ]
+
+    @property
+    def did_fail(self) -> bool:
+        return self.status == 0
 
     @property
     def receipt(self) -> TxReceipt:

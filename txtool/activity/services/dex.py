@@ -73,9 +73,11 @@ class UniswapDexEditor(Editor):
             args["path"][0],
             args["path"][-1],
         )
+        trade_tx = self.consolidate_trade(o, i)
+        trade_tx.to_addr = root_tx.to_addr
 
         return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
+            self.zero_non_root_cost([root_tx, trade_tx])
         )
 
     def parse_swap_exact_tokens_for_tokens(
@@ -94,8 +96,11 @@ class UniswapDexEditor(Editor):
             args["path"][-1],
         )
 
+        trade_tx = self.consolidate_trade(o, i)
+        trade_tx.to_addr = root_tx.to_addr
+
         return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
+            self.zero_non_root_cost([root_tx, trade_tx])
         )
 
     def parse_add_liquidity_eth(
