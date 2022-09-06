@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Tuple
 from decimal import Decimal
+from itertools import chain
 from copy import deepcopy
 
 from txtool.harmony import (
@@ -72,22 +73,42 @@ class MasterChefDexEditor(Editor):
         )
 
     def _consolidate_claims(self, claim_txs: List[WalletActivity]) -> WalletActivity:
-        plus_tx = [
-            x
+        """
+        Locking mechanism typically works by having 'MasterChef' contract send caller
+        an amount of governance token. (got tx)
+
+        During claims transaction, gov. token is minted from 0x0 or taken from
+        xGovToken HRC20 contract (if that exists). These are all consolidated and
+        sent to the 'MasterChef' contract, which then transfers all to the caller.
+
+        After caller receives these tokens from the chef contract,
+        the caller will send some portion of these tokens received in the plus
+        transaction to the HRC20 contract of said tokens (sent tx). The number of
+        tokens that are sent back is determined by the lock / emissions schedule.
+
+        Example:
+            - Caller calls Chef contract function 'claimRewards' or 'claimReward'
+            - Chef gathers 100 GOV Token
+            - Chef sends 100 GOV Token to caller
+            - Caller receives 100 GOV Token
+            - Caller sends 95 of GOV Token HRC20 Contract Address
+            - by the end of the transaction, Caller is left with 5 GOV Token
+                - this represents a 95% locked, 5% unlocked emission
+        """
+        consolidated_tx = deepcopy(next(x for x in claim_txs if x.is_receiver))
+
+        got = sum(
+            x.got_amount
             for x in claim_txs
             if x.is_receiver and x.got_currency_symbol == self.GOV_TOKEN_SYMBOL
-        ]
-        minus_tx = [
-            x
-            for x in claim_txs
-            if x.is_sender and x.got_currency_symbol == self.GOV_TOKEN_SYMBOL
-        ]
-
-        consolidated_tx = deepcopy(plus_tx[0])
-
-        delta = Decimal(
-            sum(x.got_amount for x in plus_tx) + sum(x.sent_amount for x in minus_tx)
         )
+        sent = sum(
+            x.sent_amount
+            for x in claim_txs
+            if x.is_sender and x.sent_currency_symbol == self.GOV_TOKEN_SYMBOL
+        )
+
+        delta = Decimal(got - sent)
         consolidated_tx.coin_amount = delta
         consolidated_tx.got_amount = delta
 
@@ -225,34 +246,7 @@ class UniswapDexEditor(Editor):
             ]
         )
 
-        # if pair of LP token is not known, use this transaction to set
-        # what the pair would be
-        lp_token = receive_lp_tx_1.coin_type
-
-        if not isinstance(lp_token, HarmonyToken):
-            raise RuntimeError(f"TX: {root_tx} got invalid LP Token: {lp_token}")
-
-        if not (lp_token.lp_token_0 and lp_token.lp_token_1):
-            # always get transactions in alphabetical order by token symbol
-            lp_tx_1, lp_tx_2 = sorted(
-                results[1:],
-                key=lambda x: x.sent_currency
-                and x.sent_currency.universal_symbol
-                or "",
-            )
-
-            if not (
-                isinstance(lp_tx_2.sent_currency, HarmonyToken)
-                and isinstance(lp_tx_1.sent_currency, HarmonyToken)
-            ):
-                raise RuntimeError(
-                    "TX: {0} got invalid LP Token Pairs: ({1}/{2})".format(
-                        root_tx, lp_tx_1.sent_currency, lp_tx_2.sent_currency
-                    )
-                )
-
-            lp_token.lp_token_0 = lp_tx_1.sent_currency
-            lp_token.lp_token_1 = lp_tx_2.sent_currency
+        self._set_lp_token_pairs_from_trade(results)
 
         return InterpretedTransactionGroup(results)
 
@@ -269,18 +263,18 @@ class UniswapDexEditor(Editor):
             transactions, args["tokenA"], args["tokenB"]
         )
 
-        receive_lp_tx_1 = next(
-            x for x in transactions[1:] if x.to_addr.eth == args["to"]
+        get_lp_tx_1, get_lp_tx_2 = self.split_copy(
+            next(x for x in transactions[1:] if x.to_addr.eth == args["to"]),
+            split_factor=2,
         )
-        receive_lp_tx_1, receive_lp_tx_2 = self.split_copy(receive_lp_tx_1, 2)
 
         return InterpretedTransactionGroup(
             self.zero_non_root_cost(
                 [
                     # the root txc still holds the fee
                     root_tx,
-                    self.consolidate_trade_with_root(root_tx, send_1, receive_lp_tx_1),
-                    self.consolidate_trade_with_root(root_tx, send_2, receive_lp_tx_2),
+                    self.consolidate_trade_with_root(root_tx, send_1, get_lp_tx_1),
+                    self.consolidate_trade_with_root(root_tx, send_2, get_lp_tx_2),
                 ]
             )
         )
@@ -294,10 +288,10 @@ class UniswapDexEditor(Editor):
         root_tx = transactions[0]
         args = self.get_root_tx_input(transactions)
 
-        lp_send_tx_1 = next(
-            x for x in transactions[1:] if x.from_addr.eth == root_tx.account.eth
+        lp_send_tx_1, lp_send_tx_2 = self.split_copy(
+            next(x for x in transactions[1:] if x.from_addr.eth == root_tx.account.eth),
+            split_factor=2,
         )
-        lp_send_tx_1, lp_send_tx_2 = self.split_copy(lp_send_tx_1, 2)
 
         get_1, get_2 = self.get_pair_by_address(
             transactions, args["tokenA"], args["tokenB"]
@@ -322,13 +316,14 @@ class UniswapDexEditor(Editor):
         root_tx = transactions[0]
         args = self.get_root_tx_input(transactions)
 
-        lp_send_tx_1 = next(
-            x for x in transactions[1:] if x.from_addr.eth == root_tx.account.eth
+        lp_send_tx_1, lp_send_tx_2 = self.split_copy(
+            next(x for x in transactions[1:] if x.from_addr.eth == root_tx.account.eth),
+            split_factor=2,
         )
-        lp_send_tx_1, lp_send_tx_2 = self.split_copy(lp_send_tx_1, 2)
 
         token_1_address = args["token"]
         token_2_address = HarmonyToken.get_native_token_eth_address_str()
+
         get_1, get_2 = self.get_pair_by_address(
             transactions, token_1_address, token_2_address
         )
@@ -341,30 +336,47 @@ class UniswapDexEditor(Editor):
             ]
         )
 
-        # if pair of LP token is not known, use this transaction to set
-        # what the pair would be
-        lp_token = lp_send_tx_1.coin_type
-        if not isinstance(lp_token, HarmonyToken):
-            raise RuntimeError(f"TX: {root_tx} got invalid LP Token: {lp_token}")
-
-        if not (lp_token.lp_token_0 and lp_token.lp_token_1):
-            # always get transactions in alphabetical order by token symbol
-            lp_tx_1, lp_tx_2 = sorted(
-                results[1:],
-                key=lambda x: x.got_currency and x.got_currency.universal_symbol or "",
-            )
-
-            if not (
-                isinstance(lp_tx_2.got_currency, HarmonyToken)
-                and isinstance(lp_tx_1.got_currency, HarmonyToken)
-            ):
-                raise RuntimeError(
-                    "TX: {0} got invalid LP Token Pairs: ({1}/{2})".format(
-                        root_tx, lp_tx_1.got_currency, lp_tx_2.got_currency
-                    )
-                )
-
-            lp_token.lp_token_0 = lp_tx_1.got_currency
-            lp_token.lp_token_1 = lp_tx_2.got_currency
+        self._set_lp_token_pairs_from_trade(results)
 
         return InterpretedTransactionGroup(results)
+
+    def _extract_token_tx_pair_from_lp_token_txs(
+        self, txs: List[WalletActivity]
+    ) -> Tuple[HarmonyToken, HarmonyToken]:
+        # find all non-LP tokens in given transactions
+        # sort them based on universal symbol
+        r = sorted(
+            [
+                x
+                for x in set(chain(*[x.get_relevant_tokens() for x in txs]))
+                if not x.is_lp_token
+            ],
+            key=lambda x: x.universal_symbol,
+        )
+
+        if len(r) != 2:
+            raise RuntimeError(
+                f"Trade mismatch... cannot find multiple non-LP tokens in transactions: {r}"
+            )
+
+        # alphabetical order
+        lp_token_1, lp_token_2 = r
+        return lp_token_1, lp_token_2
+
+    def _set_lp_token_pairs_from_trade(self, txs: List[WalletActivity]) -> None:
+        # if pair of LP token is not known, use this transaction to set
+        # what the pair would be
+        s = next((x for x in txs if x.sent_currency_is_lp_token), None)
+        g = next((x for x in txs if x.got_currency_is_lp_token), None)
+        base = s or g
+
+        if not base:
+            raise ValueError(f"Cannot determine LP tokens from transactions: {txs}")
+
+        lpt = next(t for t in base.get_relevant_tokens() if t.is_lp_token)
+
+        if not lpt.knows_lp_token_pairs:
+            # always get transactions in alphabetical order by token symbol
+            t_1, t_2 = self._extract_token_tx_pair_from_lp_token_txs(txs[1:])
+            lpt.lp_token_0 = t_1
+            lpt.lp_token_1 = t_2

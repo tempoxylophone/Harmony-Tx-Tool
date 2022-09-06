@@ -48,6 +48,25 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         HarmonyToken._TOKEN_DIRECTORY[self.address] = self
 
     @classmethod
+    def get_harmony_token_by_address(
+        cls,
+        address: Union[HarmonyAddress, str],
+        merge_one_wone_names: Optional[bool] = True,
+    ) -> HarmonyToken:
+        addr_obj = HarmonyAddress.get_harmony_address(address)
+
+        if not HarmonyAPI.address_belongs_to_erc_20_token(addr_obj.eth):
+            raise ValueError(
+                f"This address does not appear to belong to an ERC/HRC20 token. "
+                f"Got address: {address} (type = {type(address)})"
+            )
+
+        return HarmonyToken._TOKEN_DIRECTORY.get(addr_obj) or HarmonyToken(
+            addr_obj,
+            merge_one_wone_names,
+        )
+
+    @classmethod
     def clear_directory(cls) -> None:
         cls._TOKEN_DIRECTORY = {}
 
@@ -58,10 +77,6 @@ class HarmonyToken(Token):  # pylint: disable=R0902
     @classmethod
     def get_native_token_eth_address_str(cls) -> str:
         return NATIVE_TOKEN_ETH_ADDRESS_STR
-
-    @property
-    def is_native_token(self) -> bool:
-        return bool(self.address.eth == NATIVE_TOKEN_ETH_ADDRESS_STR)
 
     @classmethod
     def get_address_and_set_token(cls, eth_address_str: str) -> HarmonyAddress:
@@ -74,6 +89,24 @@ class HarmonyToken(Token):  # pylint: disable=R0902
             pass
 
         return addr_obj
+
+    @property
+    def is_native_token(self) -> bool:
+        return bool(self.address.eth == NATIVE_TOKEN_ETH_ADDRESS_STR)
+
+    @property
+    def universal_symbol(self) -> str:
+        if self.is_lp_token:
+            return self.symbol
+
+        if self._symbol.startswith("1"):
+            # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
+            return self._symbol[1:]
+        if self._symbol.startswith("bsc"):
+            # e.g. bscBUSD
+            return self._symbol[3:]
+
+        return self._symbol
 
     @property
     def symbol(self) -> str:
@@ -141,38 +174,12 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         # haven't seen this happen yet
         return False  # pragma: no cover
 
+    @property
+    def knows_lp_token_pairs(self) -> bool:
+        return self.is_lp_token and bool(self.lp_token_0) and bool(self.lp_token_1)
+
     def get_value_from_wei(self, amount: int) -> Decimal:
         return HarmonyAPI.get_value_from_wei(amount, self.decimals)
-
-    @property
-    def universal_symbol(self) -> str:
-        if self.symbol.startswith("1"):
-            # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
-            return self.symbol[1:]
-        if self.symbol.startswith("bsc"):
-            # e.g. bscBUSD
-            return self.symbol[3:]
-
-        return self.symbol
-
-    @classmethod
-    def get_harmony_token_by_address(
-        cls,
-        address: Union[HarmonyAddress, str],
-        merge_one_wone_names: Optional[bool] = True,
-    ) -> HarmonyToken:
-        addr_obj = HarmonyAddress.get_harmony_address(address)
-
-        if not HarmonyAPI.address_belongs_to_erc_20_token(addr_obj.eth):
-            raise ValueError(
-                f"This address does not appear to belong to an ERC/HRC20 token. "
-                f"Got address: {address} (type = {type(address)})"
-            )
-
-        return HarmonyToken._TOKEN_DIRECTORY.get(addr_obj) or HarmonyToken(
-            addr_obj,
-            merge_one_wone_names,
-        )
 
     def __str__(self) -> str:  # pragma: no cover
         return "HarmonyToken: {0} ({1}) [{2}] is_lp_token={3}".format(
