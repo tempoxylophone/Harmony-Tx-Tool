@@ -102,9 +102,6 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         if self._symbol.startswith("1"):
             # many harmony tokens start with a "1", e.g. 1USDC, 1ETH, 1BTC, 1USDT
             return self._symbol[1:]
-        if self._symbol.startswith("bsc"):
-            # e.g. bscBUSD
-            return self._symbol[3:]
 
         return self._symbol
 
