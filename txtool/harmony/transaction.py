@@ -66,7 +66,7 @@ class HarmonyEVMTransaction(Transaction):  # pylint: disable=R0902
 
         # position of transaction in logs
         self.log_idx = 0
-        self.status = self.receipt['status']
+        self.status = self.receipt["status"]
 
     def get_relevant_tokens(self) -> List[HarmonyToken]:
         coins = {

@@ -18,7 +18,7 @@ from .services.ViperSwap import (
     ViperSwapClaimRewardsEditor,
 )
 from .services.SushiSwap import SushiSwapLiquidityEditor
-from .services.DefiKingdoms import DefiKingdomsLiquidityEditor
+from .services.DefiKingdoms import DefiKingdomsLiquidityEditor, DefiKingdomsClaimsEditor
 
 EDITORS = [
     # ViperSwap
@@ -29,6 +29,7 @@ EDITORS = [
     SushiSwapLiquidityEditor(),
     # Defi Kingdoms
     DefiKingdomsLiquidityEditor(),
+    DefiKingdomsClaimsEditor(),
     # Euphoria
     EuphoriaBondEditor(),
     EuphoriaWrapEditor(),

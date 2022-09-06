@@ -1,98 +1,22 @@
 from typing import List
-from decimal import Decimal
-from copy import deepcopy
 
 from txtool.harmony import (
     WalletActivity,
 )
 from .common import Editor, InterpretedTransactionGroup
-from .dex import UniswapDexEditor
+from .dex import UniswapDexEditor, MasterChefDexEditor
 
 
-class ViperSwapClaimRewardsEditor(Editor):
+class ViperSwapClaimRewardsEditor(MasterChefDexEditor):
     CONTRACT_ADDRESSES = [
         # ViperSwap Viper Rewards Contract
         "0x7AbC67c8D4b248A38B0dc5756300630108Cb48b4",
     ]
+    GOV_TOKEN_SYMBOL = "VIPER"
+    LP_TOKEN_SYMBOL_PREFIX = "VENOM-LP"
 
     def __init__(self) -> None:
         super().__init__(self.CONTRACT_ADDRESSES)
-
-    def interpret(
-        self, transactions: List[WalletActivity]
-    ) -> InterpretedTransactionGroup:
-        root_method = transactions[0].method
-
-        if root_method == "deposit(uint256,uint256,address)":
-            return self.parse_deposit(transactions)
-
-        if root_method in ("claimRewards(uint256[])", "claimReward(uint256)"):
-            return self.parse_claim_reward(transactions)
-
-        if root_method == "withdraw(uint256,uint256,address)":
-            return self.parse_withdraw(transactions)
-
-        return InterpretedTransactionGroup(transactions)
-
-    def parse_withdraw(
-        self, transactions: List[WalletActivity]
-    ) -> InterpretedTransactionGroup:
-        relevant_txs = [x for x in transactions if x.is_sender or x.is_receiver]
-
-        cost_tx = relevant_txs[0]
-        claims_tx = [x for x in relevant_txs if x.coin_type.symbol == "VIPER"]
-        lp_get = next(x for x in relevant_txs if x.got_currency_symbol == "VENOM-LP")
-
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost(
-                [cost_tx, self._consolidate_claims(claims_tx), lp_get]
-            )
-        )
-
-    def parse_deposit(
-        self, transactions: List[WalletActivity]
-    ) -> InterpretedTransactionGroup:
-        # add liquidity and claim rewards
-        # everything after the first two is some kind of claim reward
-        # when you enter an LP position you had already entered, when
-        # you stake the position, you automatically claim rewards
-        deposit_tx = transactions[-1]
-        results = [
-            transactions[0],
-            deposit_tx,
-        ]
-
-        claim_txs = [x for x in transactions[1:-1] if x.is_sender or x.is_receiver]
-        if claim_txs:
-            results.append(self._consolidate_claims(claim_txs))
-
-        return InterpretedTransactionGroup(results)
-
-    def parse_claim_reward(
-        self, transactions: List[WalletActivity]
-    ) -> InterpretedTransactionGroup:
-        # claim rewards only
-        return InterpretedTransactionGroup(
-            [transactions[0], self._consolidate_claims(transactions[1:])]
-        )
-
-    def _consolidate_claims(self, claim_txs: List[WalletActivity]) -> WalletActivity:
-        plus_tx = [
-            x for x in claim_txs if x.is_receiver and x.got_currency_symbol == "VIPER"
-        ]
-        minus_tx = [
-            x for x in claim_txs if x.is_sender and x.got_currency_symbol == "VIPER"
-        ]
-
-        consolidated_tx = deepcopy(plus_tx[0])
-
-        delta = Decimal(
-            sum(x.got_amount for x in plus_tx) + sum(x.sent_amount for x in minus_tx)
-        )
-        consolidated_tx.coin_amount = delta
-        consolidated_tx.got_amount = delta
-
-        return consolidated_tx
 
 
 class ViperSwapXRewardsEditor(Editor):
@@ -151,9 +75,11 @@ class ViperSwapLiquidityEditor(UniswapDexEditor):
             transactions, self.VIPER_HRC20_ADDRESS, self.XVIPER_HRC20_ADDRESS
         )
 
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
-        )
+        trade_tx = self.consolidate_trade(o, i)
+        trade_tx.to_addr = root_tx.to_addr
+        trade_tx.from_addr = root_tx.from_addr
+
+        return InterpretedTransactionGroup(self.zero_non_root_cost([root_tx, trade_tx]))
 
     def parse_leave(
         self, transactions: List[WalletActivity]
@@ -165,6 +91,8 @@ class ViperSwapLiquidityEditor(UniswapDexEditor):
             transactions, self.XVIPER_HRC20_ADDRESS, self.VIPER_HRC20_ADDRESS
         )
 
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
-        )
+        trade_tx = self.consolidate_trade(o, i)
+        trade_tx.to_addr = root_tx.to_addr
+        trade_tx.from_addr = root_tx.from_addr
+
+        return InterpretedTransactionGroup(self.zero_non_root_cost([root_tx, trade_tx]))

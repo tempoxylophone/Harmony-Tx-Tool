@@ -62,7 +62,8 @@ class TransactionReportCreator:
                 date_format=self.DATE_FORMAT,
             )
             for x in events
-            if self.timestamp_is_in_bounds(x.timestamp) and not x.did_fail
+            if self.timestamp_is_in_bounds(x.timestamp)
+            and x.should_include_in_csv_export
         ]
 
         return parsed_events

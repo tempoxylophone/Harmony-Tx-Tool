@@ -1,4 +1,5 @@
-from typing import Literal
+from typing import Literal, Optional
+from decimal import Decimal
 from datetime import timezone, datetime
 
 from txtool.harmony import WalletActivity, HarmonyToken, HarmonyNFT
@@ -134,7 +135,7 @@ class TransactionCSVWrapper:
                 return ""
 
             _, coin_amount, usd_price = coin_choice
-            return str(coin_amount * (usd_price or 0))
+            return str(self._safe_mul(coin_amount, usd_price) or "")
 
         # regular send/receive
         token_quantity = (
@@ -154,7 +155,11 @@ class TransactionCSVWrapper:
             )
 
         token_usd_price = self._price_lookup[self.tx][coin_type]
-        return str(token_quantity * token_usd_price)
+        return str(self._safe_mul(token_quantity, token_usd_price) or "")
+
+    @staticmethod
+    def _safe_mul(a: Optional[Decimal], b: Optional[Decimal]) -> Decimal:
+        return (a or Decimal(0)) * (b or Decimal(0))
 
     @property
     def net_worth_currency(self) -> str:

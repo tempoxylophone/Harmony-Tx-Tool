@@ -28,7 +28,7 @@ class HarmonyToken(Token):  # pylint: disable=R0902
 
         symbol, decimals, name = HarmonyAPI.get_token_info(self.address.eth)
         self.name = name
-        self.symbol = symbol
+        self._symbol = symbol
         self.decimals = decimals
 
         # DEX stuff
@@ -36,10 +36,10 @@ class HarmonyToken(Token):  # pylint: disable=R0902
         self.lp_token_0: Union[HarmonyToken, None] = None
         self.lp_token_1: Union[HarmonyToken, None] = None
 
-        if self.symbol == "WONE":
+        if self._symbol == "WONE":
             # consider WONE and ONE equivalent by symbol
             if merge_one_wone_names:
-                self.symbol = NATIVE_TOKEN_SYMBOL
+                self._symbol = NATIVE_TOKEN_SYMBOL
         else:
             # if not a native currency, try to see if it an LP position
             self._set_is_lp_token_guess()
@@ -75,6 +75,18 @@ class HarmonyToken(Token):  # pylint: disable=R0902
 
         return addr_obj
 
+    @property
+    def symbol(self) -> str:
+        if self.is_lp_token and self.lp_token_1 and self.lp_token_0:
+            # need something to distinguish LP tokens of different address but
+            # that have the same name
+            return (
+                f"{self._symbol} "
+                f"({self.lp_token_0.universal_symbol}/{self.lp_token_1.universal_symbol})"
+            )
+
+        return self._symbol
+
     def _set_is_lp_token_guess(self) -> None:
         dex_info = self._VIPERSWAP.get_token_or_pair_info(self.address.eth)
 
@@ -86,15 +98,23 @@ class HarmonyToken(Token):  # pylint: disable=R0902
             pair_info = dex_info["pair"]
             tokn_info = dex_info["token"]
 
-            self.is_lp_token = self._is_pair(pair_info, tokn_info)
+            if self._is_pair(pair_info, tokn_info):
+                self.is_lp_token = True
 
-            if self.is_lp_token:
-                self.lp_token_0 = HarmonyToken.get_harmony_token_by_address(
-                    pair_info["token0"]["id"]
+                # get in alphabetical order by universal symbol
+                t0, t1 = sorted(
+                    (
+                        HarmonyToken.get_harmony_token_by_address(
+                            pair_info["token0"]["id"]
+                        ),
+                        HarmonyToken.get_harmony_token_by_address(
+                            pair_info["token1"]["id"]
+                        ),
+                    ),
+                    key=lambda x: x.universal_symbol,
                 )
-                self.lp_token_1 = HarmonyToken.get_harmony_token_by_address(
-                    pair_info["token1"]["id"]
-                )
+                self.lp_token_0 = t0
+                self.lp_token_1 = t1
 
     @staticmethod
     def _is_pair(pair_info: Dict, token_info: Dict) -> bool:
@@ -182,7 +202,7 @@ class HarmonyPlaceholderToken(Token):
 
         self._wrapped_token = wrapped_token
         self.name = placeholder_name
-        self.symbol = placeholder_symbol
+        self._symbol = placeholder_symbol
 
     @property
     def universal_symbol(self) -> str:
@@ -262,7 +282,7 @@ class HarmonyNFT(Token):
         self.collection = collection
         self.token_id = token_id
         self.koinly_nft_id = global_id
-        self.symbol = collection.symbol + " #" + str(self.token_id)
+        self._symbol = collection.symbol + " #" + str(self.token_id)
         self.history: Dict[str, Decimal] = {}
 
     @staticmethod

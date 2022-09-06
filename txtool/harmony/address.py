@@ -13,6 +13,7 @@ class BadAddressException(Exception):
 
 
 class HarmonyAddress:
+    _NULL_ETH_ADDR_STR = "0x0000000000000000000000000000000000000000"
     FORMAT_ETH: Literal["eth"] = "eth"
     FORMAT_ONE: Literal["one"] = "one"
     _HARMONY_BECH32_HRP = "one"
@@ -65,6 +66,10 @@ class HarmonyAddress:
     @property
     def one(self) -> str:
         return self.get_one_address()
+
+    @property
+    def is_null_address(self) -> bool:
+        return self.eth == self._NULL_ETH_ADDR_STR
 
     @classmethod
     def get_address_string_format(cls, address_string: str) -> str:

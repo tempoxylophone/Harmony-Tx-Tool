@@ -85,27 +85,32 @@ def test_lp_token_info() -> None:
     )
 
     token_object = HarmonyToken(token_address)
-    assert token_object.symbol == "VENOM-LP"
+    assert token_object.symbol == "VENOM-LP (ONE/USDC)"
     assert token_object.name == "Venom LP Token"
 
     assert token_object.is_lp_token
     assert not token_object.is_native_token
+
     assert isinstance(token_object.lp_token_0, HarmonyToken)
     assert isinstance(token_object.lp_token_1, HarmonyToken)
     assert not token_object.lp_token_0.is_lp_token
     assert not token_object.lp_token_1.is_lp_token
-    assert not token_object.lp_token_0.is_native_token
-    assert token_object.lp_token_1.is_native_token
-    assert token_object.lp_token_0.address.eth == Web3.toChecksumAddress(
+
+    # ONE
+    assert token_object.lp_token_0.is_native_token
+    # USDC
+    assert not token_object.lp_token_1.is_native_token
+
+    assert token_object.lp_token_1.address.eth == Web3.toChecksumAddress(
         "0x985458e523db3d53125813ed68c274899e9dfab4"
     )
-    assert token_object.lp_token_1.address.eth == Web3.toChecksumAddress(
+    assert token_object.lp_token_0.address.eth == Web3.toChecksumAddress(
         "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"
     )
-    assert token_object.lp_token_0.symbol == "1USDC"
-    assert token_object.lp_token_1.symbol == "ONE"
-    assert token_object.lp_token_0.universal_symbol == "USDC"
-    assert token_object.lp_token_1.universal_symbol == "ONE"
+    assert token_object.lp_token_1.symbol == "1USDC"
+    assert token_object.lp_token_0.symbol == "ONE"
+    assert token_object.lp_token_1.universal_symbol == "USDC"
+    assert token_object.lp_token_0.universal_symbol == "ONE"
 
     # random tx from explorer
     tx_hash = "0xd1501298d70e47ebb086fdbe04e4143e820da2d89509bcb9325b0463bd374151"
@@ -148,7 +153,7 @@ def test_lp_token_info() -> None:
 
     tx: WalletActivity = txs[0]
     assert float(tx.coin_amount) == 0.000057682787963833
-    assert tx.coin_type.symbol == "VENOM-LP"
+    assert tx.coin_type.symbol == "VENOM-LP (ONE/USDC)"
     assert tx.coin_type.is_lp_token
 
     price_data = DexPriceManager.get_price_data(txs)

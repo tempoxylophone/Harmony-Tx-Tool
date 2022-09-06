@@ -35,3 +35,7 @@ T_KOINLY_LABEL_RULESET = List[
 
 def noop(x: Any) -> Any:
     return x
+
+
+def before_parens(x: str) -> str:
+    return x.split("(", maxsplit=1)[0].strip()

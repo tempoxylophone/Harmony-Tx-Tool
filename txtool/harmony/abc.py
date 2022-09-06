@@ -12,7 +12,7 @@ class Token(ABC):
     ):
         self.address = address
         self.name = ""
-        self.symbol = ""
+        self._symbol = ""
         self.decimals = 0
         self.is_lp_token = False
 
@@ -36,6 +36,10 @@ class Token(ABC):
     @abstractmethod
     def get_native_token(cls) -> Token:  # pragma: no cover
         raise NotImplementedError
+
+    @property
+    def symbol(self) -> str:
+        return self._symbol
 
 
 class Transaction:  # pylint: disable=R0902,R0903

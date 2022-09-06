@@ -6,8 +6,9 @@ from txtool.activity.services.TranquilFinance import (
     TRANQUIL_COLLECT_REWARD_ADDRESSES,
 )
 from txtool.activity.services.ViperSwap import ViperSwapClaimRewardsEditor
+from txtool.activity.services.DefiKingdoms import DefiKingdomsClaimsEditor
 
-from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop
+from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop, before_parens
 from .constants import (
     TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
     CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
@@ -146,6 +147,54 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
             },
         ),
         (
+            "Unstake LP Position in Defi Kingdoms",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "withdraw(uint256,uint256,address)",
+                ),
+                "got_currency_symbol": ("==", before_parens, "JEWEL-LP"),
+                "from_addr_str": (
+                    "in",
+                    noop,
+                    DefiKingdomsClaimsEditor.CONTRACT_ADDRESSES,
+                ),
+            },
+        ),
+        (
+            "Stake LP Position in Defi Kingdoms",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "deposit(uint256,uint256,address)",
+                ),
+                "sent_currency_symbol": ("==", before_parens, "JEWEL-LP"),
+                "to_addr_str": (
+                    "in",
+                    noop,
+                    DefiKingdomsClaimsEditor.CONTRACT_ADDRESSES,
+                ),
+            },
+        ),
+        (
+            "Unstake LP Position in ViperSwap",
+            {
+                "method": (
+                    "==",
+                    noop,
+                    "withdraw(uint256,uint256,address)",
+                ),
+                "got_currency_symbol": ("==", before_parens, "VENOM-LP"),
+                "from_addr_str": (
+                    "in",
+                    noop,
+                    ViperSwapClaimRewardsEditor.CONTRACT_ADDRESSES,
+                ),
+            },
+        ),
+        (
             "Stake LP Position in ViperSwap",
             {
                 "method": (
@@ -153,7 +202,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                     noop,
                     "deposit(uint256,uint256,address)",
                 ),
-                "sent_currency_symbol": ("==", noop, "VENOM-LP"),
+                "sent_currency_symbol": ("==", before_parens, "VENOM-LP"),
                 "to_addr_str": (
                     "in",
                     noop,
@@ -164,13 +213,20 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         (
             "Exit LP Position",
             {
+                # when you trade out of an LP position
+                # LP Token -> Original Pair
                 "method": (
                     "in",
-                    lambda x: x.split("(", maxsplit=1)[0],
-                    ("removeLiquidity", "withdraw"),
+                    before_parens,
+                    ("removeLiquidity", "removeLiquidityETH"),
                 ),
                 "got_amount": (">", noop, 0),
                 "got_currency_is_lp_token": (
+                    "==",
+                    noop,
+                    False,
+                ),
+                "sent_currency_is_lp_token": (
                     "==",
                     noop,
                     True,
@@ -256,7 +312,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "sent_amount": (">", noop, 0),
                 "got_amount": (">", noop, 0),
                 "got_currency_symbol": ("==", lambda x: str(x)[:2], "tq"),
-                "method": ("in", lambda x: str(x).split("(", maxsplit=1)[0], "mint"),
+                "method": ("in", before_parens, "mint"),
                 "to_addr_str": (
                     "in",
                     noop,
@@ -314,14 +370,18 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "tx_fee_in_native_token": (">", noop, 0),
             },
         ),
-            (
+        (
             "Horizon Bridge fee",
             {
                 "sent_amount": (">", noop, 0),
-                "to_addr_str": ("==", noop, "0x8139d578f11638C78E16685EB2804c2a34482E41"),
-                "method": ("==", noop, "deposit(uint256)")
+                "to_addr_str": (
+                    "==",
+                    noop,
+                    "0x8139d578f11638C78E16685EB2804c2a34482E41",
+                ),
+                "method": ("==", noop, "deposit(uint256)"),
             },
-        )
+        ),
     ],
     KoinlyLabel.INCOME: [
         (
@@ -350,7 +410,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
                 "got_currency_symbol": ("==", noop, "VIPER"),
-                "method": ("==", noop, "unlock()")
+                "method": ("==", noop, "unlock()"),
             },
         ),
         (
@@ -389,16 +449,22 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 ),
                 "is_receiver": ("==", noop, True),
                 "got_amount": (">", noop, 0),
-                "method": (
+                "got_currency_symbol": ("==", noop, "VIPER"),
+                "method": ("in", noop, ViperSwapClaimRewardsEditor.METHODS),
+            },
+        ),
+        (
+            "Claim JEWEL rewards",
+            {
+                "from_addr_str": (
                     "in",
                     noop,
-                    (
-                        "claimReward(uint256)",
-                        "claimRewards(uint256[])",
-                        "deposit(uint256,uint256,address)",
-                        "withdraw(uint256,uint256,address)",
-                    ),
+                    DefiKingdomsClaimsEditor.CONTRACT_ADDRESSES,
                 ),
+                "got_currency_symbol": ("==", noop, "JEWEL"),
+                "is_receiver": ("==", noop, True),
+                "got_amount": (">", noop, 0),
+                "method": ("in", noop, DefiKingdomsClaimsEditor.METHODS),
             },
         ),
     ],

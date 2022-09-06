@@ -1,11 +1,97 @@
 from typing import List
 from decimal import Decimal
+from copy import deepcopy
 
 from txtool.harmony import (
     HarmonyToken,
     WalletActivity,
 )
 from .common import Editor, InterpretedTransactionGroup
+
+
+class MasterChefDexEditor(Editor):
+    # anything that looks like this:
+    # https://github.com/sushiswap/sushiswap/blob/913076f9c02b8f3bc0d2dfefb59853d86d6e9e17/contracts/MasterChef.sol
+    CONTRACT_ADDRESSES: List[str] = []
+    GOV_TOKEN_SYMBOL = ""
+    LP_TOKEN_SYMBOL_PREFIX = ""
+    _HANDLERS = {
+        "deposit(uint256,uint256,address)": "parse_deposit",
+        "claimRewards(uint256[])": "parse_claim_reward",
+        "claimReward(uint256)": "parse_claim_reward",
+        "withdraw(uint256,uint256,address)": "parse_withdraw",
+    }
+    METHODS = list(_HANDLERS)  # keys only
+
+    def parse_withdraw(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        relevant_txs = [x for x in transactions if x.is_sender or x.is_receiver]
+
+        cost_tx = relevant_txs[0]
+        claims_tx = [
+            x for x in relevant_txs if x.coin_type.symbol == self.GOV_TOKEN_SYMBOL
+        ]
+        lp_get = next(
+            x
+            for x in relevant_txs
+            if x.got_currency_symbol.startswith(self.LP_TOKEN_SYMBOL_PREFIX)
+        )
+
+        return InterpretedTransactionGroup(
+            self.zero_non_root_cost(
+                [cost_tx, self._consolidate_claims(claims_tx), lp_get]
+            )
+        )
+
+    def parse_deposit(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # add liquidity and claim rewards
+        # everything after the first two is some kind of claim reward
+        # when you enter an LP position you had already entered, when
+        # you stake the position, you automatically claim rewards
+        deposit_tx = transactions[-1]
+        results = [
+            transactions[0],
+            deposit_tx,
+        ]
+
+        claim_txs = [x for x in transactions[1:-1] if x.is_sender or x.is_receiver]
+        if claim_txs:
+            results.append(self._consolidate_claims(claim_txs))
+
+        return InterpretedTransactionGroup(results)
+
+    def parse_claim_reward(
+        self, transactions: List[WalletActivity]
+    ) -> InterpretedTransactionGroup:
+        # claim rewards only
+        return InterpretedTransactionGroup(
+            [transactions[0], self._consolidate_claims(transactions[1:])]
+        )
+
+    def _consolidate_claims(self, claim_txs: List[WalletActivity]) -> WalletActivity:
+        plus_tx = [
+            x
+            for x in claim_txs
+            if x.is_receiver and x.got_currency_symbol == self.GOV_TOKEN_SYMBOL
+        ]
+        minus_tx = [
+            x
+            for x in claim_txs
+            if x.is_sender and x.got_currency_symbol == self.GOV_TOKEN_SYMBOL
+        ]
+
+        consolidated_tx = deepcopy(plus_tx[0])
+
+        delta = Decimal(
+            sum(x.got_amount for x in plus_tx) + sum(x.sent_amount for x in minus_tx)
+        )
+        consolidated_tx.coin_amount = delta
+        consolidated_tx.got_amount = delta
+
+        return consolidated_tx
 
 
 class UniswapDexEditor(Editor):
@@ -50,12 +136,15 @@ class UniswapDexEditor(Editor):
         )
 
         # zero out cost transaction
-        root_tx.got_amount = Decimal(0)
-        root_tx.sent_amount = Decimal(0)
-        root_tx.coin_amount = Decimal(0)
+        root_tx = self.zero_root_amounts(root_tx)
 
         return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, self.consolidate_trade(o, i)])
+            self.zero_non_root_cost(
+                [
+                    root_tx,
+                    self.consolidate_trade_with_root(root_tx, o, i),
+                ]
+            )
         )
 
     def parse_swap_exact_tokens_for_eth(
@@ -73,11 +162,11 @@ class UniswapDexEditor(Editor):
             args["path"][0],
             args["path"][-1],
         )
-        trade_tx = self.consolidate_trade(o, i)
-        trade_tx.to_addr = root_tx.to_addr
 
         return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, trade_tx])
+            self.zero_non_root_cost(
+                [root_tx, self.consolidate_trade_with_root(root_tx, o, i)]
+            )
         )
 
     def parse_swap_exact_tokens_for_tokens(
@@ -96,11 +185,10 @@ class UniswapDexEditor(Editor):
             args["path"][-1],
         )
 
-        trade_tx = self.consolidate_trade(o, i)
-        trade_tx.to_addr = root_tx.to_addr
-
         return InterpretedTransactionGroup(
-            self.zero_non_root_cost([root_tx, trade_tx])
+            self.zero_non_root_cost(
+                [root_tx, self.consolidate_trade_with_root(root_tx, o, i)]
+            )
         )
 
     def parse_add_liquidity_eth(
@@ -127,20 +215,46 @@ class UniswapDexEditor(Editor):
         receive_lp_tx_1, receive_lp_tx_2 = self.split_copy(receive_lp_tx_1, 2)
 
         # root transaction over-counts what you added to LP
-        root_tx.coin_amount = Decimal(0)
-        root_tx.sent_amount = Decimal(0)
-        root_tx.got_amount = Decimal(0)
-
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost(
-                [
-                    # the root txc still holds the fee
-                    root_tx,
-                    self.consolidate_trade(send_1, receive_lp_tx_1),
-                    self.consolidate_trade(send_2, receive_lp_tx_2),
-                ]
-            )
+        root_tx = self.zero_root_amounts(root_tx)
+        results = self.zero_non_root_cost(
+            [
+                # the root txc still holds the fee
+                root_tx,
+                self.consolidate_trade_with_root(root_tx, send_1, receive_lp_tx_1),
+                self.consolidate_trade_with_root(root_tx, send_2, receive_lp_tx_2),
+            ]
         )
+
+        # if pair of LP token is not known, use this transaction to set
+        # what the pair would be
+        lp_token = receive_lp_tx_1.coin_type
+
+        if not isinstance(lp_token, HarmonyToken):
+            raise RuntimeError(f"TX: {root_tx} got invalid LP Token: {lp_token}")
+
+        if not (lp_token.lp_token_0 and lp_token.lp_token_1):
+            # always get transactions in alphabetical order by token symbol
+            lp_tx_1, lp_tx_2 = sorted(
+                results[1:],
+                key=lambda x: x.sent_currency
+                and x.sent_currency.universal_symbol
+                or "",
+            )
+
+            if not (
+                isinstance(lp_tx_2.sent_currency, HarmonyToken)
+                and isinstance(lp_tx_1.sent_currency, HarmonyToken)
+            ):
+                raise RuntimeError(
+                    "TX: {0} got invalid LP Token Pairs: ({1}/{2})".format(
+                        root_tx, lp_tx_1.sent_currency, lp_tx_2.sent_currency
+                    )
+                )
+
+            lp_token.lp_token_0 = lp_tx_1.sent_currency
+            lp_token.lp_token_1 = lp_tx_2.sent_currency
+
+        return InterpretedTransactionGroup(results)
 
     def parse_add_liquidity(
         self, transactions: List[WalletActivity]
@@ -165,8 +279,8 @@ class UniswapDexEditor(Editor):
                 [
                     # the root txc still holds the fee
                     root_tx,
-                    self.consolidate_trade(send_1, receive_lp_tx_1),
-                    self.consolidate_trade(send_2, receive_lp_tx_2),
+                    self.consolidate_trade_with_root(root_tx, send_1, receive_lp_tx_1),
+                    self.consolidate_trade_with_root(root_tx, send_2, receive_lp_tx_2),
                 ]
             )
         )
@@ -193,8 +307,8 @@ class UniswapDexEditor(Editor):
             self.zero_non_root_cost(
                 [
                     root_tx,
-                    self.consolidate_trade(lp_send_tx_1, get_1),
-                    self.consolidate_trade(lp_send_tx_2, get_2),
+                    self.consolidate_trade_with_root(root_tx, lp_send_tx_1, get_1),
+                    self.consolidate_trade_with_root(root_tx, lp_send_tx_2, get_2),
                 ]
             )
         )
@@ -219,12 +333,38 @@ class UniswapDexEditor(Editor):
             transactions, token_1_address, token_2_address
         )
 
-        return InterpretedTransactionGroup(
-            self.zero_non_root_cost(
-                [
-                    root_tx,
-                    self.consolidate_trade(lp_send_tx_1, get_1),
-                    self.consolidate_trade(lp_send_tx_2, get_2),
-                ]
-            )
+        results = self.zero_non_root_cost(
+            [
+                root_tx,
+                self.consolidate_trade_with_root(root_tx, lp_send_tx_1, get_1),
+                self.consolidate_trade_with_root(root_tx, lp_send_tx_2, get_2),
+            ]
         )
+
+        # if pair of LP token is not known, use this transaction to set
+        # what the pair would be
+        lp_token = lp_send_tx_1.coin_type
+        if not isinstance(lp_token, HarmonyToken):
+            raise RuntimeError(f"TX: {root_tx} got invalid LP Token: {lp_token}")
+
+        if not (lp_token.lp_token_0 and lp_token.lp_token_1):
+            # always get transactions in alphabetical order by token symbol
+            lp_tx_1, lp_tx_2 = sorted(
+                results[1:],
+                key=lambda x: x.got_currency and x.got_currency.universal_symbol or "",
+            )
+
+            if not (
+                isinstance(lp_tx_2.got_currency, HarmonyToken)
+                and isinstance(lp_tx_1.got_currency, HarmonyToken)
+            ):
+                raise RuntimeError(
+                    "TX: {0} got invalid LP Token Pairs: ({1}/{2})".format(
+                        root_tx, lp_tx_1.got_currency, lp_tx_2.got_currency
+                    )
+                )
+
+            lp_token.lp_token_0 = lp_tx_1.got_currency
+            lp_token.lp_token_1 = lp_tx_2.got_currency
+
+        return InterpretedTransactionGroup(results)

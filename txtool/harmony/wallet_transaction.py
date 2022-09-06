@@ -58,6 +58,15 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             and self.got_currency != self.sent_currency
         )
 
+    @property
+    def should_include_in_csv_export(self) -> bool:
+        # maybe better idea to pass a function to csv_creator where
+        # you can define the properties that would cause a tx to be
+        # omitted from export...
+
+        # do not include failed / reverted transactions
+        return not self.did_fail
+
     def _get_action(self) -> WalletAction:
         if self.is_receiver:
             return WalletAction.PAYMENT if self._is_payment() else WalletAction.DEPOSIT

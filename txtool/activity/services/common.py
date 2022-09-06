@@ -69,6 +69,20 @@ class Editor:
 
         return get_tx
 
+    def consolidate_trade_with_root(
+        self, root_tx: WalletActivity, give_tx: WalletActivity, get_tx: WalletActivity
+    ) -> WalletActivity:
+        trade_tx = self.consolidate_trade(give_tx, get_tx)
+        trade_tx.to_addr = root_tx.to_addr
+        trade_tx.from_addr = root_tx.from_addr
+        return trade_tx
+
+    def zero_root_amounts(self, root_tx: WalletActivity) -> WalletActivity:
+        root_tx.coin_amount = Decimal(0)
+        root_tx.sent_amount = Decimal(0)
+        root_tx.got_amount = Decimal(0)
+        return root_tx
+
     def zero_non_root_cost(
         self, transactions: List[WalletActivity]
     ) -> List[WalletActivity]:
