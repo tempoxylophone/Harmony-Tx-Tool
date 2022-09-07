@@ -1,5 +1,3 @@
-from typing import Dict
-
 from txtool.activity.services.TranquilFinance import (
     TranquilFinanceStakingEditor,
     TRANQUIL_DEPOSIT_COLLATERAL_ADDRESSES,
@@ -8,13 +6,15 @@ from txtool.activity.services.TranquilFinance import (
 from txtool.activity.services.ViperSwap import ViperSwapClaimRewardsEditor
 from txtool.activity.services.DefiKingdoms import DefiKingdomsClaimsEditor
 
-from .types import T_KOINLY_LABEL_RULESET, KoinlyLabel, noop, before_parens
-from .constants import (
+from ...common import T_LABEL_RULESET, noop, before_parens
+from ...constants import (
     TOKEN_JENNY_GEM_MINE_CONTRACT_ADDRESS_STR,
-    CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR,
+    CURVE_REWARD_GAUGE_DEPOSIT_CONTRACT_ADDRESS_STR
 )
 
-KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
+from .types import KoinlyLabel
+
+KOINLY_LABEL_RULES: T_LABEL_RULESET = {
     KoinlyLabel.SWAP: [
         (
             "unwrap wsWAGMI to become sWAGMI",

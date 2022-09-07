@@ -1,10 +1,10 @@
 from decimal import Decimal
 
 from txtool.harmony import HarmonyAddress
-from txtool.koinly import get_label_for_tx_and_description, KoinlyLabel
+from txtool.tax.koinly import get_label_for_tx_and_description, KoinlyLabel
 from txtool.activity import get_interpreted_transactions
 
-from txtool.koinly.ruleset.constants import (
+from txtool.tax.constants import (
     TRANQUIL_FINANCE_COMPTROLLER_CONTRACT_ADDRESS_STR,
 )
 

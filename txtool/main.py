@@ -4,7 +4,7 @@ from eth_typing import HexStr
 
 from .harmony import HarmonyAPI, HarmonyAddress, WalletActivity
 from .activity.interpreter import get_interpreted_transactions
-from .koinly import KoinlyReportCreator
+from .tax.koinly import KoinlyReportCreator
 
 from .utils import MAIN_LOGGER, make_red
 

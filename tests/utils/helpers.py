@@ -1,7 +1,7 @@
 from typing import List
 
 from txtool.harmony import WalletActivity, HarmonyAddress
-from txtool.koinly import is_cost
+from txtool.tax.koinly import is_cost
 
 
 def get_non_cost_transactions_from_txt_hash(

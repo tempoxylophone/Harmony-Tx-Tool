@@ -1,5 +1,5 @@
 from datetime import timezone
-from txtool.koinly import KoinlyReportCreator
+from txtool.tax.koinly import KoinlyReportCreator
 
 
 def test_koinly_tracked_currency() -> None:

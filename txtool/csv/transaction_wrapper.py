@@ -7,7 +7,7 @@ from txtool.harmony import WalletActivity, HarmonyToken, HarmonyNFT
 from txtool.harmony.constants import NATIVE_TOKEN_SYMBOL
 
 from txtool.fiat.get_prices import T_PRICE_DATA_DICT
-from txtool.koinly.ruleset.fixes import KOINLY_UNSUPPORTED_COIN_NAMES
+from txtool.tax.koinly.ruleset.fixes import KOINLY_UNSUPPORTED_COIN_NAMES
 
 
 class TransactionCSVWrapper:
