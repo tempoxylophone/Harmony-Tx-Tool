@@ -384,6 +384,8 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
         ),
     ],
     KoinlyLabel.INCOME: [
+    ],
+    KoinlyLabel.REWARD: [
         (
             "Got JENN from gem mine",
             {
@@ -396,9 +398,7 @@ KOINLY_LABEL_RULES: Dict[KoinlyLabel, T_KOINLY_LABEL_RULESET] = {
                 "got_amount": (">", noop, 0),
                 "got_currency_symbol": ("==", noop, "JENN"),
             },
-        )
-    ],
-    KoinlyLabel.REWARD: [
+        ),
         (
             "Unlock locked VIPER",
             {
