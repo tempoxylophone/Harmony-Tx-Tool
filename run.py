@@ -3,7 +3,7 @@ import logging
 import argparse
 
 from txtool.main import get_harmony_tx_from_wallet_as_csv
-from txtool.koinly import KoinlyReportCreator
+from txtool.tax.koinly import KoinlyReportCreator
 from txtool.utils import MAIN_LOGGER
 
 LOG_LEVELS = {"error": logging.ERROR, "info": logging.INFO, "debug": logging.DEBUG}
