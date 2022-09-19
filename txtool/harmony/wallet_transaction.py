@@ -7,7 +7,6 @@ from copy import deepcopy
 from eth_typing import HexStr
 from web3.types import EventData
 
-from txtool.dfk.constants import HARMONY_TOKEN_ADDRESS_MAP, DFK_PAYMENT_WALLET_ADDRESSES
 from txtool.utils import MAIN_LOGGER
 
 from .token import HarmonyToken, Token, HarmonyNFT, HarmonyNFTCollection
@@ -69,14 +68,10 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
 
     def _get_action(self) -> WalletAction:
         if self.is_receiver:
-            return WalletAction.PAYMENT if self._is_payment() else WalletAction.DEPOSIT
+            return WalletAction.DEPOSIT
 
         if self.is_sender:
-            return (
-                WalletAction.DONATION
-                if self._is_donation()
-                else WalletAction.WITHDRAWAL
-            )
+            return WalletAction.WITHDRAWAL
 
         # unknown
         return WalletAction.NULL
@@ -95,14 +90,6 @@ class WalletActivity(HarmonyEVMTransaction):  # pylint: disable=R0902
             self.sent_currency = self.coin_type
             self.got_amount = Decimal(0)
             self.got_currency = None
-
-    def _is_payment(self) -> bool:
-        return self.from_addr.eth in DFK_PAYMENT_WALLET_ADDRESSES
-
-    def _is_donation(self) -> bool:
-        return bool(self.to_addr) and "Donation" in HARMONY_TOKEN_ADDRESS_MAP.get(
-            self.to_addr.eth, ""
-        )
 
     @classmethod
     def extract_all_wallet_activity_from_transaction(
